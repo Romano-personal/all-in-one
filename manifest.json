@@ -1,6 +1,6 @@
 {
   "name": "Spidey Tracker",
-  "short_name": "Tracker",
+  "short_name": "A.T.L.A.S",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#040814",
