@@ -1,502 +1,721 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>E.D.I.T.H // Minimal Red</title>
+  <title>SPIDEY TRACKER // BRAND NEW DAY</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#040814">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Premium Fonts: Outfit (UI) & JetBrains Mono (Numbers/Clock) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700;800&family=Orbitron:wght@700;800;900&family=Press+Start+2P&family=Noto+Sans+TC:wght@700;900&family=DotGothic16&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
-      --primary-red: #FF2E4D;
-      --primary-red-light: #FF4E6B;
-      --primary-red-soft: #FFF0F2;
-      --text-main: #141416;
-      --text-muted: #777E90;
-      --bg-white: #FFFFFF;
-      --bg-soft: #FAFAFC;
-      --glow-color: rgba(255, 46, 77, 0.4);
-      --glow-color-strong: rgba(255, 46, 77, 0.65);
+      --spidey-blue-dark: #071f40;
+      --spidey-blue-mid: #145ca8;
+      --spidey-blue-light: #2b7dd9;
+      --spidey-blue-highlight: #5aa4f8;
+      --spidey-screen-bg: #030e1d;
+      --spidey-screen-glass: #061933;
+      --spidey-red: #e62429;
+      --spidey-red-dark: #8c0e12;
+      --spidey-red-glow: #ff474d;
+      --spidey-amber: #f59e0b;
+      --spidey-amber-light: #fbbf24;
+      --spidey-amber-dark: #78350f;
+      --spidey-green: #10b981;
+      --spidey-green-dark: #064e3b;
+      --spidey-cyan: #38bdf8;
     }
-
-    * { box-sizing: border-box; }
 
     body {
-      margin: 0;
-      background-color: var(--bg-white);
-      color: var(--text-main);
-      /* 加入 Noto Sans TC 確保中文科目顯示漂亮 */
-      font-family: 'Outfit', 'Noto Sans TC', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      line-height: 1.5;
-      overflow-x: hidden;
+      font-family: 'Chakra Petch', 'Orbitron', 'Noto Sans TC', sans-serif;
+      font-weight: 800;
+      background-color: #040814;
+      background-image: 
+        radial-gradient(1px 1px at 20px 30px, #ffffff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 100px 150px, #38bdf8 100%, transparent),
+        radial-gradient(1px 1px at 240px 70px, #ffffff 100%, transparent),
+        radial-gradient(2px 2px at 320px 220px, #fbbf24 100%, transparent),
+        radial-gradient(1px 1px at 450px 110px, #ffffff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 580px 290px, #38bdf8 100%, transparent),
+        radial-gradient(circle at 50% 15%, rgba(13, 56, 120, 0.28) 0%, transparent 70%);
+      background-size: 550px 550px;
+      color: #cbd5e1;
+      min-height: 100vh;
     }
 
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: -0.02em;
-    }
-
-    /* Soft background glow */
-    .bg-glow {
-      position: fixed;
-      top: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255, 46, 77, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .kyodo-case {
-      background: var(--bg-white);
+    /* Handheld Spidey Tracker Bezel */
+    .spidey-case {
+      background: linear-gradient(180deg, #1d69bc 0%, #124e94 50%, #0c3b74 100%);
+      border: 4px solid #06162e;
+      border-radius: 18px;
+      box-shadow: 
+        inset 3px 3px 0px #5aa4f8,
+        inset -3px -3px 0px #082852,
+        0 10px 35px rgba(0, 0, 0, 0.85);
       position: relative;
-      max-width: 900px;
-      margin: 0 auto;
-      z-index: 1;
     }
 
-    .kyodo-panel {
-      background: var(--bg-white);
-      border: 1px solid #F1F1F5;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-      transition: all 0.3s ease;
-    }
-
-    /* Buttons */
-    .btn-glow {
-      position: relative;
-      background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
-      color: #FFFFFF !important;
-      font-weight: 700;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 8px 24px var(--glow-color), 0 2px 6px rgba(255, 46, 77, 0.2);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-glow:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px var(--glow-color-strong), 0 4px 10px rgba(255, 46, 77, 0.3);
-      filter: brightness(1.05);
-    }
-    .btn-glow:active { transform: translateY(0); box-shadow: 0 4px 16px var(--glow-color); }
-    .btn-glow * { pointer-events: none; }
-    .btn-glow:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .btn-secondary {
-      background-color: var(--bg-white);
-      color: var(--text-main);
-      font-weight: 700;
-      border-radius: 999px;
-      border: 1px solid #E6E8EC;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-    .btn-secondary:hover { background-color: var(--bg-soft); border-color: #D1D5DB; }
-    .btn-secondary * { pointer-events: none; }
-
-    /* Tags & Tabs */
-    .spidey-item-btn, .spidey-tab-btn {
-      background: var(--bg-white);
-      color: var(--text-muted);
-      border: 1px solid #E6E8EC;
+    /* LCD Screen Inset Frame */
+    .spidey-screen {
+      background: #030e1d;
+      border: 3px solid #08264d;
       border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      cursor: pointer;
+      box-shadow: 
+        inset 0 0 25px rgba(0, 20, 60, 0.9),
+        inset 2px 2px 0px #04142b,
+        0 2px 4px rgba(0, 0, 0, 0.5);
+      position: relative;
     }
-    .spidey-tab-btn { border-radius: 16px; border: none; background: transparent; }
-    
-    .spidey-item-btn:hover, .spidey-tab-btn:hover { background: var(--bg-soft); color: var(--text-main); }
-    
-    .spidey-item-active {
-      background: var(--primary-red-soft) !important;
-      color: var(--primary-red) !important;
-      border-color: rgba(255, 46, 77, 0.2) !important;
-      font-weight: 700;
+
+    /* Scanline overlay for screen */
+    .spidey-screen::before {
+      content: " ";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      opacity: 0.35;
+      z-index: 2;
+      border-radius: 9px;
     }
-    
-    .spidey-tab-active {
-      background: var(--bg-white) !important;
-      color: var(--primary-red) !important;
-      box-shadow: 0 4px 14px rgba(255, 46, 77, 0.1);
+
+    /* Sub-panels inside screen */
+    .spidey-panel {
+      background: rgba(5, 23, 49, 0.75);
+      border: 1.5px solid #133f73;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    /* Typography Utilities: Authentic 8-bit & 16-bit Retro Pixel Fonts */
+    .font-pixel, [class*="font-pixel"] {
+      font-family: 'Press Start 2P', 'DotGothic16', monospace !important;
+      letter-spacing: 0.05em;
+    }
+    .font-pixel-num {
+      font-family: 'Press Start 2P', monospace !important;
+      letter-spacing: 0.04em;
+    }
+    .font-pixel-zh {
+      font-family: 'DotGothic16', 'Noto Sans TC', sans-serif !important;
+      font-weight: 900 !important;
+    }
+    .font-subpixel {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    /* Top Console Deck Strictly Uses Pixel Font */
+    .top-console-pixel, .top-console-pixel span, .top-console-pixel div, .top-console-pixel button {
+      font-family: 'Press Start 2P', 'DotGothic16', monospace !important;
+    }
+
+    /* Global Chunky Bold English & Solid Chinese Typography across remaining UI Controls */
+    body, input, select, textarea, label, h1, h2, h3, h4, th, td, .btn-text, .spidey-item-btn {
+      font-family: 'Chakra Petch', 'Orbitron', 'Noto Sans TC', 'DotGothic16', sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    /* Buttons default to bold, unless explicitly designated pixel font */
+    button:not(.font-pixel):not([class*="font-pixel"]) {
+      font-family: 'Chakra Petch', 'Orbitron', 'Noto Sans TC', 'DotGothic16', sans-serif;
       font-weight: 800;
     }
 
-    /* Inputs */
-    .spidey-input {
-      background: var(--bg-soft);
-      border: 1px solid #E6E8EC;
-      color: var(--text-main);
-      border-radius: 10px;
+    /* Preserve Font Awesome icons */
+    i[class*="fa-"] {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      font-weight: 900 !important;
+    }
+
+    /* Dedicated Numeric Pixel Font */
+    .font-pixel-num, [id*="Coords"], [id*="Fps"], .num-pixel {
+      font-family: 'Press Start 2P', monospace !important;
+      letter-spacing: 0.04em;
+    }
+
+    /* Pixelated image and canvas rendering */
+    canvas.pixelated, .pixelated {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Retro Pixel / Arcade Buttons - Thick, wide, chunky */
+    .btn-pixel {
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      font-family: 'Chakra Petch', 'Orbitron', 'Noto Sans TC', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: 6px;
+      transition: all 0.08s ease-in-out;
       outline: none;
-      transition: all 0.2s ease;
-      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-pixel * { pointer-events: none; }
+    .btn-pixel:active {
+      transform: translateY(2px);
+    }
+
+    /* Amber / Orange Spidey Button */
+    .btn-orange {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+      border: 2px solid #451a03;
+      box-shadow: inset 1.5px 1.5px 0px #fde68a, inset -1.5px -1.5px 0px #92400e, 0 2.5px 0px #451a03;
+      color: #ffffff;
+      text-shadow: 1px 1px 0px #78350f;
+    }
+    .btn-orange:hover { background: linear-gradient(180deg, #fbbf24 0%, #ea580c 100%); }
+    .btn-orange:active { box-shadow: inset 2px 2px 0px #78350f; }
+
+    /* Green Spidey Button */
+    .btn-green {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      border: 2px solid #022c22;
+      box-shadow: inset 1.5px 1.5px 0px #a7f3d0, inset -1.5px -1.5px 0px #047857, 0 2.5px 0px #022c22;
+      color: #ffffff;
+      text-shadow: 1px 1px 0px #064e3b;
+    }
+    .btn-green:hover { background: linear-gradient(180deg, #34d399 0%, #059669 100%); }
+    .btn-green:active { box-shadow: inset 2px 2px 0px #064e3b; }
+
+    /* Red Spidey Button */
+    .btn-red {
+      background: linear-gradient(180deg, #e62429 0%, #b91c1c 100%);
+      border: 2px solid #450a0a;
+      box-shadow: inset 1.5px 1.5px 0px #fca5a5, inset -1.5px -1.5px 0px #991b1b, 0 2.5px 0px #450a0a;
+      color: #ffffff;
+      text-shadow: 1px 1px 0px #7f1d1d;
+    }
+    .btn-red:hover { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); }
+    .btn-red:active { box-shadow: inset 2px 2px 0px #7f1d1d; }
+
+    /* Blue Tech Button */
+    .btn-blue {
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      border: 2px solid #0f172a;
+      box-shadow: inset 1.5px 1.5px 0px #93c5fd, inset -1.5px -1.5px 0px #1e40af, 0 2.5px 0px #0f172a;
+      color: #ffffff;
+      text-shadow: 1px 1px 0px #1e3a8a;
+    }
+    .btn-blue:hover { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); }
+
+    /* Tab navigation buttons */
+    .spidey-tab-btn {
+      background: #082245;
+      border: 2px solid #14467d;
+      color: #7dd3fc;
+      box-shadow: inset 1px 1px 0 #1b589c, 0 2px 0 #041326;
+      font-family: 'Chakra Petch', 'Noto Sans TC', sans-serif !important;
+      letter-spacing: normal;
+    }
+    .spidey-tab-btn:hover:not(.spidey-tab-active) {
+      background: #0c3163;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    .spidey-tab-active {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
+      border-color: #451a03 !important;
+      color: #ffffff !important;
+      box-shadow: inset 1.5px 1.5px 0px #fde68a, inset -1.5px -1.5px 0px #92400e, 0 2px 0px #451a03 !important;
+      text-shadow: 1px 1px 0px #78350f;
+    }
+
+    /* Tag / Selector Items */
+    .spidey-item-btn {
+      background: #071c38;
+      border: 1.5px solid #17457a;
+      color: #93c5fd;
+      border-radius: 5px;
+      font-size: 11px;
+      padding: 5px 9px;
+      transition: all 0.1s;
+      outline: none;
+    }
+    .spidey-item-btn:hover:not(.spidey-item-active) {
+      border-color: #38bdf8;
+      color: #ffffff;
+      background: #0c2b54;
+    }
+    .spidey-item-active {
+      background: linear-gradient(180deg, #e62429 0%, #b91c1c 100%) !important;
+      border-color: #fca5a5 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 8px rgba(230, 36, 41, 0.6) !important;
+    }
+
+    /* Inputs & Selects styled as LCD screens */
+    .spidey-input {
+      background: #020914;
+      border: 2px solid #14467d;
+      color: #e2e8f0;
+      border-radius: 6px;
+      font-family: 'Chakra Petch', 'Noto Sans TC', monospace;
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
     .spidey-input:focus {
-      background: var(--bg-white);
-      border-color: var(--primary-red);
-      box-shadow: 0 0 0 3px var(--primary-red-soft);
+      border-color: #f59e0b;
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(245, 158, 11, 0.4);
     }
-    .spidey-input::placeholder { color: #A0A4AB; font-weight: 400; }
+    .spidey-input::placeholder { color: #475569; }
 
-    /* Scrollbar */
+    /* Pulsing & animations */
+    @keyframes radar-pulse {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.85); opacity: 0.9; }
+    }
+    .radar-ping { animation: radar-pulse 2s infinite ease-in-out; }
+
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px;}
-    .custom-scroll::-webkit-scrollbar-track { background: var(--bg-soft); border-radius: 10px;}
-    .custom-scroll::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
 
-    /* Modal & Toast */
-    #toast {
-      background: rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(8px);
-      border: 1px solid #F1F1F5 !important;
-      color: var(--text-main) !important;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-      border-radius: 999px;
-      font-weight: 700;
-    }
+    /* Timetable Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #030d1a; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #1e4b82; border-radius: 3px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
   </style>
 </head>
 <body class="p-2 sm:p-5 flex justify-center items-start">
-  <div class="bg-glow"></div>
 
-  <!-- ==================== KYODO TRACKER CONTAINER ==================== -->
-  <div class="w-full max-w-xl kyodo-case p-1 my-1 space-y-4">
+  <!-- ==================== SPIDEY TRACKER CONTAINER ==================== -->
+  <div class="w-full max-w-xl spidey-case p-2.5 sm:p-4 my-1">
     
-    <!-- TOP HEADER -->
-    <header class="flex items-center justify-between gap-3 px-3 py-2 select-none">
-      <!-- Left: Uplink -->
-      <button onclick="pingSatellite()" class="flex items-center gap-3 hover:opacity-70 transition cursor-pointer active:scale-95 text-left border-none bg-transparent p-0 outline-none shrink-0">
-        <div class="w-10 h-10 bg-[#FFF0F2] text-[#FF2E4D] rounded-full flex items-center justify-center pointer-events-none">
-          <i class="fa-solid fa-satellite text-sm" id="satLinkPing"></i>
+    <!-- TOP BEZEL: SLEEK TACTICAL CYBER CONSOLE DECK (PIXEL FONT) -->
+    <div class="top-console-pixel font-pixel flex items-center justify-between gap-1.5 sm:gap-2 px-2 py-1.5 bg-[#031124] border border-[#13437c] rounded-lg mb-2.5 shadow-inner select-none">
+      
+      <!-- Left: Uplink Deck (SAT-II) with Cyber Signal -->
+      <button onclick="pingSatellite()" class="flex items-center gap-1.5 sm:gap-2 text-[#38bdf8] hover:brightness-125 transition cursor-pointer active:scale-95 text-left border-none bg-transparent p-0 outline-none shrink-0">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#051a36] border border-[#1d6fc2] rounded flex items-center justify-center shadow-inner pointer-events-none">
+          <i class="fa-solid fa-satellite text-xs text-[#38bdf8] animate-pulse"></i>
         </div>
         <div class="leading-none pointer-events-none">
-          <div class="font-bold text-[15px] text-gray-900">E.D.I.T.H</div>
-          <div class="text-[10px] text-gray-500 font-semibold mt-1">SAT-II SYNC</div>
+          <div class="flex items-center gap-1">
+            <span class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#10b981] animate-ping" id="satLinkPing"></span>
+            <span class="font-pixel text-[8px] sm:text-[9px] tracking-wider text-[#38bdf8]">SAT-II</span>
+          </div>
+          <!-- 復古 Pixel 階梯式訊號指示燈 -->
+          <div class="flex items-end gap-[2px] mt-1 pl-0.5 h-2.5">
+            <div class="w-1.5 sm:w-2 h-1 bg-[#10b981]"></div>
+            <div class="w-1.5 sm:w-2 h-1.5 bg-[#10b981]"></div>
+            <div class="w-1.5 sm:w-2 h-2 bg-[#10b981]"></div>
+            <!-- 最後一格是暗藍色，代表未滿格 -->
+            <div class="w-1.5 sm:w-2 h-2.5 bg-[#0a274d]"></div>
+          </div>
         </div>
       </button>
 
-      <!-- Center: Status Text -->
-      <div class="flex-1 flex flex-col items-center justify-center min-w-0">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Location Status</span>
-        <span class="text-xs font-bold text-gray-800 truncate w-full text-center" id="trackerSubLocation">AQUIRING...</span>
-      </div>
-
-      <!-- Right: Clock -->
-      <div class="text-right shrink-0">
-        <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider" id="sys-date">YYYY.MM.DD</div>
-        <div class="text-sm font-bold text-gray-900 font-mono" id="topClockLeft">00:00:00</div>
-        <!-- Hidden elements for JS compatibility -->
-        <span id="sys-time" class="hidden"></span>
-      </div>
-    </header>
-
-    <!-- TRACKER TAB NAVIGATION -->
-    <div class="flex p-1 bg-gray-100 rounded-2xl">
-      <button id="tabBtnSchedule" onclick="switchTab('schedule')" class="spidey-tab-btn spidey-tab-active py-2 px-2 flex-1 flex flex-col items-center gap-1 min-w-0" data-text="SCHEDULE">
-        <i class="fa-solid fa-calendar-plus text-sm"></i>
-        <span class="btn-text text-[11px] font-bold">SCHEDULE</span>
-      </button>
-      <button id="tabBtnTimetable" onclick="switchTab('timetable')" class="spidey-tab-btn py-2 px-2 flex-1 flex flex-col items-center gap-1 min-w-0" data-text="TIMETABLE">
-        <i class="fa-solid fa-table-cells text-sm"></i>
-        <span class="btn-text text-[11px] font-bold">TIMETABLE</span>
-      </button>
-      <button id="tabBtnTracker" onclick="switchTab('tracker')" class="spidey-tab-btn py-2 px-2 flex-1 flex flex-col items-center gap-1 min-w-0" data-text="TRACKER">
-        <i class="fa-solid fa-stopwatch text-sm"></i>
-        <span class="btn-text text-[11px] font-bold">TRACKER</span>
-      </button>
-      <button id="tabBtnSettings" onclick="switchTab('settings')" class="spidey-tab-btn py-2 px-2 flex-1 flex flex-col items-center gap-1 min-w-0" data-text="SETTINGS">
-        <i class="fa-solid fa-sliders text-sm"></i>
-        <span class="btn-text text-[11px] font-bold">SETTINGS</span>
-      </button>
-    </div>
-
-    <!-- ==================== TAB 1: SCHEDULE VIEW ==================== -->
-    <div id="tabSchedule" class="space-y-4 block">
-      <div class="kyodo-panel p-4 space-y-4">
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Calendar Node</label>
-            <button onclick="loadUserCalendars()" class="text-[11px] text-[#FF2E4D] font-bold uppercase">Reload</button>
+      <!-- Center: Wide Tactical HUD Visor -->
+      <div class="flex-1 px-2.5 sm:px-3 py-1.5 bg-[#020b18] border border-[#15467e] rounded flex items-center justify-between shadow-inner min-w-0">
+        <div class="flex flex-col items-start truncate pr-1">
+          <div class="flex items-center gap-1 font-pixel text-[7px] sm:text-[8px] text-[#f59e0b] tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse"></span>
+            <span>GEO-LOCATOR</span>
           </div>
-          <select id="calendarSelect" class="w-full spidey-input px-4 py-2.5 text-sm font-semibold"></select>
+          <span class="font-pixel-num text-[7px] sm:text-[8px] text-[#38bdf8] mt-0.5 truncate w-full" id="trackerSubLocation">AQUIRING...</span>
+        </div>
+        <div class="border-l border-[#15467e] pl-2 sm:pl-3 flex shrink-0">
+          <span class="font-pixel-num text-[9px] sm:text-[10px] text-white tracking-widest" id="topClockLeft">00:00:00</span>
         </div>
       </div>
 
-      <div class="kyodo-panel p-5 space-y-5">
-        <div class="space-y-2.5">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Event Title / Presets</label>
-            <button onclick="openModal('title')" class="text-[11px] text-[#FF2E4D] font-bold uppercase">Edit Tags</button>
-          </div>
-          <div class="flex flex-wrap gap-2 max-h-36 overflow-y-auto no-scrollbar" id="titleTags"></div>
-          <input type="text" id="eventTitle" placeholder="Enter title..." oninput="clearTitleHighlight()" class="w-full spidey-input px-4 py-3 text-sm font-semibold mt-1">
-        </div>
-
-        <div class="space-y-2.5">
-          <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Date</label>
-          <input type="date" id="eventDate" oninput="clearDateButtonHighlight()" class="w-full spidey-input px-4 py-3 text-sm font-semibold">
-          <div class="grid grid-cols-3 gap-2" id="quickDateContainer">
-            <button type="button" onclick="handleQuickDateClick(0, this)" class="spidey-item-btn py-2 text-xs font-bold date-quick-btn">TODAY</button>
-            <button type="button" onclick="handleQuickDateClick(1, this)" class="spidey-item-btn py-2 text-xs font-bold date-quick-btn">TOMORROW</button>
-            <button type="button" onclick="handleQuickDateClick(2, this)" class="spidey-item-btn py-2 text-xs font-bold date-quick-btn">DAY AFTER</button>
-          </div>
-        </div>
-
-        <div class="space-y-2.5">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Time Periods</label>
-            <button onclick="openModal('time')" class="text-[11px] text-[#FF2E4D] font-bold uppercase">Edit Periods</button>
-          </div>
-          <div class="flex flex-wrap gap-2 max-h-36 overflow-y-auto no-scrollbar" id="timeTags"></div>
-          <div class="grid grid-cols-2 gap-3 mt-1">
-            <div><span class="text-[11px] text-gray-400 font-bold block mb-1 uppercase">Start Time</span><input type="time" id="startTime" class="w-full spidey-input px-3 py-2 text-sm font-semibold font-mono"></div>
-            <div><span class="text-[11px] text-gray-400 font-bold block mb-1 uppercase">End Time</span><input type="time" id="endTime" class="w-full spidey-input px-3 py-2 text-sm font-semibold font-mono"></div>
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-gray-100 space-y-3">
-          <div><label class="text-[11px] text-gray-400 font-bold block mb-1 uppercase">Location (Optional)</label><input type="text" id="eventLocation" placeholder="Location..." class="w-full spidey-input px-3 py-2.5 text-sm"></div>
-          <div><label class="text-[11px] text-gray-400 font-bold block mb-1 uppercase">Notes (Optional)</label><textarea id="eventDesc" rows="2" placeholder="Details..." class="w-full spidey-input px-3 py-2.5 text-sm"></textarea></div>
-        </div>
-
-        <button id="submitBtn" onclick="submitEvent()" class="btn-glow w-full py-3.5 text-sm tracking-wide" data-text="CREATE EVENT">
-          <span class="btn-text">CREATE EVENT</span> <i class="fa-solid fa-arrow-right ml-1"></i>
+      <!-- Right: Compact Radar Toggle Button -->
+      <div class="shrink-0">
+        <button onclick="toggleEarthRadar()" title="Toggle Tactical Radar HUD" class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-[#0a274d] hover:bg-[#12396e] border border-[#2b7dd9] rounded text-[#38bdf8] hover:text-white transition shadow-sm active:scale-95" id="earthToggleBtn">
+          <i class="fa-solid fa-earth-americas text-[13px] sm:text-[14px]"></i>
         </button>
       </div>
+
     </div>
 
-    <!-- ==================== TAB 2: TIMETABLE VIEW ==================== -->
-    <div id="tabTimetable" class="hidden space-y-4">
-      <div class="flex justify-between items-center px-1">
-        <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Timetable Overview</h2>
-        <div class="flex gap-2">
-          <button onclick="openSwapModal()" class="btn-secondary px-3 py-1.5 text-xs"><i class="fa-solid fa-right-left mr-1"></i> SWAP</button>
-          <button onclick="syncTimetableFromCloud()" class="btn-secondary px-3 py-1.5 text-xs" title="Sync"><i class="fa-solid fa-arrows-rotate"></i></button>
+    <!-- MAIN LCD SCREEN CONTAINER -->
+    <div class="spidey-screen p-2.5 sm:p-3 space-y-3">
+
+      <!-- HOLOGRAPHIC EARTH RADAR HUD (Tactical HUD with Pixel Earth & right-side Oscilloscope) -->
+      <div id="spideyRadarContainer" class="spidey-panel p-2 overflow-hidden border-[#194c8a] bg-[#020b17]/90 relative">
+        <div class="flex justify-between items-center px-1 pb-1.5 text-[11px] border-b border-[#0f325e]">
+          <div class="flex items-center gap-1.5 text-[#38bdf8] font-bold tracking-wider">
+            <span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span>
+            <span class="font-pixel text-[9px] sm:text-[10px]">GLOBAL SENSORS</span>
+          </div>
+          <div class="text-[#f59e0b] font-pixel text-[9px]" id="radarCoords">STATUS: ACTIVE</div>
+        </div>
+
+        <div class="flex flex-row items-center justify-between gap-2 my-1.5">
+          <!-- Left: Rotating Pixel-Art Earth -->
+          <div class="relative flex-1 h-40 sm:h-44 flex items-center justify-center bg-[#020a17] rounded border border-[#0d2a4d] overflow-hidden">
+            <div class="absolute left-1 top-2 bottom-2 flex flex-col justify-between text-[7px] text-[#38bdf8] font-pixel-num border-r border-[#15467e] pr-1 select-none z-10 opacity-75">
+              <span>10</span><span>-</span><span>-</span><span>5</span><span>-</span><span>-</span><span>0</span>
+            </div>
+            <div class="absolute left-4 top-1.5 bottom-1 flex flex-col justify-between items-center z-10 select-none">
+              <div class="flex flex-col gap-1">
+                <div class="w-4 h-4 bg-[#e62429] border border-[#000000] text-white font-pixel text-[8px] flex items-center justify-center shadow-md font-bold">D</div>
+                <div class="w-4 h-4 bg-[#e62429] border border-[#000000] text-white font-pixel text-[8px] flex items-center justify-center shadow-md font-bold">S</div>
+                <div class="w-4 h-4 bg-[#e62429] border border-[#000000] text-white font-pixel text-[8px] flex items-center justify-center shadow-md font-bold">T</div>
+              </div>
+              <div class="flex flex-col items-center gap-0.5 my-1">
+                <div class="w-3 h-1 bg-[#10b981]"></div>
+                <div class="w-3 h-1 bg-[#10b981]"></div>
+                <div class="w-3 h-1 bg-[#38bdf8]"></div>
+                <span class="font-pixel text-[7px] text-[#38bdf8] mt-0.5">NAV</span>
+              </div>
+            </div>
+            <canvas id="earthCanvas" class="w-full h-full max-h-40 sm:max-h-44 pixelated"></canvas>
+            <div class="absolute right-1.5 bottom-1 text-right font-pixel text-[8px] text-[#38bdf8] z-10">
+              <span id="earthFps">LOCKED</span>
+            </div>
+          </div>
+
+          <!-- Right: Oscilloscope -->
+          <div class="w-28 sm:w-36 h-40 sm:h-44 bg-[#020814] border border-[#133f73] rounded p-1.5 flex flex-col justify-between shadow-inner shrink-0">
+            <div class="flex items-center justify-between border-b border-[#0f325e] pb-1">
+              <span class="font-pixel text-[8px] text-[#10b981] flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span> OSC
+              </span>
+              <span class="font-pixel-num text-[8px] text-[#38bdf8]">842MHz</span>
+            </div>
+            <div class="w-full h-20 sm:h-22 relative overflow-hidden bg-[#01050c] rounded my-0.5 border border-[#0d2a4d]">
+              <canvas id="osc-canvas" class="w-full h-full opacity-95"></canvas>
+            </div>
+            <div class="text-[8px] font-pixel text-[#94a3b8] leading-tight space-y-1 pt-1 border-t border-[#0f325e]">
+              <div class="flex justify-between"><span>SIGNAL:</span><span class="text-[#10b981] font-bold font-pixel-num">98%</span></div>
+              <div class="flex justify-between"><span>PULSE:</span><span class="text-[#f59e0b] font-bold">SYNC</span></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="kyodo-panel p-2 flex items-center justify-between">
-        <button onclick="navigateWeek(-1)" class="btn-secondary w-10 h-10 p-0 text-sm"><i class="fa-solid fa-chevron-left"></i></button>
-        <div class="flex flex-col items-center cursor-pointer" onclick="navigateWeek(0)">
-          <div id="weekRangeLabel" class="text-gray-900 font-bold text-sm font-mono tracking-tight">LOADING...</div>
-          <div id="weekRelativeLabel" class="text-[#FF2E4D] font-bold text-[10px] mt-0.5 uppercase tracking-widest">THIS WEEK</div>
+      <!-- TELEMETRY & CLOCK BAR -->
+      <div class="spidey-panel p-2 sm:p-2.5 bg-[#051833] border border-[#133f73] space-y-1.5">
+        <div class="flex items-center justify-between border-b border-[#0f325e] pb-1 px-1">
+          <div class="text-[#38bdf8] font-bold text-xs sm:text-sm tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-satellite-dish text-[#f59e0b] text-[11px]"></i>
+            <span>TACTICAL TRACKER</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[9px] sm:text-[10px] tracking-wider font-bold">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+            <span id="sys-status" class="text-[#10b981]">ONLINE // READY</span>
+          </div>
         </div>
-        <button onclick="navigateWeek(1)" class="btn-secondary w-10 h-10 p-0 text-sm"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] text-[#64748b] font-bold tracking-wider">DATE</span>
+            <span class="text-[#93c5fd] font-pixel-num text-[10px] sm:text-[11px]" id="sys-date">YYYY.MM.DD</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] text-[#64748b] font-bold tracking-wider">CHRONO</span>
+            <span class="text-[#f59e0b] font-pixel-num text-[11px] sm:text-[12px] font-bold tracking-wider" id="sys-time">00:00:00</span>
+          </div>
+        </div>
       </div>
 
-      <div id="activeSwapsBanner" class="hidden p-3 kyodo-panel bg-[#FFF0F2] border-[#FF4E6B] border flex justify-between items-center">
-        <span class="flex items-center gap-2 text-[#FF2E4D] font-bold text-xs"><i class="fa-solid fa-circle-exclamation"></i><span><span id="swapCountText">0</span> ACTIVE SWAP(S)</span></span>
-        <button onclick="openSwapListModal()" class="text-[#FF2E4D] underline text-[11px] font-bold uppercase">View Logs</button>
-      </div>
-
-      <div class="kyodo-panel p-3 space-y-3">
-        <div class="overflow-x-auto custom-scroll rounded-xl border border-gray-100">
-          <table class="w-full text-center border-collapse table-fixed min-w-[340px]">
-            <thead><tr class="border-b border-gray-100 bg-gray-50 text-xs text-gray-500 font-bold uppercase" id="timetableHeaderRow"></tr></thead>
-            <tbody id="timetableBody" class="divide-y divide-gray-100"></tbody>
-          </table>
-        </div>
-        <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="btn-secondary w-full py-3 text-sm tracking-wide" data-text="SAVE & SYNC">
-          <span class="btn-text">SAVE & SYNC</span>
+      <!-- TRACKER RETRO TAB NAVIGATION -->
+      <div class="grid grid-cols-4 gap-1 sm:gap-1.5 p-1.5 spidey-panel bg-[#04152e]">
+        <button id="tabBtnSchedule" onclick="switchTab('schedule')" class="btn-pixel spidey-tab-btn py-2 px-1 flex flex-col items-center justify-center gap-0.5 spidey-tab-active w-full min-w-0" data-text="SCHEDULE">
+          <i class="fa-solid fa-calendar-plus text-xs sm:text-sm"></i>
+          <span class="btn-text text-[10px] sm:text-[11px] font-bold tracking-tight block w-full truncate text-center">SCHEDULE</span>
+        </button>
+        <button id="tabBtnTimetable" onclick="switchTab('timetable')" class="btn-pixel spidey-tab-btn py-2 px-1 flex flex-col items-center justify-center gap-0.5 w-full min-w-0" data-text="TIMETABLE">
+          <i class="fa-solid fa-table-cells text-xs sm:text-sm"></i>
+          <span class="btn-text text-[10px] sm:text-[11px] font-bold tracking-tight block w-full truncate text-center">TIMETABLE</span>
+        </button>
+        <button id="tabBtnTracker" onclick="switchTab('tracker')" class="btn-pixel spidey-tab-btn py-2 px-1 flex flex-col items-center justify-center gap-0.5 w-full min-w-0" data-text="TRACKER">
+          <i class="fa-solid fa-stopwatch text-xs sm:text-sm"></i>
+          <span class="btn-text text-[10px] sm:text-[11px] font-bold tracking-tight block w-full truncate text-center">TRACKER</span>
+        </button>
+        <button id="tabBtnSettings" onclick="switchTab('settings')" class="btn-pixel spidey-tab-btn py-2 px-1 flex flex-col items-center justify-center gap-0.5 w-full min-w-0" data-text="SETTINGS">
+          <i class="fa-solid fa-sliders text-xs sm:text-sm"></i>
+          <span class="btn-text text-[10px] sm:text-[11px] font-bold tracking-tight block w-full truncate text-center">SETTINGS</span>
         </button>
       </div>
-    </div>
 
-    <!-- ==================== TAB 3: TRACKER ==================== -->
-    <div id="tabTracker" class="hidden space-y-4">
-      <div class="kyodo-panel p-4 space-y-3">
-        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Select Subject</label>
-        
-        <!-- 這裡已改回完全對應原本資料庫設定的中文科目，請勿改為英文以免計時壞掉 -->
-        <div class="grid grid-cols-4 gap-2 text-xs" id="subject-selector">
-          <button onclick="setSubject('國文')" class="spidey-item-btn py-2 text-center" data-subj="國文">國文</button>
-          <button onclick="setSubject('英文')" class="spidey-item-btn py-2 text-center" data-subj="英文">英文</button>
-          <button onclick="setSubject('數學')" class="spidey-item-btn spidey-item-active py-2 text-center" data-subj="數學">數學</button>
-          <button onclick="setSubject('物理')" class="spidey-item-btn py-2 text-center" data-subj="物理">物理</button>
-          <button onclick="setSubject('化學')" class="spidey-item-btn py-2 text-center" data-subj="化學">化學</button>
-          <button onclick="setSubject('生物')" class="spidey-item-btn py-2 text-center" data-subj="生物">生物</button>
-          <button onclick="setSubject('地科')" class="spidey-item-btn py-2 text-center" data-subj="地科">地科</button>
+      <!-- ==================== TAB 1: SCHEDULE VIEW ==================== -->
+      <div id="tabSchedule" class="space-y-3.5 block">
+        <div class="spidey-panel p-2.5 space-y-1.5">
+          <div class="flex justify-between items-center px-1">
+            <label class="text-[12px] font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-database text-xs"></i> TARGET CALENDAR / NODE
+            </label>
+            <button onclick="loadUserCalendars()" class="text-[11px] text-[#38bdf8] hover:text-[#fbbf24] font-bold transition">[ RELOAD ]</button>
+          </div>
+          <select id="calendarSelect" class="w-full spidey-input px-3 py-2 text-xs sm:text-sm font-bold">
+            <option value="primary">PRIMARY NODE</option>
+          </select>
         </div>
-      </div>
 
-      <div class="kyodo-panel p-6 flex flex-col items-center justify-center space-y-6">
-        <div class="flex w-full justify-between items-center text-xs border-b border-gray-100 pb-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-gray-300" id="pulse-dot"></span><span class="font-bold text-gray-800 tracking-wider" id="terminal-state">IDLE</span></div>
-          <div class="font-bold text-[#FF2E4D] bg-[#FFF0F2] px-3 py-1 rounded-full" id="current-track-badge">數學</div>
-        </div>
-        
-        <div class="text-center py-4">
-          <div class="text-6xl font-extrabold tracking-tighter text-gray-900 font-mono" id="timer-display">00:00:00</div>
-          <p class="text-xs text-gray-400 mt-2 font-bold uppercase tracking-widest" id="timer-status">WAITING TO START...</p>
-        </div>
-        
-        <div id="timer-actions" class="w-full">
-          <button id="start-btn" onclick="startTimer()" class="btn-glow w-full py-4 text-lg tracking-wide" data-text="START TIMER">
-            <span class="btn-text">START TIMER</span>
+        <div class="spidey-panel p-3.5 space-y-4">
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-[12px] font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-tags text-xs"></i> EVENT TITLE / PRESETS</label>
+              <button onclick="openModal('title')" class="text-[11px] text-[#38bdf8] hover:text-[#f59e0b] font-bold transition">[ CONFIG ]</button>
+            </div>
+            <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto no-scrollbar" id="titleTags"></div>
+            <input type="text" id="eventTitle" placeholder="ENTER MISSION TITLE..." oninput="clearTitleHighlight()" class="w-full spidey-input px-3 py-2 text-xs sm:text-sm font-bold">
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[12px] font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-calendar-day text-xs"></i> DATE COORDINATES</label>
+            <input type="date" id="eventDate" oninput="clearDateButtonHighlight()" class="w-full spidey-input px-3 py-2 text-xs sm:text-sm font-bold uppercase text-[#38bdf8]">
+            <div class="grid grid-cols-3 gap-1.5" id="quickDateContainer">
+              <button type="button" onclick="handleQuickDateClick(0, this)" class="spidey-item-btn text-center font-bold date-quick-btn">TODAY [T-0]</button>
+              <button type="button" onclick="handleQuickDateClick(1, this)" class="spidey-item-btn text-center font-bold date-quick-btn">TOMORROW [+1]</button>
+              <button type="button" onclick="handleQuickDateClick(2, this)" class="spidey-item-btn text-center font-bold date-quick-btn">DAY AFTER [+2]</button>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-[12px] font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-clock text-xs"></i> TIME PERIODS</label>
+              <button onclick="openModal('time')" class="text-[11px] text-[#38bdf8] hover:text-[#f59e0b] font-bold transition">[ CONFIG ]</button>
+            </div>
+            <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto no-scrollbar" id="timeTags"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><span class="text-[11px] text-[#94a3b8] font-bold block mb-1">START TIME</span><input type="time" id="startTime" class="w-full spidey-input px-3 py-1.5 text-xs sm:text-sm font-bold text-[#38bdf8]"></div>
+              <div><span class="text-[11px] text-[#94a3b8] font-bold block mb-1">END TIME</span><input type="time" id="endTime" class="w-full spidey-input px-3 py-1.5 text-xs sm:text-sm font-bold text-[#38bdf8]"></div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#133f73] space-y-2.5">
+            <div><label class="text-[11px] text-[#94a3b8] font-bold block mb-1">LOCATION / VENUE</label><input type="text" id="eventLocation" placeholder="Queens, Manhattan, Library..." class="w-full spidey-input px-3 py-1.5 text-xs sm:text-sm"></div>
+            <div><label class="text-[11px] text-[#94a3b8] font-bold block mb-1">TELEMETRY / NOTES</label><textarea id="eventDesc" rows="2" placeholder="Mission details or homework requirements..." class="w-full spidey-input px-3 py-1.5 text-xs sm:text-sm"></textarea></div>
+          </div>
+
+          <button id="submitBtn" onclick="submitEvent()" class="btn-pixel btn-orange w-full py-3 text-sm font-bold tracking-wider flex items-center justify-center gap-2 mt-2" data-text="EXECUTE // TRANSMIT">
+            <i class="fa-solid fa-satellite-dish"></i><span class="btn-text">EXECUTE // TRANSMIT</span>
           </button>
-          <div id="running-actions" class="hidden grid grid-cols-2 gap-3 w-full">
-            <button id="pause-resume-btn" onclick="togglePauseResume()" class="btn-secondary py-3 text-sm border-[#FF2E4D] text-[#FF2E4D] tracking-wide" data-text="PAUSE">
-              <span class="btn-text">PAUSE</span>
-            </button>
-            <button id="commit-timer-btn" onclick="commitTimer()" class="btn-glow py-3 text-sm tracking-wide" data-text="STOP & LOG">
-              <span class="btn-text">STOP & LOG</span>
-            </button>
-          </div>
         </div>
       </div>
 
-      <div class="kyodo-panel p-5 space-y-4">
-        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-          <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Study Units & Logs</h3>
-          <button onclick="clearSelectedUnits()" class="text-[11px] text-gray-400 hover:text-[#FF2E4D] font-bold uppercase">Clear</button>
-        </div>
-        
-        <div class="space-y-2">
-          <div id="unit-tag-container" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto no-scrollbar">
-            <span class="text-xs text-gray-400">Loading...</span>
+      <!-- ==================== TAB 2: TIMETABLE VIEW ==================== -->
+      <div id="tabTimetable" class="hidden space-y-3">
+        <div class="flex justify-between items-center px-1">
+          <h2 class="text-xs sm:text-sm font-bold tracking-wider text-[#f59e0b] flex items-center gap-1.5"><i class="fa-solid fa-table-cells text-[#38bdf8]"></i> MATRIX OVERVIEW (TIMETABLE)</h2>
+          <div class="flex gap-1.5">
+            <button onclick="openSwapModal()" class="btn-pixel btn-orange px-2.5 py-1 text-[11px] flex items-center gap-1"><i class="fa-solid fa-right-left text-[10px]"></i><span>SWAP</span></button>
+            <button onclick="syncTimetableFromCloud()" class="btn-pixel btn-green px-2.5 py-1 text-[11px]" title="Sync Matrix"><i class="fa-solid fa-arrows-rotate text-[10px]"></i></button>
           </div>
-          <div class="text-[11px] text-gray-500 pt-1 font-semibold uppercase">Selected: <span id="selected-units-preview" class="text-[#FF2E4D]">None</span></div>
         </div>
-        
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-          <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Mark as completed</span>
-          <input type="checkbox" id="is-completed" class="w-5 h-5 accent-[#FF2E4D] cursor-pointer" checked>
+
+        <div class="spidey-panel p-2 flex items-center justify-between text-xs font-bold tracking-wider bg-[#061e3d]">
+          <button onclick="navigateWeek(-1)" class="btn-pixel btn-blue px-3 py-1 text-[11px]">&lt; PREV</button>
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center cursor-pointer" onclick="navigateWeek(0)">
+            <div id="weekRangeLabel" class="text-[#38bdf8] font-bold text-xs sm:text-sm">LOADING...</div>
+            <div id="weekRelativeLabel" class="text-[#f59e0b] text-[11px]">[CURRENT]</div>
+          </div>
+          <button onclick="navigateWeek(1)" class="btn-pixel btn-blue px-3 py-1 text-[11px]">NEXT &gt;</button>
         </div>
-        
+
+        <div id="activeSwapsBanner" class="hidden p-2 spidey-panel text-xs text-[#fbbf24] font-bold flex justify-between items-center border-[#f59e0b] bg-[#451a03]/40">
+          <span class="flex items-center gap-1.5 animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i><span><span id="swapCountText">0</span> SWAP MODIFICATIONS DETECTED</span></span>
+          <button onclick="openSwapListModal()" class="text-[#38bdf8] hover:text-white font-bold underline text-[11px]">LOGS &gt;</button>
+        </div>
+
+        <div class="spidey-panel p-2 space-y-2 bg-[#020b17]">
+          <div class="overflow-x-auto custom-scroll border-2 border-[#133f73] rounded-md">
+            <table class="w-full text-center border-collapse table-fixed min-w-[340px]">
+              <thead><tr class="border-b-2 border-[#133f73] text-[11px] text-[#93c5fd] bg-[#071f3f]" id="timetableHeaderRow"></tr></thead>
+              <tbody id="timetableBody" class="divide-y divide-[#133f73] bg-[#030e1d]"></tbody>
+            </table>
+          </div>
+          <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="btn-pixel btn-green w-full py-2.5 text-xs sm:text-sm font-bold tracking-wider flex justify-center items-center gap-2 mt-1" data-text="SAVE MATRIX // SYNC">
+            <i class="fa-solid fa-cloud-arrow-up"></i><span class="btn-text">SAVE MATRIX // SYNC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: TRACKER ==================== -->
+      <div id="tabTracker" class="hidden space-y-4">
         <div class="space-y-1.5">
-          <input type="text" id="note-input" placeholder="Study notes, mistakes..." class="w-full spidey-input px-4 py-3 text-sm font-medium">
+          <label class="text-[12px] font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5 px-1"><i class="fa-solid fa-bullseye text-xs"></i> TARGET SUBJECT MODULE</label>
+          <div class="grid grid-cols-4 gap-1.5 text-xs font-bold" id="subject-selector">
+            <button onclick="setSubject('國文')" class="spidey-item-btn text-center" data-subj="國文">國文</button>
+            <button onclick="setSubject('英文')" class="spidey-item-btn text-center" data-subj="英文">英文</button>
+            <button onclick="setSubject('數學')" class="spidey-item-btn spidey-item-active text-center" data-subj="數學">數學</button>
+            <button onclick="setSubject('物理')" class="spidey-item-btn text-center" data-subj="物理">物理</button>
+            <button onclick="setSubject('化學')" class="spidey-item-btn text-center" data-subj="化學">化學</button>
+            <button onclick="setSubject('生物')" class="spidey-item-btn text-center" data-subj="生物">生物</button>
+            <button onclick="setSubject('地科')" class="spidey-item-btn text-center" data-subj="地科">地科</button>
+          </div>
+        </div>
+
+        <div class="spidey-panel p-4 space-y-3.5 bg-[#04142b]">
+          <div class="flex justify-between items-center text-xs border-b border-[#133f73] pb-2">
+            <div class="flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 rounded-full bg-[#e62429]" id="pulse-dot"></span><span class="font-bold tracking-wider text-[#93c5fd]">CHRONO_SYS // GSAT</span></div>
+            <div class="flex items-center gap-1.5"><span id="terminal-state" class="text-[#94a3b8] font-bold tracking-wider">IDLE</span><span class="text-[#334155]">|</span><span id="current-track-badge" class="text-[#f59e0b] font-bold tracking-wider px-2 py-0.5 bg-[#451a03] rounded border border-[#78350f]">數學</span></div>
+          </div>
+          
+          <div class="text-center py-3 border-2 border-[#133f73] bg-[#020914] rounded-lg shadow-inner">
+            <div class="text-3xl sm:text-4xl font-bold tracking-wider font-pixel-num text-[#f59e0b] drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" id="timer-display">00:00:00</div>
+            <p class="text-[11px] text-[#94a3b8] mt-1.5 flex justify-center items-center gap-1.5 font-bold tracking-wider" id="timer-status">AWAITING INITIATION...</p>
+          </div>
+          
+          <div id="timer-actions">
+            <button id="start-btn" onclick="startTimer()" class="btn-pixel btn-green w-full py-3 text-sm font-bold tracking-wider flex justify-center items-center gap-2" data-text="INITIATE SEQ.">
+              <i class="fa-solid fa-play text-xs"></i><span class="btn-text">INITIATE SEQ.</span>
+            </button>
+            <div id="running-actions" class="hidden grid grid-cols-2 gap-2">
+              <button id="pause-resume-btn" onclick="togglePauseResume()" class="btn-pixel btn-orange py-3 text-xs sm:text-sm font-bold tracking-wider flex justify-center items-center gap-2" data-text="PAUSE">
+                <i class="fa-solid fa-pause text-xs"></i><span class="btn-text">PAUSE</span>
+              </button>
+              <button id="commit-timer-btn" onclick="commitTimer()" class="btn-pixel btn-red py-3 text-xs sm:text-sm font-bold tracking-wider flex justify-center items-center gap-2" data-text="HALT & COMMIT">
+                <i class="fa-solid fa-stop text-xs"></i><span class="btn-text">HALT & COMMIT</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="spidey-panel p-3.5 space-y-3 bg-[#031024]">
+          <div class="flex justify-between items-center border-b border-[#133f73] pb-2">
+            <h3 class="text-xs sm:text-sm font-bold tracking-wider text-[#f59e0b] flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-xs text-[#38bdf8]"></i> STUDY UNITS & NOTES</h3>
+            <button onclick="clearSelectedUnits()" class="text-[11px] text-[#38bdf8] hover:text-[#e62429] font-bold">[ PURGE ]</button>
+          </div>
+          
+          <div class="space-y-1.5">
+            <label class="text-[11px] text-[#94a3b8] font-bold tracking-wider block">ACQUIRED TOPICS / CHAPTERS</label>
+            <div id="unit-tag-container" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 border-2 border-[#133f73] rounded-md no-scrollbar bg-[#020813]">
+              <span class="text-xs text-[#64748b]">AWAITING TOPIC DATABASE...</span>
+            </div>
+            <div class="text-[11px] text-[#94a3b8] pt-1">SELECTED: <span id="selected-units-preview" class="font-bold text-[#38bdf8]">NULL</span></div>
+          </div>
+          
+          <div class="flex items-center justify-between p-2 border-2 border-[#133f73] rounded-md bg-[#020813]">
+            <span class="text-xs font-bold text-[#cbd5e1] tracking-wider">MARK SESSION AS COMPLETED</span>
+            <input type="checkbox" id="is-completed" class="w-4 h-4 accent-[#f59e0b] cursor-pointer" checked>
+          </div>
+          
+          <div class="space-y-1">
+            <label class="text-[11px] text-[#94a3b8] font-bold tracking-wider block">TELEMETRY MEMO</label>
+            <input type="text" id="note-input" placeholder="Notes, errors reviewed, formulas..." class="w-full spidey-input px-3 py-2 text-xs sm:text-sm">
+          </div>
+          
+          <button id="progress-btn" onclick="saveProgress()" class="btn-pixel btn-orange w-full py-2.5 text-xs sm:text-sm font-bold tracking-wider flex justify-center items-center gap-2 mt-1" data-text="SYNC TO DATABASE">
+            <i class="fa-solid fa-database text-xs"></i><span class="btn-text">SYNC TO DATABASE</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 4: SETTINGS VIEW ==================== -->
+      <div id="tabSettings" class="hidden space-y-3.5">
+        <div class="spidey-panel p-3.5 space-y-2.5 bg-[#031024]">
+          <div class="flex justify-between items-center border-b border-[#133f73] pb-2">
+            <label class="text-xs sm:text-sm font-bold text-[#f59e0b] tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-palette text-xs text-[#38bdf8]"></i> SUBJECT COLOR PALETTE</label>
+            <button onclick="addCustomSubjectPrompt()" class="text-[11px] text-[#10b981] hover:text-[#34d399] font-bold">[ + NEW NODE ]</button>
+          </div>
+          <div id="subjectColorList" class="space-y-1.5 max-h-[50vh] overflow-y-auto pr-1 no-scrollbar"></div>
         </div>
         
-        <button id="progress-btn" onclick="saveProgress()" class="btn-secondary w-full py-3.5 mt-2 tracking-wide" data-text="SAVE PROGRESS">
-          <span class="btn-text">SAVE PROGRESS</span>
+        <div class="spidey-panel p-3.5 space-y-3 bg-[#031024]">
+          <label class="text-xs sm:text-sm font-bold text-[#f59e0b] tracking-wider block border-b border-[#133f73] pb-2">SYSTEM PARAMETERS</label>
+          <div class="space-y-2.5 text-xs sm:text-sm font-bold text-[#cbd5e1]">
+            <div class="flex justify-between items-center">
+              <span>PERIODS PER DAY</span>
+              <select id="settingTotalPeriods" onchange="updateTotalPeriods(this.value)" class="spidey-input px-2.5 py-1 text-xs">
+                <option value="6">6 PERIODS</option>
+                <option value="7">7 PERIODS</option>
+                <option value="8" selected>8 PERIODS</option>
+                <option value="9">9 PERIODS</option>
+                <option value="10">10 PERIODS</option>
+              </select>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>SWAP PULSE NOTIFICATIONS</span>
+              <input type="checkbox" id="settingShowSwapPulse" checked onchange="toggleSwapPulse(this.checked)" class="w-4 h-4 accent-[#f59e0b]">
+            </div>
+          </div>
+        </div>
+        
+        <button id="saveSettingsBtn" onclick="saveAllSettingsToCloud()" class="btn-pixel btn-green w-full py-3 text-xs sm:text-sm font-bold tracking-wider flex justify-center items-center gap-2" data-text="SAVE CONFIG TO CLOUD">
+          <i class="fa-solid fa-floppy-disk text-xs"></i><span class="btn-text">SAVE CONFIG TO CLOUD</span>
         </button>
       </div>
-    </div>
 
-    <!-- ==================== TAB 4: SETTINGS VIEW ==================== -->
-    <div id="tabSettings" class="hidden space-y-4">
-      <div class="kyodo-panel p-5 space-y-4">
-        <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-          <label class="text-sm font-bold text-gray-800 uppercase tracking-wide">Subject Colors</label>
-          <button onclick="addCustomSubjectPrompt()" class="text-[11px] text-[#FF2E4D] font-bold uppercase">+ New</button>
-        </div>
-        <div id="subjectColorList" class="space-y-2 max-h-[50vh] overflow-y-auto pr-1 custom-scroll"></div>
-      </div>
-      
-      <div class="kyodo-panel p-5 space-y-4">
-        <label class="text-sm font-bold text-gray-800 border-b border-gray-100 pb-3 block uppercase tracking-wide">System Settings</label>
-        <div class="space-y-4 text-sm font-bold text-gray-600">
-          <div class="flex justify-between items-center">
-            <span>Periods Per Day</span>
-            <select id="settingTotalPeriods" onchange="updateTotalPeriods(this.value)" class="spidey-input px-3 py-1.5 text-sm bg-white font-semibold">
-              <option value="6">6 Periods</option>
-              <option value="7">7 Periods</option>
-              <option value="8" selected>8 Periods</option>
-              <option value="9">9 Periods</option>
-              <option value="10">10 Periods</option>
-            </select>
-          </div>
-          <div class="flex justify-between items-center">
-            <span>Show Swap Pulse Indicator</span>
-            <input type="checkbox" id="settingShowSwapPulse" checked onchange="toggleSwapPulse(this.checked)" class="w-5 h-5 accent-[#FF2E4D]">
-          </div>
-        </div>
-      </div>
-      
-      <button id="saveSettingsBtn" onclick="saveAllSettingsToCloud()" class="btn-glow w-full py-3.5 text-sm tracking-wide" data-text="SAVE SETTINGS">
-        <span class="btn-text">SAVE SETTINGS</span>
-      </button>
     </div>
 
     <!-- Toast Notification Banner -->
-    <div id="toast" class="hidden text-sm p-3 text-center transition-all fixed bottom-8 left-1/2 -translate-x-1/2 w-[85%] max-w-sm z-[100]"></div>
+    <div id="toast" class="hidden text-xs p-2.5 text-center font-bold transition-all fixed bottom-6 left-1/2 -translate-x-1/2 w-[85%] max-w-sm z-[100] border-2 rounded-md shadow-2xl tracking-wider uppercase font-pixel" style="background: rgba(3, 14, 29, 0.95); border-color: #f59e0b; color: #f59e0b;"></div>
   </div>
 
   <!-- Manage Presets Modal -->
-  <div id="manageModal" class="hidden fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="kyodo-panel p-5 max-w-sm w-full space-y-4">
-      <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-        <h3 id="modalTitle" class="text-sm font-bold text-gray-900 uppercase tracking-wide">Edit Tags</h3>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-800 text-lg">✕</button>
+  <div id="manageModal" class="hidden fixed inset-0 bg-[#020914]/85 z-50 flex items-center justify-center p-3">
+    <div class="spidey-panel p-4 max-w-sm w-full space-y-3.5 border-2 border-[#f59e0b] bg-[#031229]">
+      <div class="flex justify-between items-center border-b border-[#133f73] pb-2">
+        <h3 id="modalTitle" class="text-xs sm:text-sm font-bold tracking-wider text-[#f59e0b]">PRESET CONFIG</h3>
+        <button onclick="closeModal()" class="text-[#94a3b8] hover:text-white text-sm font-bold">✕</button>
       </div>
-      <div id="modalBody" class="space-y-3"></div>
-      <button onclick="closeModal()" class="btn-glow w-full py-3 text-sm tracking-wide" data-text="DONE"><span class="btn-text">DONE</span></button>
+      <div id="modalBody"></div>
+      <button onclick="closeModal()" class="btn-pixel btn-orange w-full py-2 text-xs sm:text-sm font-bold" data-text="DONE"><span class="btn-text">DONE</span></button>
     </div>
   </div>
 
   <!-- Swap Modal -->
-  <div id="swapModal" class="hidden fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="kyodo-panel p-5 max-w-sm w-full space-y-4">
-      <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Route Swap</h3>
-        <button onclick="closeSwapModal()" class="text-gray-400 hover:text-gray-800 text-lg">✕</button>
+  <div id="swapModal" class="hidden fixed inset-0 bg-[#020914]/85 z-50 flex items-center justify-center p-3">
+    <div class="spidey-panel p-4 max-w-sm w-full space-y-3 border-2 border-[#f59e0b] bg-[#031229]">
+      <div class="flex justify-between items-center border-b border-[#133f73] pb-2">
+        <h3 class="text-xs sm:text-sm font-bold tracking-wider text-[#f59e0b] flex items-center gap-1.5"><i class="fa-solid fa-right-left text-xs"></i> TIMETABLE ROUTE SWAP</h3>
+        <button onclick="closeSwapModal()" class="text-[#94a3b8] hover:text-white text-sm font-bold">✕</button>
       </div>
-      <div class="grid grid-cols-2 gap-2 bg-gray-50 p-1 rounded-xl">
-        <button id="swapModeTwoBtn" onclick="switchSwapMode('two')" class="btn-secondary bg-white shadow-sm py-2 text-xs border-none tracking-wide" data-text="2-WAY SWAP"><span class="btn-text">2-WAY SWAP</span></button>
-        <button id="swapModeMultiBtn" onclick="switchSwapMode('multi')" class="btn-secondary py-2 text-xs border-none bg-transparent tracking-wide" data-text="MULTI SWAP"><span class="btn-text">MULTI SWAP</span></button>
+      <div class="grid grid-cols-2 gap-1.5 p-1 text-xs font-bold bg-[#020b17] border border-[#133f73] rounded">
+        <button id="swapModeTwoBtn" onclick="switchSwapMode('two')" class="btn-pixel btn-orange py-1.5" data-text="2-WAY SWAP"><span class="btn-text">2-WAY SWAP</span></button>
+        <button id="swapModeMultiBtn" onclick="switchSwapMode('multi')" class="btn-pixel btn-blue py-1.5" data-text="MULTI SWAP"><span class="btn-text">MULTI SWAP</span></button>
       </div>
-      <div id="swapModeTwoView" class="space-y-3 text-sm">
-        <div class="p-3 border border-gray-100 rounded-xl space-y-2">
-          <div class="font-bold text-gray-500 text-xs uppercase tracking-wide">Source (From)</div>
-          <div class="grid grid-cols-2 gap-2"><div><input type="date" id="swapA_Date" class="w-full spidey-input px-2 py-2 text-xs"></div><div><select id="swapA_Period" class="w-full spidey-input px-2 py-2 text-xs bg-white font-semibold"></select></div></div>
+      <div id="swapModeTwoView" class="space-y-2 text-xs">
+        <div class="p-2 border border-[#133f73] space-y-1.5 bg-[#020914] rounded">
+          <div class="font-bold text-[#38bdf8] text-[11px] tracking-wider">SOURCE PERIOD (FROM)</div>
+          <div class="grid grid-cols-2 gap-1.5"><div><input type="date" id="swapA_Date" class="w-full spidey-input px-2 py-1 text-xs"></div><div><select id="swapA_Period" class="w-full spidey-input px-2 py-1 text-xs"></select></div></div>
         </div>
-        <div class="p-3 border border-gray-100 rounded-xl space-y-2">
-          <div class="font-bold text-[#FF2E4D] text-xs uppercase tracking-wide">Target (To)</div>
-          <div class="grid grid-cols-2 gap-2"><div><input type="date" id="swapB_Date" class="w-full spidey-input px-2 py-2 text-xs"></div><div><select id="swapB_Period" class="w-full spidey-input px-2 py-2 text-xs bg-white font-semibold"></select></div></div>
+        <div class="p-2 border border-[#133f73] space-y-1.5 bg-[#020914] rounded">
+          <div class="font-bold text-[#f59e0b] text-[11px] tracking-wider">TARGET PERIOD (TO)</div>
+          <div class="grid grid-cols-2 gap-1.5"><div><input type="date" id="swapB_Date" class="w-full spidey-input px-2 py-1 text-xs"></div><div><select id="swapB_Period" class="w-full spidey-input px-2 py-1 text-xs"></select></div></div>
         </div>
       </div>
-      <div id="swapModeMultiView" class="hidden space-y-3 text-sm">
-        <div class="flex justify-between items-center text-xs font-bold text-gray-500 uppercase tracking-wide"><span>Chain Nodes (1 > 2 > 3 > 1)</span><button onclick="addMultiSwapStep()" class="text-[#FF2E4D]">+ Add</button></div>
-        <div id="multiSwapStepsContainer" class="space-y-2 max-h-40 overflow-y-auto custom-scroll pr-1"></div>
+      <div id="swapModeMultiView" class="hidden space-y-2 text-xs">
+        <div class="flex justify-between items-center text-[11px] text-[#93c5fd] font-bold"><span>CHAIN NODES (1 &gt; 2 &gt; 3 &gt; 1)</span><button onclick="addMultiSwapStep()" class="text-[#10b981] font-bold text-xs">[+ ADD NODE]</button></div>
+        <div id="multiSwapStepsContainer" class="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar"></div>
       </div>
-      <div><input type="text" id="swapNote" placeholder="Reason (optional)..." class="w-full spidey-input px-3 py-2 text-sm font-medium"></div>
-      <button onclick="commitSwapRecord()" class="btn-glow w-full py-3 text-sm tracking-wide" data-text="CONFIRM SWAP"><span class="btn-text">CONFIRM SWAP</span></button>
+      <div><input type="text" id="swapNote" placeholder="Swap reason (e.g. Teacher exchange)..." class="w-full spidey-input px-2.5 py-1.5 text-xs"></div>
+      <button onclick="commitSwapRecord()" class="btn-pixel btn-green w-full py-2.5 text-xs sm:text-sm font-bold tracking-wider" data-text="COMMIT ROUTE"><span class="btn-text">COMMIT ROUTE</span></button>
     </div>
   </div>
 
   <!-- Swap List View Modal -->
-  <div id="swapListModal" class="hidden fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="kyodo-panel p-5 max-w-sm w-full space-y-3">
-      <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Swap Logs</h3>
-        <button onclick="closeSwapListModal()" class="text-gray-400 hover:text-gray-800 text-lg">✕</button>
+  <div id="swapListModal" class="hidden fixed inset-0 bg-[#020914]/85 z-50 flex items-center justify-center p-3">
+    <div class="spidey-panel p-4 max-w-sm w-full space-y-2.5 border-2 border-[#f59e0b] bg-[#031229]">
+      <div class="flex justify-between items-center border-b border-[#133f73] pb-2">
+        <h3 class="text-xs sm:text-sm font-bold tracking-wider text-[#f59e0b]">SWAP AUDIT LOGS</h3>
+        <button onclick="closeSwapListModal()" class="text-[#94a3b8] hover:text-white text-sm font-bold">✕</button>
       </div>
-      <div id="swapListModalContent" class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1"></div>
+      <div id="swapListModalContent" class="space-y-1.5 max-h-52 overflow-y-auto no-scrollbar pt-1"></div>
     </div>
   </div>
 
   <script>
     // ==========================================
-    // API & Logic 
+    // API 橋樑 (替換原有的 google.script.run)
     // ==========================================
+    // ⚠️ 部署 GAS 後，請將獲得的網頁應用程式 URL 貼在這裡
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwO5uOOWyuU3wmYwcZuiTpM7JlUTBtcgPtZrsVvG5DWjJJo5sY7-ciN9zSdm0GhGRWj/exec";
 
     function callBackend(action, payload, onSuccess, onFailure) {
       if (GAS_API_URL === "YOUR_WEB_APP_URL_HERE") {
-        console.warn("API URL not set, entering offline mode");
-        if (onFailure) onFailure(new Error("API URL not set"));
+        console.warn("API URL 未設定，啟動離線/測試模式");
+        if (onFailure) onFailure(new Error("API URL 未設定"));
         return;
       }
       fetch(GAS_API_URL, {
@@ -507,13 +726,16 @@
       .then(res => res.json())
       .then(data => {
         if (data.success && onSuccess) onSuccess(data.data);
-        else if (!data.success && onFailure) onFailure(new Error(data.message || "API Error"));
+        else if (!data.success && onFailure) onFailure(new Error(data.message || "API 執行錯誤"));
       })
       .catch(err => {
         if (onFailure) onFailure(err);
       });
     }
 
+    // ==========================================
+    // SPIDEY TRACKER APPLICATION LOGIC
+    // ==========================================
     var EvStore = {
       get: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
       set: function(k, v) { try { localStorage.setItem(k, v); } catch(e) {} },
@@ -521,10 +743,6 @@
     };
 
     var currentTab = 'schedule';
-    
-    // ==============================================================
-    // ⚠️ 已完美恢復原本的中文變數與邏輯，確保你的 Google Sheet 可以正常連動
-    // ==============================================================
     var dbTitles = ["國文作業", "國文考試", "數學作業", "數學考試", "英文作業", "英文考試", "物理作業", "物理考試", "化學作業", "化學考試", "自習", "讀書"];
     var dbTimes = [
       { label: "第一節", start: "08:10", end: "09:00" }, { label: "第二節", start: "09:10", end: "10:00" },
@@ -538,9 +756,6 @@
       "國文": "#ef4444", "英文": "#38bdf8", "數學": "#f59e0b", "物理": "#10b981",
       "化學": "#c084fc", "生物": "#a3e635", "地科": "#818cf8", "體育": "#f472b6"
     };
-    var currentSubject = '數學';
-    // ==============================================================
-
     var appSettings = { totalPeriods: 8, showSwapPulse: true };
     var currentWeekOffset = 0, editingTimeIndex = null, selectedTitle = null, selectedDateOffset = null, selectedTimeLabel = null;
     var periodTimes = dbTimes.slice();
@@ -553,13 +768,225 @@
     }
     
     var swapRecords = [], currentSwapMode = 'two', multiSwapSteps = [];
-    
+    var currentSubject = '數學';
     var timerState = 'IDLE', currentSegmentStartMs = null, accumulatedMs = 0, timerInterval = null;
     var unitsCache = {}, selectedUnits = [];
 
     // ==========================================
-    // Telemetry & Utility
+    // PIXEL ART EARTH CANVAS (Tactical Globe)
     // ==========================================
+    function initEarthCanvas() {
+      var canvas = document.getElementById('earthCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var angle = 0;
+
+      function isLand(lat, lon) {
+        if (lat > 0.15 && lat < 0.95 && lon > -2.3 && lon < -0.9) {
+          if (lat < 0.35 && lon > -1.4) return false; return true;
+        }
+        if (lat > -0.95 && lat <= 0.15 && lon > -1.55 && lon < -0.6) {
+          if (lat < -0.4 && lon > -0.9) return false; return true;
+        }
+        if (lat > 0.2 && lat < 1.05 && lon > 0.05 && lon < 2.4) {
+          if (lat < 0.45 && lon < 0.7) return false; return true;
+        }
+        if (lat > -0.65 && lat <= 0.45 && lon > -0.35 && lon < 0.85) return true;
+        if (lat > -0.75 && lat < -0.18 && lon > 1.95 && lon < 2.7) return true;
+        return false;
+      }
+
+      function isMountain(lat, lon) {
+        if (lat > 0.35 && lat < 0.85 && lon > -2.15 && lon < -1.8) return true;
+        if (lat > -0.85 && lat < 0.1 && lon > -1.45 && lon < -1.25) return true;
+        if (lat > 0.38 && lat < 0.58 && lon > 1.25 && lon < 1.75) return true;
+        return false;
+      }
+
+      function drawPixelEarth() {
+        var w = canvas.offsetWidth;
+        var h = canvas.offsetHeight;
+        if (w === 0 || h === 0) {
+          requestAnimationFrame(drawPixelEarth);
+          return;
+        }
+        canvas.width = w;
+        canvas.height = h;
+
+        ctx.imageSmoothingEnabled = false;
+
+        var pxSize = Math.max(3, Math.floor(Math.min(w, h) / 38));
+        var gridCols = Math.floor(w / pxSize);
+        var gridRows = Math.floor(h / pxSize);
+        var cx = Math.floor(gridCols / 2);
+        var cy = Math.floor(gridRows / 2);
+        var radius = Math.floor(Math.min(gridCols, gridRows) * 0.42);
+
+        var offsetX = Math.floor((w - gridCols * pxSize) / 2);
+        var offsetY = Math.floor((h - gridRows * pxSize) / 2);
+
+        ctx.fillStyle = '#020914';
+        ctx.fillRect(0, 0, w, h);
+
+        for (var gy = 0; gy < gridRows; gy++) {
+          var dy = gy - cy;
+          for (var gx = 0; gx < gridCols; gx++) {
+            var dx = gx - cx;
+            var dist2 = dx * dx + dy * dy;
+            var dist = Math.sqrt(dist2);
+
+            var screenX = offsetX + gx * pxSize;
+            var screenY = offsetY + gy * pxSize;
+
+            if (dist > radius + 1) {
+              if ((gx * 3 + gy * 7) % 19 === 0) {
+                ctx.fillStyle = '#0d284f';
+                ctx.fillRect(screenX, screenY, pxSize, pxSize);
+              }
+              continue;
+            }
+
+            if (dist >= radius - 0.5) {
+              ctx.fillStyle = '#38bdf8';
+              ctx.fillRect(screenX, screenY, pxSize, pxSize);
+              continue;
+            }
+
+            if (dist >= radius - 1.5) {
+              ctx.fillStyle = '#1d6fc2';
+              ctx.fillRect(screenX, screenY, pxSize, pxSize);
+              continue;
+            }
+
+            var dz = Math.sqrt(Math.max(0, radius * radius - dist2));
+            var lat = -dy / radius;
+            var lon = Math.atan2(dx, dz) + angle;
+            lon = ((lon + Math.PI) % (Math.PI * 2));
+            if (lon < 0) lon += Math.PI * 2;
+            lon -= Math.PI;
+
+            var color = '#0284c7'; 
+            if (Math.abs(lat) > 0.78) {
+              color = '#f0f9ff';
+            } else if (isLand(lat, lon)) {
+              if (isMountain(lat, lon)) {
+                color = '#f59e0b';
+              } else if ((gx + gy) % 3 === 0) {
+                color = '#34d399';
+              } else {
+                color = '#10b981';
+              }
+            } else {
+              var lightFactor = (dz / radius) * 0.7 + (dx / radius) * 0.3;
+              if (lightFactor > 0.5) { color = '#0284c7'; } 
+              else if (lightFactor > 0.2) { color = '#0369a1'; } 
+              else { color = '#074878'; }
+            }
+
+            ctx.fillStyle = color;
+            ctx.fillRect(screenX, screenY, pxSize, pxSize);
+          }
+        }
+
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY + cy * pxSize);
+        ctx.lineTo(offsetX + gridCols * pxSize, offsetY + cy * pxSize);
+        ctx.moveTo(offsetX + cx * pxSize, offsetY);
+        ctx.lineTo(offsetX + cx * pxSize, offsetY + gridRows * pxSize);
+        ctx.stroke();
+
+        angle += 0.003;
+        requestAnimationFrame(drawPixelEarth);
+      }
+      drawPixelEarth();
+    }
+
+    function toggleEarthRadar() {
+      var box = document.getElementById('spideyRadarContainer');
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden'); showToast('RADAR DISPLAY: ACTIVE', 'success');
+      } else {
+        box.classList.add('hidden'); showToast('RADAR DISPLAY: MINIMIZED', 'info');
+      }
+    }
+
+    // ==========================================
+    // 示波器與遙測
+    // ==========================================
+    function initOscilloscope() {
+      var canvas = document.getElementById('osc-canvas');
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var pointCount = 36;
+      var signalBuffer = [];
+      for (var i = 0; i < pointCount; i++) signalBuffer.push(0);
+      var currentY = 0, targetY = 0, frameCount = 0;
+
+      function draw() {
+        var width = canvas.offsetWidth;
+        var height = canvas.offsetHeight;
+        if (width === 0 || height === 0) {
+          requestAnimationFrame(draw); return;
+        }
+        
+        canvas.width = width; canvas.height = height;
+        var halfH = height / 2;
+        var maxAmp = height * 0.38;
+        
+        ctx.strokeStyle = 'rgba(15, 50, 94, 0.7)'; 
+        ctx.lineWidth = 1;
+        ctx.beginPath(); 
+        ctx.moveTo(0, halfH); 
+        ctx.lineTo(width, halfH); 
+        ctx.stroke();
+
+        frameCount++;
+        if (frameCount % 2 === 0) {
+          var noise = (Math.random() - 0.5) * (maxAmp * 0.6);
+          targetY = targetY * 0.72 + noise;
+          if (Math.random() < 0.08) {
+            var surge = (Math.random() > 0.5 ? 1 : -1) * (maxAmp * (0.4 + Math.random() * 0.5));
+            targetY += surge;
+          }
+          if (targetY > maxAmp) targetY = maxAmp;
+          if (targetY < -maxAmp) targetY = -maxAmp;
+        }
+
+        currentY += (targetY - currentY) * 0.3;
+        signalBuffer.shift();
+        signalBuffer.push(currentY + (Math.random() - 0.5) * 1.5);
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 1.8;
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 4;
+
+        var step = width / (signalBuffer.length - 1);
+        ctx.moveTo(0, halfH + signalBuffer[0]);
+
+        for (var p = 0; p < signalBuffer.length - 1; p++) {
+          var x1 = p * step;
+          var y1 = halfH + signalBuffer[p];
+          var x2 = (p + 1) * step;
+          var y2 = halfH + signalBuffer[p + 1];
+          var midX = (x1 + x2) / 2;
+          var midY = (y1 + y2) / 2;
+          ctx.quadraticCurveTo(x1, y1, midX, midY);
+        }
+        ctx.lineTo(width, halfH + signalBuffer[signalBuffer.length - 1]);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        setTimeout(function() {
+          requestAnimationFrame(draw);
+        }, 40);
+      }
+      draw();
+    }
+
     function initTelemetry() {
       setInterval(function() {
         var now = new Date();
@@ -570,17 +997,37 @@
         var topL = document.getElementById('topClockLeft');
         if(topL) topL.innerText = h + ':' + m + ':' + s;
 
+        var timeEl = document.getElementById('sys-time');
+        if(timeEl) timeEl.innerText = h + ':' + m + ':' + s;
+        
         var y = now.getFullYear();
         var mo = String(now.getMonth() + 1).padStart(2, '0');
         var d = String(now.getDate()).padStart(2, '0');
         var dateEl = document.getElementById('sys-date');
         if(dateEl) dateEl.innerText = y + '.' + mo + '.' + d;
       }, 50);
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          var lat = pos.coords.latitude.toFixed(1);
+          var lon = pos.coords.longitude.toFixed(1);
+          var locText = Math.abs(lat) + '°' + (lat >= 0 ? 'N' : 'S') + ' ' + Math.abs(lon) + '°' + (lon >= 0 ? 'E' : 'W');
+          var locEl = document.getElementById('trackerSubLocation');
+          if(locEl) locEl.innerText = locText;
+        }, function(err) {
+          var locEl = document.getElementById('trackerSubLocation');
+          if(locEl) locEl.innerText = 'NO SIGNAL';
+        });
+      } else {
+        var locEl = document.getElementById('trackerSubLocation');
+        if(locEl) locEl.innerText = 'OFFLINE';
+      }
     }
 
     function pingSatellite() {
-      showToast('Syncing...', 'info');
+      showToast('PINGING SAT-II DOWNLINK...', 'info');
       var pingIcon = document.getElementById('satLinkPing');
+      if (pingIcon) pingIcon.classList.remove('animate-ping');
       
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
@@ -589,20 +1036,29 @@
           var locText = Math.abs(lat) + '°' + (lat >= 0 ? 'N' : 'S') + ' ' + Math.abs(lon) + '°' + (lon >= 0 ? 'E' : 'W');
           var locEl = document.getElementById('trackerSubLocation');
           if(locEl) locEl.innerText = locText;
-          showToast('LOCATED: ' + locText, 'success');
-          if(pingIcon) pingIcon.classList.add('text-[#10b981]');
+          showToast('SATELLITE SYNC: ' + locText, 'success');
+          if (pingIcon) pingIcon.classList.add('animate-ping');
         }, function(err) {
           var locEl = document.getElementById('trackerSubLocation');
           if(locEl) locEl.innerText = 'NO SIGNAL';
-          showToast('LOCATION FAILED', 'error');
+          showToast('SATELLITE SYNC FAILED', 'error');
+          if (pingIcon) pingIcon.classList.add('animate-ping');
         });
+      } else {
+        var locEl = document.getElementById('trackerSubLocation');
+        if(locEl) locEl.innerText = 'OFFLINE';
+        showToast('LOCATION SENSOR OFFLINE', 'error');
+        if (pingIcon) pingIcon.classList.add('animate-ping');
       }
     }
 
+    // ==========================================
+    // UI 元件生成與輔助 (Tactical Theme)
+    // ==========================================
     function createEVBtn(text, clickHandler, isActive) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'spidey-item-btn py-1.5 px-3 text-xs ' + (isActive ? 'spidey-item-active' : '');
+      btn.className = 'spidey-item-btn ' + (isActive ? 'spidey-item-active' : '');
       btn.dataset.text = text;
       btn.innerText = text;
       btn.onclick = function() { clickHandler(btn); };
@@ -621,16 +1077,23 @@
     function showToast(msg, type) {
       var t = document.getElementById('toast');
       if(!t) return;
-      t.innerText = msg;
-      if (type === 'success') { t.style.color = '#10b981'; t.style.borderColor = '#10b981'; } 
-      else if (type === 'error') { t.style.color = '#FF2E4D'; t.style.borderColor = '#FF2E4D'; } 
-      else { t.style.color = '#141416'; t.style.borderColor = '#E6E8EC'; }
+      t.innerText = '📡 ' + msg;
+      if (type === 'success') {
+        t.style.borderColor = '#10b981';
+        t.style.color = '#10b981';
+      } else if (type === 'error') {
+        t.style.borderColor = '#e62429';
+        t.style.color = '#e62429';
+      } else {
+        t.style.borderColor = '#f59e0b';
+        t.style.color = '#f59e0b';
+      }
       t.classList.remove('hidden');
       setTimeout(function() { t.classList.add('hidden'); }, 3200);
     }
 
     // ==========================================
-    // SCHEDULE & TIMETABLE
+    // 排程系統邏輯 (Schedule & Timetable)
     // ==========================================
     function switchTab(tab) {
       currentTab = tab;
@@ -641,35 +1104,36 @@
         if(!btn || !view) return;
         if(t === tab) {
           btn.classList.add('spidey-tab-active');
-          btn.classList.remove('text-gray-500');
           view.classList.remove('hidden'); view.classList.add('block');
         } else {
           btn.classList.remove('spidey-tab-active');
-          btn.classList.add('text-gray-500');
           view.classList.add('hidden'); view.classList.remove('block');
         }
       });
       if(tab === 'timetable') renderTimetableGrid();
-      if(tab === 'settings') renderSettingsTab();
     }
 
     function loadUserCalendars() {
       var select = document.getElementById('calendarSelect');
       if(!select) return;
-      select.innerHTML = '<option value="primary">FETCHING...</option>';
+      
+      select.innerHTML = '<option value="primary">FETCHING NODES...</option>';
+      
       callBackend('getUserCalendars', null, 
         function(calendars) {
           select.innerHTML = '';
-          if (!calendars || calendars.length === 0) { select.innerHTML = '<option value="primary">PRIMARY CALENDAR</option>'; return; }
+          if (!calendars || calendars.length === 0) { select.innerHTML = '<option value="primary">PRIMARY NODE</option>'; return; }
           var savedCalId = EvStore.get('cal_selected_calendar');
           calendars.forEach(function(cal) {
-            var opt = document.createElement('option'); opt.value = cal.id; opt.innerText = cal.name;
+            var opt = document.createElement('option'); opt.value = cal.id; opt.innerText = cal.name.toUpperCase();
             if (savedCalId && cal.id === savedCalId) opt.selected = true;
             select.appendChild(opt);
           });
           select.onchange = function() { EvStore.set('cal_selected_calendar', select.value); };
         }, 
-        function(err) { select.innerHTML = '<option value="primary">PRIMARY CALENDAR (OFFLINE)</option>'; }
+        function(err) {
+          select.innerHTML = '<option value="primary">PRIMARY NODE (OFFLINE)</option>';
+        }
       );
     }
 
@@ -680,9 +1144,7 @@
         if (data.subjects && data.subjects.length) dbSubjects = data.subjects;
         if (data.subjectColors) dbSubjectColors = data.subjectColors;
         if (data.settings) appSettings = data.settings;
-        
-        // 恢復原本的行為：僅重新渲染標籤預設等
-        renderTags();
+        saveLocalCache(); renderTags();
         if (currentTab === 'timetable') renderTimetableGrid();
         if (currentTab === 'settings') renderSettingsTab();
       });
@@ -714,6 +1176,7 @@
     }
 
     function clearTitleHighlight() { selectedTitle = null; document.querySelectorAll('#titleTags button').forEach(function(b){ b.classList.remove('spidey-item-active'); }); }
+    function clearTimeHighlight() { selectedTimeLabel = null; document.querySelectorAll('#timeTags button').forEach(function(b){ b.classList.remove('spidey-item-active'); }); }
     function clearDateButtonHighlight() { document.querySelectorAll('.date-quick-btn').forEach(function(btn){ btn.classList.remove('spidey-item-active'); }); selectedDateOffset = null; }
 
     function handleQuickDateClick(offset, btnElement) {
@@ -738,19 +1201,19 @@
         location: document.getElementById('eventLocation').value.trim(),
         description: document.getElementById('eventDesc').value.trim()
       };
-      if (!payload.title || !payload.date || !payload.start || !payload.end) { showToast('PLEASE FILL ALL REQUIRED FIELDS', 'error'); return; }
+      if (!payload.title || !payload.date || !payload.start || !payload.end) { showToast('ERR: PARAMS MISSING', 'error'); return; }
       
       var btn = document.getElementById('submitBtn'); btn.disabled = true;
-      setBtnText('submitBtn', 'CREATING...');
+      setBtnText('submitBtn', 'TRANSMITTING...');
 
       callBackend('addCalendarEvent', payload,
         function() {
-          showToast('EVENT CREATED SUCCESSFULLY!', 'success');
-          btn.disabled = false; setBtnText('submitBtn', 'CREATE EVENT');
+          showToast('MISSION LOGGED: ' + payload.title, 'success');
+          btn.disabled = false; setBtnText('submitBtn', 'EXECUTE // TRANSMIT');
           document.getElementById('eventTitle').value = ""; document.getElementById('eventDesc').value = ""; selectedTitle = null; renderTags();
         },
         function(err) {
-          showToast('ERROR: ' + err.message, 'error');
+          showToast('FAIL: ' + err.message, 'error');
           btn.disabled = false; setBtnText('submitBtn', 'RETRY');
         }
       );
@@ -760,53 +1223,65 @@
     function openModal(type) {
       var modal = document.getElementById('manageModal'); var title = document.getElementById('modalTitle'); var body = document.getElementById('modalBody');
       if (type === 'title') {
-        title.innerText = 'EDIT TAGS';
-        body.innerHTML = '<div class="flex gap-2"><input type="text" id="newTitleInput" placeholder="New Tag..." class="flex-1 spidey-input px-3 py-2 text-sm"><button onclick="addTitle()" class="btn-secondary px-4 text-sm font-bold">ADD</button></div><div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-2 custom-scroll" id="modalTitleTags"></div>';
+        title.innerText = 'PRESET CONFIG';
+        body.innerHTML = '<div class="flex gap-1.5"><input type="text" id="newTitleInput" placeholder="TAG NAME..." class="flex-1 spidey-input px-2.5 py-1.5 text-xs"><button onclick="addTitle()" class="btn-pixel btn-orange px-3 py-1 text-xs" data-text="ADD"><span class="btn-text">ADD</span></button></div><div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pt-2 no-scrollbar" id="modalTitleTags"></div>';
         renderModalTitleTags();
       } else {
-        editingTimeIndex = null; title.innerText = 'EDIT TIME PERIODS';
-        body.innerHTML = '<div class="space-y-2"><input type="text" id="newTimeLabel" placeholder="Label (e.g. P1)" class="w-full spidey-input px-3 py-2 text-sm"><div class="grid grid-cols-2 gap-2"><input type="time" id="newTimeStart" value="08:10" class="spidey-input px-3 py-2 text-sm font-mono"><input type="time" id="newTimeEnd" value="09:00" class="spidey-input px-3 py-2 text-sm font-mono"></div><button id="saveTimeSlotBtn" onclick="saveTimeSlot()" class="btn-secondary w-full py-2.5 mt-1 text-sm font-bold">ADD PERIOD</button></div><div class="flex flex-col gap-2 max-h-40 overflow-y-auto pt-3 mt-3 border-t border-gray-100 custom-scroll" id="modalTimeTags"></div>';
+        editingTimeIndex = null; title.innerText = 'TIME VECTOR CONFIG';
+        body.innerHTML = '<div class="space-y-1.5"><input type="text" id="newTimeLabel" placeholder="LABEL (e.g. 第九節)" class="w-full spidey-input px-2.5 py-1.5 text-xs"><div class="grid grid-cols-2 gap-1.5"><input type="time" id="newTimeStart" value="08:10" class="spidey-input px-2 py-1 text-xs"><input type="time" id="newTimeEnd" value="09:00" class="spidey-input px-2 py-1 text-xs"></div><button id="saveTimeSlotBtn" onclick="saveTimeSlot()" class="btn-pixel btn-green w-full py-2 mt-1 text-xs" data-text="ADD SLOT"><span class="btn-text">ADD SLOT</span></button></div><div class="flex flex-col gap-1.5 max-h-36 overflow-y-auto pt-2 mt-2 border-t border-[#133f73] no-scrollbar" id="modalTimeTags"></div>';
         renderModalTimeTags();
       }
       modal.classList.remove('hidden');
     }
-    function closeModal() { document.getElementById('manageModal').classList.add('hidden'); editingTimeIndex = null; renderTags(); }
+
+    function closeModal() {
+      document.getElementById('manageModal').classList.add('hidden'); editingTimeIndex = null; renderTags();
+      callBackend('savePresetsData', { titles: dbTitles, times: dbTimes });
+    }
 
     function addTitle() {
       var val = document.getElementById('newTitleInput').value.trim();
       if (val && !dbTitles.includes(val)) { dbTitles.push(val); document.getElementById('newTitleInput').value = ''; renderModalTitleTags(); }
     }
-    function removeTitle(idx) { dbTitles.splice(idx, 1); renderModalTitleTags(); }
+    function removeTitle(idx) {
+      if (selectedTitle === dbTitles[idx]) { selectedTitle = null; document.getElementById('eventTitle').value = ''; }
+      dbTitles.splice(idx, 1); renderModalTitleTags();
+    }
     function renderModalTitleTags() {
       var container = document.getElementById('modalTitleTags'); container.innerHTML = '';
-      dbTitles.forEach(function(t, i) { container.innerHTML += '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-semibold">' + t + '<button onclick="removeTitle(' + i + ')" class="text-gray-400 hover:text-red-500 font-bold px-1">✕</button></span>'; });
+      dbTitles.forEach(function(t, i) { container.innerHTML += '<span class="inline-flex items-center gap-1.5 px-2 py-1 border border-[#133f73] bg-[#020b17] rounded text-xs text-[#93c5fd]">' + t + '<button onclick="removeTitle(' + i + ')" class="text-[#e62429] hover:text-white font-bold px-1">✕</button></span>'; });
     }
     
     function saveTimeSlot() {
       var label = document.getElementById('newTimeLabel').value.trim() || 'Slot';
       var start = document.getElementById('newTimeStart').value, end = document.getElementById('newTimeEnd').value;
       if (!start || !end) return;
-      if (editingTimeIndex !== null) { dbTimes[editingTimeIndex] = { label: label, start: start, end: end }; editingTimeIndex = null; setBtnText('saveTimeSlotBtn', 'ADD PERIOD'); } 
+      if (editingTimeIndex !== null) { dbTimes[editingTimeIndex] = { label: label, start: start, end: end }; editingTimeIndex = null; setBtnText('saveTimeSlotBtn', 'ADD SLOT'); } 
       else { dbTimes.push({ label: label, start: start, end: end }); }
       document.getElementById('newTimeLabel').value = ''; renderModalTimeTags();
     }
     function editTime(idx) {
       editingTimeIndex = idx; var target = dbTimes[idx];
       document.getElementById('newTimeLabel').value = target.label; document.getElementById('newTimeStart').value = target.start; document.getElementById('newTimeEnd').value = target.end;
-      setBtnText('saveTimeSlotBtn', 'UPDATE PERIOD');
+      setBtnText('saveTimeSlotBtn', 'UPDATE SLOT');
     }
-    function removeTime(idx) { dbTimes.splice(idx, 1); renderModalTimeTags(); }
+    function removeTime(idx) {
+      if (editingTimeIndex === idx) { editingTimeIndex = null; setBtnText('saveTimeSlotBtn', 'ADD SLOT'); document.getElementById('newTimeLabel').value = ''; }
+      if (selectedTimeLabel === dbTimes[idx].label) { selectedTimeLabel = null; document.getElementById('startTime').value = ''; document.getElementById('endTime').value = ''; }
+      dbTimes.splice(idx, 1); renderModalTimeTags();
+    }
     function renderModalTimeTags() {
       var container = document.getElementById('modalTimeTags'); container.innerHTML = '';
       dbTimes.forEach(function(t, i) {
-        container.innerHTML += '<div class="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 font-semibold"><span>' + t.label + ' <span class="text-gray-400 font-normal ml-1 font-mono">(' + t.start + '-' + t.end + ')</span></span><div class="flex items-center gap-3"><button onclick="editTime(' + i + ')" class="text-blue-500">EDIT</button><button onclick="removeTime(' + i + ')" class="text-red-500">DEL</button></div></div>';
+        container.innerHTML += '<div class="flex items-center justify-between p-1.5 border border-[#133f73] bg-[#020b17] rounded text-xs text-[#93c5fd]"><span>' + t.label + ' <span class="text-[#f59e0b]">(' + t.start + '-' + t.end + ')</span></span><div class="flex items-center gap-2"><button onclick="editTime(' + i + ')" class="text-[#10b981] font-bold">EDIT</button><button onclick="removeTime(' + i + ')" class="text-[#e62429] font-bold">DEL</button></div></div>';
       });
     }
 
     // ==========================================
-    // TIMETABLE RENDERING 
+    // TIMETABLE RENDERING (PRECISION SIZING)
     // ==========================================
     function navigateWeek(direction) { currentWeekOffset = (direction === 0) ? 0 : currentWeekOffset + direction; renderTimetableGrid(); }
+
     function getCurrentWeekDates() {
       var now = new Date(); var currentDayOfWeek = now.getDay(); var mondayDiff = (currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek) + (currentWeekOffset * 7);
       var dates = [];
@@ -818,9 +1293,9 @@
     }
 
     function getSubjectCustomStyle(subject) {
-      if (!subject) return 'background-color: transparent; border: 1px dashed #E6E8EC; color: #A0A4AB;';
-      var hex = dbSubjectColors[subject] || '#FF2E4D';
-      return 'background-color: ' + hex + '15; color: ' + hex + '; border: 1px solid ' + hex + '30;';
+      if (!subject) return 'background-color: rgba(3, 15, 33, 0.4); color: #475569; border: 1px dashed #143e70;';
+      var hex = dbSubjectColors[subject] || '#38bdf8';
+      return 'background-color: ' + hex + '22; color: #ffffff; border: 1.5px solid ' + hex + '; text-shadow: 0 0 5px ' + hex + '66;';
     }
 
     function renderTimetableGrid() {
@@ -828,17 +1303,17 @@
       if (!tbody || !headerRow) return;
       tbody.innerHTML = '';
       var weekDates = getCurrentWeekDates(); var dayNamesShort = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
-      document.getElementById('weekRangeLabel').innerText = weekDates[0].slice(5) + ' ~ ' + weekDates[4].slice(5);
+      document.getElementById('weekRangeLabel').innerText = weekDates[0].slice(5) + ' // ' + weekDates[4].slice(5);
       
       var relLabel = document.getElementById('weekRelativeLabel');
-      if (currentWeekOffset === 0) { relLabel.innerText = 'THIS WEEK'; } 
-      else { relLabel.innerText = currentWeekOffset > 0 ? '+' + currentWeekOffset + ' WEEKS' : currentWeekOffset + ' WEEKS'; }
+      if (currentWeekOffset === 0) { relLabel.innerText = '[CURRENT WEEK]'; } 
+      else { relLabel.innerText = currentWeekOffset > 0 ? '[+ ' + currentWeekOffset + ' WEEKS]' : '[- ' + Math.abs(currentWeekOffset) + ' WEEKS]'; }
 
-      headerRow.innerHTML = '<th class="py-2 border-r border-gray-100 w-12 font-bold">#</th>';
+      headerRow.innerHTML = '<th class="p-1.5 border-r border-[#133f73] w-14 sm:w-16 text-[9px] text-[#f59e0b] font-pixel">#</th>';
       for (var d = 0; d < 5; d++) {
-        headerRow.innerHTML += '<th class="py-2 border-r last:border-r-0 border-gray-100">' +
-          '<div class="text-gray-700 font-bold text-xs">' + dayNamesShort[d] + '</div>' +
-          '<div class="text-gray-400 text-[10px] mt-0.5 font-mono">' + weekDates[d].slice(5) + '</div>' +
+        headerRow.innerHTML += '<th class="p-1.5 border-r last:border-r-0 border-[#133f73] font-mono">' +
+          '<div class="text-[#f59e0b] font-bold text-[10px] sm:text-[11px] font-pixel">' + dayNamesShort[d] + '</div>' +
+          '<div class="text-[#93c5fd] text-[8px] sm:text-[9px] font-pixel-num mt-0.5">' + weekDates[d].slice(5) + '</div>' +
         '</th>';
       }
 
@@ -849,9 +1324,9 @@
         var tr = document.createElement('tr');
         var timeInfo = periodTimes[p] || { label: 'P' + (p+1), start: '' };
         
-        var tdHtml = '<td class="p-1 border-r border-gray-100 bg-white w-12">' +
-          '<div class="text-xs font-bold text-gray-400 text-center font-mono">' + (p + 1) + '</div>' +
-          '<div class="text-[9px] text-gray-300 leading-tight mt-0.5 text-center font-mono">' + (timeInfo.start || '') + '</div>' +
+        var tdHtml = '<td class="p-1 border-r border-[#133f73] bg-[#051833] w-14 sm:w-16">' +
+          '<div class="text-[9px] font-bold text-[#f59e0b] font-pixel-num text-center">P' + (p + 1) + '</div>' +
+          '<div class="text-[8px] text-[#38bdf8] font-pixel-num leading-tight mt-0.5 text-center break-words">' + (timeInfo.start || '') + '</div>' +
         '</td>';
 
         for (var d2 = 0; d2 < 5; d2++) {
@@ -865,14 +1340,14 @@
             var origDayIdx = getWeekdayIndex(swapIn.fromDate);
             var origSubj = timetableData[swapIn.fromPeriod - 1] ? timetableData[swapIn.fromPeriod - 1][origDayIdx] : '';
             displaySubject = origSubj || rawSubject;
-            dotBadge = '<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#FF2E4D] ' + (appSettings.showSwapPulse ? 'animate-pulse' : '') + '"></span>';
+            dotBadge = '<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#fbbf24] ' + (appSettings.showSwapPulse ? 'animate-pulse' : '') + ' shadow-[0_0_4px_#fbbf24]"></span>';
           } else if (swapOut) {
-            dotBadge = '<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-300"></span>';
+            dotBadge = '<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#ef4444]"></span>';
           }
 
-          tdHtml += '<td class="p-1 border-r last:border-r-0 border-gray-100 select-none align-middle">' +
-            '<div class="relative w-full h-full min-h-[50px] rounded-lg p-1 flex flex-col justify-center items-center cursor-pointer transition hover:opacity-80" style="' + getSubjectCustomStyle(displaySubject) + '">' +
-              '<span class="text-sm font-bold leading-tight break-words text-center w-full">' + (displaySubject || '') + '</span>' + 
+          tdHtml += '<td class="p-1 border-r last:border-r-0 border-[#133f73] select-none align-middle">' +
+            '<div class="relative w-full h-full min-h-[46px] rounded p-1 flex flex-col justify-center items-center cursor-pointer transition hover:brightness-110 overflow-hidden" style="' + getSubjectCustomStyle(displaySubject) + '">' +
+              '<span class="text-[14px] sm:text-[16px] font-bold leading-tight break-words text-center w-full font-pixel-zh hyphens-auto">' + (displaySubject || '-') + '</span>' + 
               dotBadge + 
             '</div>' +
           '</td>';
@@ -893,14 +1368,22 @@
     function saveTimetableToCloud() {
       var btn = document.getElementById('syncMatrixBtn'); btn.disabled = true;
       setBtnText('syncMatrixBtn', 'SYNCING...');
+      
       callBackend('saveTimetableData', timetableData,
-        function() { showToast('TIMETABLE SYNCED', 'success'); btn.disabled = false; setBtnText('syncMatrixBtn', 'SAVE & SYNC'); },
-        function(err) { showToast('ERROR: ' + err.message, 'error'); btn.disabled = false; setBtnText('syncMatrixBtn', 'SAVE & SYNC'); }
+        function() {
+          showToast('MATRIX SYNCED TO CLOUD', 'success');
+          btn.disabled = false; setBtnText('syncMatrixBtn', 'SAVE MATRIX // SYNC');
+        },
+        function(err) {
+          showToast('FAIL: ' + err.message, 'error');
+          btn.disabled = false; setBtnText('syncMatrixBtn', 'SAVE MATRIX // SYNC');
+        }
       );
     }
+
     function syncTimetableFromCloud() {
       callBackend('getTimetableData', null, function(data) {
-        if (data && Array.isArray(data)) { timetableData = data; if (currentTab === 'timetable') renderTimetableGrid(); showToast('TIMETABLE UPDATED', 'success'); }
+        if (data && Array.isArray(data)) { timetableData = data; saveLocalCache(); if (currentTab === 'timetable') renderTimetableGrid(); showToast('TIMETABLE SYNCED', 'success'); }
       });
     }
 
@@ -915,10 +1398,12 @@
       renderMultiSwapSteps(); switchSwapMode('two');
       document.getElementById('swapModal').classList.remove('hidden');
     }
+
     function populatePeriodSelect(elementId) {
       var el = document.getElementById(elementId); if (!el) return; el.innerHTML = '';
-      for (var i = 1; i <= (appSettings.totalPeriods || 8); i++) el.innerHTML += '<option value="' + i + '">Period ' + i + '</option>';
+      for (var i = 1; i <= (appSettings.totalPeriods || 8); i++) el.innerHTML += '<option value="' + i + '">PERIOD ' + i + '</option>';
     }
+
     function closeSwapModal() { document.getElementById('swapModal').classList.add('hidden'); }
 
     function switchSwapMode(mode) {
@@ -926,24 +1411,22 @@
       var btnTwo = document.getElementById('swapModeTwoBtn'), btnMulti = document.getElementById('swapModeMultiBtn');
       var viewTwo = document.getElementById('swapModeTwoView'), viewMulti = document.getElementById('swapModeMultiView');
       if (mode === 'two') {
-        btnTwo.classList.add('bg-white', 'shadow-sm'); btnTwo.classList.remove('bg-transparent');
-        btnMulti.classList.remove('bg-white', 'shadow-sm'); btnMulti.classList.add('bg-transparent');
+        btnTwo.className = 'btn-pixel btn-orange py-1.5'; btnMulti.className = 'btn-pixel btn-blue py-1.5';
         viewTwo.classList.remove('hidden'); viewMulti.classList.add('hidden');
       } else {
-        btnMulti.classList.add('bg-white', 'shadow-sm'); btnMulti.classList.remove('bg-transparent');
-        btnTwo.classList.remove('bg-white', 'shadow-sm'); btnTwo.classList.add('bg-transparent');
+        btnMulti.className = 'btn-pixel btn-orange py-1.5'; btnTwo.className = 'btn-pixel btn-blue py-1.5';
         viewMulti.classList.remove('hidden'); viewTwo.classList.add('hidden');
       }
     }
 
     function addMultiSwapStep() { multiSwapSteps.push({ date: new Date().toISOString().split('T')[0], period: multiSwapSteps.length + 1 }); renderMultiSwapSteps(); }
-    function removeMultiSwapStep(idx) { if (multiSwapSteps.length <= 3) return; multiSwapSteps.splice(idx, 1); renderMultiSwapSteps(); }
+    function removeMultiSwapStep(idx) { if (multiSwapSteps.length <= 3) { showToast('MIN 3 NODES REQUIRED', 'error'); return; } multiSwapSteps.splice(idx, 1); renderMultiSwapSteps(); }
 
     function renderMultiSwapSteps() {
       var container = document.getElementById('multiSwapStepsContainer'); container.innerHTML = '';
       multiSwapSteps.forEach(function(step, idx) {
-        var optHtml = ''; for (var p = 1; p <= (appSettings.totalPeriods || 8); p++) optHtml += '<option value="' + p + '" ' + (step.period === p ? 'selected' : '') + '>Period ' + p + '</option>';
-        container.innerHTML += '<div class="p-2 border border-gray-100 bg-white rounded-xl flex items-center gap-2"><span class="w-6 h-6 bg-gray-100 text-gray-500 font-bold text-xs flex justify-center items-center rounded-full">' + (idx + 1) + '</span><input type="date" value="' + step.date + '" onchange="multiSwapSteps[' + idx + '].date=this.value" class="spidey-input px-2 py-2 text-xs w-32 font-mono"><select onchange="multiSwapSteps[' + idx + '].period=parseInt(this.value)" class="spidey-input px-2 py-2 text-xs flex-1 bg-white">' + optHtml + '</select>' + (multiSwapSteps.length > 3 ? '<button onclick="removeMultiSwapStep(' + idx + ')" class="text-gray-400 hover:text-red-500 text-sm px-1 font-bold">✕</button>' : '') + '</div>';
+        var optHtml = ''; for (var p = 1; p <= (appSettings.totalPeriods || 8); p++) optHtml += '<option value="' + p + '" ' + (step.period === p ? 'selected' : '') + '>P' + p + '</option>';
+        container.innerHTML += '<div class="p-1.5 border border-[#133f73] bg-[#020b17] rounded flex items-center gap-1.5"><span class="w-5 h-5 bg-[#10b981] text-black font-bold text-xs flex justify-center items-center rounded">' + (idx + 1) + '</span><input type="date" value="' + step.date + '" onchange="multiSwapSteps[' + idx + '].date=this.value" class="spidey-input px-2 py-1 text-xs"><select onchange="multiSwapSteps[' + idx + '].period=parseInt(this.value)" class="spidey-input px-2 py-1 text-xs flex-1">' + optHtml + '</select>' + (multiSwapSteps.length > 3 ? '<button onclick="removeMultiSwapStep(' + idx + ')" class="text-[#e62429] text-xs px-1.5 font-bold">✕</button>' : '') + '</div>';
       });
     }
 
@@ -952,7 +1435,7 @@
       if (currentSwapMode === 'two') {
         var dateA = document.getElementById('swapA_Date').value, periodA = parseInt(document.getElementById('swapA_Period').value);
         var dateB = document.getElementById('swapB_Date').value, periodB = parseInt(document.getElementById('swapB_Period').value);
-        if (!dateA || !dateB) return;
+        if (!dateA || !dateB) { showToast('INVALID DATES', 'error'); return; }
         swapRecords.push({ id: 'SWAP_' + Date.now() + '_1', fromDate: dateA, fromPeriod: periodA, toDate: dateB, toPeriod: periodB, note: note, chainGroup: groupId });
         swapRecords.push({ id: 'SWAP_' + Date.now() + '_2', fromDate: dateB, fromPeriod: periodB, toDate: dateA, toPeriod: periodA, note: note, chainGroup: groupId });
       } else {
@@ -962,33 +1445,42 @@
           swapRecords.push({ id: `SWAP_${Date.now()}_${i}`, fromDate: from.date, fromPeriod: from.period, toDate: to.date, toPeriod: to.period, note: note, chainGroup: groupId });
         }
       }
-      saveSwapsToCloud(); renderTimetableGrid(); closeSwapModal(); showToast('SWAP CONFIRMED', 'success');
+      saveSwapsToCloud(); renderTimetableGrid(); closeSwapModal(); showToast('ROUTE SWAP EXECUTED', 'success');
     }
 
-    function syncSwapsFromCloud() { callBackend('getSwapRecords', null, function(data) { if (data && Array.isArray(data)) { swapRecords = data; if (currentTab === 'timetable') renderTimetableGrid(); } }); }
-    function saveSwapsToCloud() { callBackend('saveSwapRecords', swapRecords); }
+    function syncSwapsFromCloud() {
+      callBackend('getSwapRecords', null, function(data) {
+        if (data && Array.isArray(data)) { swapRecords = data; if (currentTab === 'timetable') renderTimetableGrid(); }
+      });
+    }
+    
+    function saveSwapsToCloud() {
+      callBackend('saveSwapRecords', swapRecords);
+    }
 
     function openSwapListModal() {
       var container = document.getElementById('swapListModalContent'); container.innerHTML = '';
-      if (swapRecords.length === 0) container.innerHTML = '<div class="text-sm text-gray-400 text-center py-6 font-semibold uppercase tracking-wider">NO LOGS</div>';
-      else swapRecords.forEach(function(r, idx) { container.innerHTML += '<div class="p-3 border border-gray-100 bg-gray-50 rounded-xl flex justify-between items-center"><div><div class="font-bold text-gray-700 text-xs">' + r.fromDate + ' (P' + r.fromPeriod + ') <i class="fa-solid fa-arrow-right text-gray-400 mx-1"></i> ' + r.toDate + ' (P' + r.toPeriod + ')</div>' + (r.note ? '<div class="text-[11px] text-gray-500 mt-1">' + r.note + '</div>' : '') + '</div><button onclick="deleteSwapRecord(' + idx + ')" class="text-gray-400 hover:text-red-500 text-sm font-bold px-2 py-1"><i class="fa-solid fa-trash"></i></button></div>'; });
+      if (swapRecords.length === 0) container.innerHTML = '<div class="text-xs text-[#64748b] text-center py-4 font-mono tracking-wider">NO ACTIVE SWAP LOGS</div>';
+      else swapRecords.forEach(function(r, idx) { container.innerHTML += '<div class="p-2 border border-[#133f73] bg-[#020b17] rounded flex justify-between items-center"><div><div class="font-bold text-[#f59e0b] text-xs">' + r.fromDate + ' (P' + r.fromPeriod + ') &gt; ' + r.toDate + ' (P' + r.toPeriod + ')</div>' + (r.note ? '<div class="text-[11px] text-[#94a3b8] mt-0.5">' + r.note + '</div>' : '') + '</div><button onclick="deleteSwapRecord(' + idx + ')" class="text-[#e62429] hover:text-white text-xs font-bold px-2 py-1 bg-[#450a0a] rounded border border-[#7f1d1d]">DEL</button></div>'; });
       document.getElementById('swapListModal').classList.remove('hidden');
     }
+
     function closeSwapListModal() { document.getElementById('swapListModal').classList.add('hidden'); }
+    
     function deleteSwapRecord(idx) {
       var target = swapRecords[idx];
       if (target.chainGroup) swapRecords = swapRecords.filter(function(r) { return r.chainGroup !== target.chainGroup; }); else swapRecords.splice(idx, 1);
-      saveSwapsToCloud(); renderTimetableGrid(); openSwapListModal(); showToast('LOG DELETED', 'success');
+      saveSwapsToCloud(); renderTimetableGrid(); openSwapListModal(); showToast('LOG PURGED', 'success');
     }
 
     // ==========================================
-    // TRACKER
+    // TRACKER 功能 (GSAT Timer & Progress)
     // ==========================================
     function checkPersistedTimer() {
       var state = EvStore.get('gsat_timer_state');
       if (state && (state === 'RUNNING' || state === 'PAUSED')) {
         timerState = state;
-        currentSubject = EvStore.get('gsat_timer_subject') || '數學'; // 對應中文
+        currentSubject = EvStore.get('gsat_timer_subject') || '數學';
         accumulatedMs = parseInt(EvStore.get('gsat_timer_accumulated') || '0', 10);
         var savedStart = EvStore.get('gsat_timer_segment_start');
         currentSegmentStartMs = savedStart ? parseInt(savedStart, 10) : null;
@@ -1005,7 +1497,9 @@
       else EvStore.del('gsat_timer_segment_start');
     }
     
-    function getTotalElapsedMs() { var total = accumulatedMs; if (timerState === 'RUNNING' && currentSegmentStartMs) total += (Date.now() - currentSegmentStartMs); return total; }
+    function getTotalElapsedMs() {
+      var total = accumulatedMs; if (timerState === 'RUNNING' && currentSegmentStartMs) total += (Date.now() - currentSegmentStartMs); return total;
+    }
 
     function updateClockDisplay() {
       var s = Math.floor(getTotalElapsedMs() / 1000);
@@ -1014,7 +1508,8 @@
     }
 
     function updateSubjectUI(subj) {
-      var badge = document.getElementById('current-track-badge'); if(badge) badge.innerText = subj;
+      var badge = document.getElementById('current-track-badge');
+      if(badge) badge.innerText = subj;
       document.querySelectorAll('#subject-selector button').forEach(function(b) {
         if (b.dataset.subj === subj) { b.classList.add('spidey-item-active'); }
         else { b.classList.remove('spidey-item-active'); }
@@ -1023,7 +1518,8 @@
     }
 
     function setSubject(subj) {
-            currentSubject = subj; selectedUnits = []; updateSubjectUI(subj);
+      if (timerState !== 'IDLE') { showToast('SYS: HALT TIMER FIRST', 'error'); return; }
+      currentSubject = subj; selectedUnits = []; updateSubjectUI(subj);
     }
 
     function startTimer() {
@@ -1043,11 +1539,15 @@
       clearInterval(timerInterval);
       var hours = getTotalElapsedMs() / (1000 * 60 * 60);
       var btn = document.getElementById('commit-timer-btn'); btn.disabled = true; 
-      setBtnText('commit-timer-btn', 'SAVING...');
+      setBtnText('commit-timer-btn', 'COMMITTING...');
       
       callBackend('apiRecordTime', { subject: currentSubject, elapsedHours: hours },
-        function() { showToast('LOGGED SUCCESSFULLY!', 'success'); resetTimerUI(btn); },
-        function(err) { showToast('ERROR: ' + err.message, 'error'); btn.disabled = false; setBtnText('commit-timer-btn', 'STOP & LOG'); }
+        function() {
+          showToast('LOGGED: +' + hours.toFixed(2) + 'H', 'success'); resetTimerUI(btn);
+        },
+        function(err) {
+          showToast('ERR: ' + err.message, 'error'); btn.disabled = false; setBtnText('commit-timer-btn', 'HALT & COMMIT');
+        }
       );
     }
 
@@ -1056,95 +1556,102 @@
       EvStore.del('gsat_timer_accumulated'); EvStore.del('gsat_timer_segment_start');
       timerState = 'IDLE'; currentSegmentStartMs = null; accumulatedMs = 0;
       document.getElementById('start-btn').classList.remove('hidden'); document.getElementById('running-actions').classList.add('hidden');
-      document.getElementById('terminal-state').innerText = 'IDLE'; document.getElementById('terminal-state').className = 'font-bold text-gray-400 tracking-wider';
-      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-gray-300';
-      document.getElementById('timer-status').innerHTML = 'WAITING TO START...';
+      document.getElementById('terminal-state').innerText = 'IDLE'; document.getElementById('terminal-state').className = 'text-[#94a3b8] font-bold tracking-wider';
+      document.getElementById('pulse-dot').className = 'inline-block w-2.5 h-2.5 rounded-full bg-[#e62429]';
+      document.getElementById('timer-status').innerHTML = 'AWAITING INITIATION...';
       document.getElementById('timer-display').innerText = '00:00:00';
-      if(btn) { btn.disabled = false; setBtnText('commit-timer-btn', 'STOP & LOG'); }
+      if(btn) { btn.disabled = false; setBtnText('commit-timer-btn', 'HALT & COMMIT'); }
     }
 
     function setUIRunning() {
       document.getElementById('start-btn').classList.add('hidden'); document.getElementById('running-actions').classList.remove('hidden');
       setBtnText('pause-resume-btn', 'PAUSE');
-      document.getElementById('terminal-state').innerText = 'RECORDING'; document.getElementById('terminal-state').className = 'font-bold text-[#FF2E4D] tracking-wider';
-      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-[#FF2E4D] animate-pulse shadow-[0_0_8px_rgba(255,46,77,0.5)]';
-      document.getElementById('timer-status').innerHTML = 'RECORDING: ' + currentSubject.toUpperCase();
+      document.querySelector('#pause-resume-btn i').className = 'fa-solid fa-pause text-xs';
+      document.getElementById('terminal-state').innerText = 'RECORDING'; document.getElementById('terminal-state').className = 'text-[#e62429] font-bold tracking-wider';
+      document.getElementById('pulse-dot').className = 'inline-block w-2.5 h-2.5 rounded-full bg-[#e62429] animate-ping';
+      document.getElementById('timer-status').innerHTML = 'RECORDING SESSION: ' + currentSubject;
     }
 
     function setUIPaused() {
-      document.getElementById('start-btn').classList.add('hidden'); document.getElementById('running-actions').classList.remove('hidden');
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('running-actions').classList.remove('hidden');
       setBtnText('pause-resume-btn', 'RESUME');
-      document.getElementById('terminal-state').innerText = 'PAUSED'; document.getElementById('terminal-state').className = 'font-bold text-gray-600 tracking-wider';
-      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-gray-400';
-      document.getElementById('timer-status').innerHTML = 'PAUSED';
+      document.querySelector('#pause-resume-btn i').className = 'fa-solid fa-play text-xs';
+      document.getElementById('terminal-state').innerText = 'PAUSED'; document.getElementById('terminal-state').className = 'text-[#f59e0b] font-bold tracking-wider';
+      document.getElementById('pulse-dot').className = 'inline-block w-2.5 h-2.5 rounded-full bg-[#f59e0b]';
+      document.getElementById('timer-status').innerHTML = 'SESSION PAUSED';
     }
 
+    // Units Logic
     function renderUnitTags() {
       var c = document.getElementById('unit-tag-container'); c.innerHTML = '';
       var list = unitsCache[currentSubject] || [];
-      if (!list.length) { c.innerHTML = '<span class="text-xs text-gray-400 uppercase tracking-wider">NO UNITS AVAILABLE</span>'; document.getElementById('selected-units-preview').innerText = 'NONE'; return; }
+      if (!list.length) { c.innerHTML = '<span class="text-xs text-[#64748b] font-mono tracking-wider">NULL DB - NO TOPICS LOADED</span>'; document.getElementById('selected-units-preview').innerText = 'NULL'; return; }
       list.forEach(function(u) {
         var btn = createEVBtn(u, function(b) {
           if(selectedUnits.includes(u)) selectedUnits = selectedUnits.filter(function(x){ return x!==u;}); else selectedUnits.push(u); renderUnitTags();
         }, selectedUnits.includes(u));
         c.appendChild(btn);
       });
-      document.getElementById('selected-units-preview').innerText = selectedUnits.length ? selectedUnits.join(', ') : 'NONE';
+      document.getElementById('selected-units-preview').innerText = selectedUnits.length ? selectedUnits.join(', ') : 'NULL';
     }
+    
     function clearSelectedUnits() { selectedUnits = []; renderUnitTags(); }
     
     function saveProgress() {
       var unitStr = selectedUnits.join(', '), isDone = document.getElementById('is-completed').checked, note = document.getElementById('note-input').value.trim();
-      if (!unitStr && !note) { showToast('SELECT UNIT OR ADD NOTE', 'error'); return; }
-      var btn = document.getElementById('progress-btn'); btn.disabled = true; setBtnText('progress-btn', 'SAVING...');
+      if (!unitStr && !note) { showToast('DATA REQUIRED: SELECT TOPIC OR ADD NOTE', 'error'); return; }
+      var btn = document.getElementById('progress-btn'); btn.disabled = true; setBtnText('progress-btn', 'SYNCING...');
       
       callBackend('apiRecordProgress', { subject: currentSubject, unit: unitStr, isCompleted: isDone, note: note },
         function() {
-          showToast('PROGRESS SAVED', 'success'); btn.disabled = false; setBtnText('progress-btn', 'SAVE PROGRESS');
+          showToast('PROGRESS SYNCED', 'success');
+          btn.disabled = false; setBtnText('progress-btn', 'SYNC TO DATABASE');
           document.getElementById('note-input').value = ''; selectedUnits = []; renderUnitTags();
         },
-        function(err) { showToast('ERROR: ' + err.message, 'error'); btn.disabled = false; setBtnText('progress-btn', 'SAVE PROGRESS'); }
+        function(err) {
+          showToast('FAIL: ' + err.message, 'error');
+          btn.disabled = false; setBtnText('progress-btn', 'SYNC TO DATABASE');
+        }
       );
     }
 
     // ==========================================
-    // SETTINGS
+    // SETTINGS 功能
     // ==========================================
     function renderSettingsTab() {
       var list = document.getElementById('subjectColorList'); list.innerHTML = '';
-      
-      // 自動掃描目前的課表，把所有出現過的科目自動加入設定清單
-      timetableData.forEach(function(row) {
-        row.forEach(function(subj) {
-          var s = subj.trim();
-          if (s !== '' && !dbSubjects.includes(s)) {
-            dbSubjects.push(s);
-          }
-        });
-      });
-
       dbSubjects.forEach(function(sub, idx) {
-        var c = dbSubjectColors[sub] || '#FF2E4D';
-        list.innerHTML += `<div class="flex items-center justify-between p-3 border border-gray-100 bg-gray-50 rounded-xl text-sm font-bold text-gray-700"><span class="pl-1">${sub}</span><div class="flex items-center gap-3"><input type="color" value="${c}" onchange="updateSubjectHexColor('${sub}', this.value)" class="w-7 h-7 border-0 cursor-pointer bg-transparent rounded p-0"><input type="text" value="${c}" onchange="updateSubjectHexColor('${sub}', this.value)" class="w-[70px] px-2 py-1.5 spidey-input text-xs uppercase text-center font-mono bg-white"><button onclick="removeSubject(${idx})" class="text-gray-400 hover:text-red-500 text-sm px-1"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        var c = dbSubjectColors[sub] || '#ef4444';
+        list.innerHTML += `<div class="flex items-center justify-between p-2 border border-[#133f73] bg-[#020b17] rounded text-xs font-bold text-[#cbd5e1]"><span class="pl-1">${sub}</span><div class="flex items-center gap-2"><input type="color" value="${c}" onchange="updateSubjectHexColor('${sub}', this.value)" class="w-6 h-6 border border-[#133f73] cursor-pointer bg-transparent rounded p-0"><input type="text" value="${c}" onchange="updateSubjectHexColor('${sub}', this.value)" class="w-16 px-1.5 py-1 spidey-input text-xs uppercase text-center font-mono"><button onclick="removeSubject(${idx})" class="text-[#e62429] hover:text-white font-bold px-2 py-1 bg-[#450a0a] rounded border border-[#7f1d1d] text-xs">✕</button></div></div>`;
       });
       document.getElementById('settingTotalPeriods').value = String(appSettings.totalPeriods || 8);
       document.getElementById('settingShowSwapPulse').checked = !!appSettings.showSwapPulse;
     }
-    function updateSubjectHexColor(subject, hexVal) { if (!hexVal.startsWith('#')) hexVal = '#' + hexVal; dbSubjectColors[subject] = hexVal; renderTimetableGrid(); }
-    function addCustomSubjectPrompt() { var name = prompt('ENTER NEW SUBJECT NAME:'); if (name && name.trim() && !dbSubjects.includes(name.trim())) { dbSubjects.push(name.trim()); dbSubjectColors[name.trim()] = '#FF2E4D'; renderSettingsTab(); renderTimetableGrid(); } }
-    function removeSubject(idx) { var name = dbSubjects[idx]; dbSubjects.splice(idx, 1); delete dbSubjectColors[name]; renderSettingsTab(); renderTimetableGrid(); }
-    function updateTotalPeriods(val) { appSettings.totalPeriods = parseInt(val) || 8; renderTimetableGrid(); }
-    function toggleSwapPulse(checked) { appSettings.showSwapPulse = checked; renderTimetableGrid(); }
+    function updateSubjectHexColor(subject, hexVal) { if (!hexVal.startsWith('#')) hexVal = '#' + hexVal; dbSubjectColors[subject] = hexVal; saveLocalCache(); renderTimetableGrid(); }
+    function addCustomSubjectPrompt() { var name = prompt('ENTER NEW SUBJECT NAME:'); if (name && name.trim() && !dbSubjects.includes(name.trim())) { dbSubjects.push(name.trim()); dbSubjectColors[name.trim()] = '#38bdf8'; saveLocalCache(); renderSettingsTab(); renderTimetableGrid(); } }
+    function removeSubject(idx) { var name = dbSubjects[idx]; dbSubjects.splice(idx, 1); delete dbSubjectColors[name]; saveLocalCache(); renderSettingsTab(); renderTimetableGrid(); }
+    function updateTotalPeriods(val) { appSettings.totalPeriods = parseInt(val) || 8; saveLocalCache(); renderTimetableGrid(); }
+    function toggleSwapPulse(checked) { appSettings.showSwapPulse = checked; saveLocalCache(); renderTimetableGrid(); }
     
     function saveAllSettingsToCloud() {
       var btn = document.getElementById('saveSettingsBtn');
       btn.disabled = true; setBtnText('saveSettingsBtn', 'SAVING...');
       
       callBackend('savePresetsData', { subjects: dbSubjects, subjectColors: dbSubjectColors, settings: appSettings },
-        function() { showToast('SETTINGS SAVED', 'success'); btn.disabled = false; setBtnText('saveSettingsBtn', 'SAVE SETTINGS'); },
-        function(err) { showToast('ERROR: ' + err.message, 'error'); btn.disabled = false; setBtnText('saveSettingsBtn', 'SAVE SETTINGS'); }
+        function() {
+          showToast('SETTINGS OVERWRITTEN TO CLOUD', 'success');
+          btn.disabled = false; setBtnText('saveSettingsBtn', 'SAVE CONFIG TO CLOUD');
+        },
+        function(err) {
+          showToast('FAIL: ' + err.message, 'error');
+          btn.disabled = false; setBtnText('saveSettingsBtn', 'SAVE CONFIG TO CLOUD');
+        }
       );
     }
+    
+    function loadLocalCache() {}
+    function saveLocalCache() {}
 
     // ==========================================
     // SYSTEM INITIALIZATION
@@ -1153,10 +1660,13 @@
       if (window._sysInitialized) return;
       window._sysInitialized = true;
 
+      try { initEarthCanvas(); } catch(e){}
+      try { initOscilloscope(); } catch(e){}
       try { initTelemetry(); } catch(e){}
       
       try {
         renderTags();
+        loadLocalCache();
         renderTimetableGrid();
         renderSettingsTab();
         checkPersistedTimer();
@@ -1176,8 +1686,13 @@
     }
 
     sysInit();
+// 註冊 Service Worker 啟動 PWA
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(err => {}); });
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA Service Worker registered!', reg))
+          .catch(err => console.log('PWA SW registration failed: ', err));
+      });
     }
   </script>
 </body>
