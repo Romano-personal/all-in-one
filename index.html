@@ -712,25 +712,45 @@
     // ⚠️ 部署 GAS 後，請將獲得的網頁應用程式 URL 貼在這裡
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwO5uOOWyuU3wmYwcZuiTpM7JlUTBtcgPtZrsVvG5DWjJJo5sY7-ciN9zSdm0GhGRWj/exec";
 
+    // 實作 Request Queue，避免 Google Apps Script 短時間內被併發請求塞爆
+    let backendQueue = [];
+    let isBackendProcessing = false;
+
+    function processBackendQueue() {
+      if (isBackendProcessing || backendQueue.length === 0) return;
+      isBackendProcessing = true;
+      const task = backendQueue.shift();
+
+      fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: task.action, payload: task.payload })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && task.onSuccess) task.onSuccess(data.data);
+        else if (!data.success && task.onFailure) task.onFailure(new Error(data.message || "API 執行錯誤"));
+      })
+      .catch(err => {
+        if (task.onFailure) task.onFailure(err);
+      })
+      .finally(() => {
+        isBackendProcessing = false;
+        // 稍微延遲一下再處理下一個請求，避免 GAS API 節流限制 (Throttle)
+        setTimeout(processBackendQueue, 300);
+      });
+    }
+
     function callBackend(action, payload, onSuccess, onFailure) {
       if (GAS_API_URL === "YOUR_WEB_APP_URL_HERE") {
         console.warn("API URL 未設定，啟動離線/測試模式");
         if (onFailure) onFailure(new Error("API URL 未設定"));
         return;
       }
-      fetch(GAS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: action, payload: payload })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && onSuccess) onSuccess(data.data);
-        else if (!data.success && onFailure) onFailure(new Error(data.message || "API 執行錯誤"));
-      })
-      .catch(err => {
-        if (onFailure) onFailure(err);
-      });
+      
+      // 將請求加入佇列並開始處理
+      backendQueue.push({ action, payload, onSuccess, onFailure });
+      processBackendQueue();
     }
 
     // ==========================================
@@ -1675,6 +1695,8 @@
 
       setTimeout(function() {
         try { loadUserCalendars(); } catch(e){}
+        // We delay subsequent requests slightly to rely on the new queuing system.
+        // Actually, the new queue system will handle the concurrency automatically.
         try { syncFromCloudSheet(); } catch(e){}
         try { syncTimetableFromCloud(); } catch(e){}
         try { syncSwapsFromCloud(); } catch(e){}
