@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Hi Romano</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#F7F7F7">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +42,7 @@
       border: 1.5px solid var(--border-subtle);
       border-radius: 22px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
 
     .b-input {
@@ -87,13 +89,14 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    /* Blur transition for background content when Bot Menu is open */
+    /* Lighter, more transparent blur when Bot Menu is open */
     #appContentWrapper {
-      transition: filter 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: filter 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
     }
     body.menu-open #appContentWrapper {
-      filter: blur(10px);
-      transform: scale(0.985);
+      filter: blur(3.5px);
+      opacity: 0.55;
+      transform: scale(0.992);
       pointer-events: none;
       user-select: none;
     }
@@ -101,22 +104,31 @@
     /* Agent Overlay Items Staggered Pop */
     .agent-item {
       opacity: 0;
-      transform: translateY(14px) scale(0.95);
-      transition: all 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: translateY(10px) scale(0.96);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     body.menu-open .agent-item {
       opacity: 1;
       transform: translateY(0) scale(1);
     }
-    body.menu-open .agent-item:nth-child(1) { transition-delay: 0.03s; }
-    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.07s; }
-    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.11s; }
-    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.15s; }
+    body.menu-open .agent-item:nth-child(1) { transition-delay: 0.02s; }
+    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.05s; }
+    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.08s; }
+    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.11s; }
 
-    /* Mini Bot Floating Animation in Menu */
+    /* Highlight state when dragging finger over an Agent item */
+    .agent-item.drag-hover {
+      border-color: #111111 !important;
+      background: #FFFFFF !important;
+      transform: scale(1.04) translateX(6px) !important;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09) !important;
+    }
+
     @keyframes mini-float {
-      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
-      50% { transform: translateY(-3.5px) rotate(2deg) scale(1.03, 0.98); }
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-2.5px) scale(1.02, 0.99); }
     }
     .mini-bot-svg {
       animation: mini-float 2.8s ease-in-out infinite;
@@ -131,7 +143,7 @@
 
   <div class="w-full max-w-md min-h-screen flex flex-col justify-between px-5 pt-6 pb-28 relative">
 
-    <!-- ==================== WRAPPED CONTENT (BLURS WHEN MENU OPEN) ==================== -->
+    <!-- ==================== WRAPPED CONTENT (LIGHT BLUR WHEN MENU OPEN) ==================== -->
     <div id="appContentWrapper" class="space-y-4">
 
       <!-- HEADER: Hi Romano -->
@@ -421,71 +433,68 @@
 
     </div>
 
-    <!-- ==================== FLOATING AGENT MENU OVERLAY (STRAIGHT EYES + FLOATING BODY) ==================== -->
-    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-6">
-      <div class="w-full max-w-xs space-y-4">
+    <!-- ==================== FLOATING AGENT MENU OVERLAY (SUPPORTS TAP & HOLD-DRAG-RELEASE) ==================== -->
+    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-6 bg-white/15">
+      <div class="w-full max-w-xs space-y-3.5">
         
         <!-- 1. Circle -> SCHEDULE -->
-        <button onclick="selectAgent('schedule', 'circle', '#111111')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95 transition">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg" viewBox="0 0 100 100">
+        <button data-agent-tab="schedule" data-agent-shape="circle" data-agent-color="#111111" onclick="selectAgent('schedule', 'circle', '#111111')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" viewBox="0 0 100 100">
             <path d="M50,10 A40,40 0 1,1 49.9,10 Z" fill="#111111"/>
             <g class="mini-eyes" fill="#FFFFFF">
               <rect x="37" y="34" width="7" height="15" rx="3.5"/>
               <rect x="54" y="34" width="7" height="15" rx="3.5"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111]">SCHEDULE</span>
+          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">SCHEDULE</span>
         </button>
 
         <!-- 2. Triangle -> TIMETABLE -->
-        <button onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95 transition">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg" style="animation-delay: 0.4s" viewBox="0 0 100 100">
+        <button data-agent-tab="timetable" data-agent-shape="triangle" data-agent-color="#34C77B" onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.4s" viewBox="0 0 100 100">
             <path d="M43,15 Q50,5 57,15 L86,72 Q92,84 79,84 L21,84 Q8,84 14,72 Z" fill="#34C77B"/>
             <g class="mini-eyes" fill="#FFFFFF">
               <rect x="38" y="47" width="6.5" height="13" rx="3.25"/>
               <rect x="53" y="47" width="6.5" height="13" rx="3.25"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111]">TIMETABLE</span>
+          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">TIMETABLE</span>
         </button>
 
         <!-- 3. Hexagon -> TRACKER -->
-        <button onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95 transition">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg" style="animation-delay: 0.8s" viewBox="0 0 100 100">
+        <button data-agent-tab="tracker" data-agent-shape="hexagon" data-agent-color="#F28B30" onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.8s" viewBox="0 0 100 100">
             <path d="M28,14 L72,14 L92,50 L72,86 L28,86 L8,50 Z" stroke="#F28B30" stroke-width="8" stroke-linejoin="round" fill="#F28B30"/>
             <g class="mini-eyes" fill="#FFFFFF">
               <rect x="36" y="36" width="7" height="14" rx="3.5"/>
               <rect x="53" y="36" width="7" height="14" rx="3.5"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111]">TRACKER</span>
+          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">TRACKER</span>
         </button>
 
         <!-- 4. Squircle -> SETTINGS -->
-        <button onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95 transition">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg" style="animation-delay: 1.2s" viewBox="0 0 100 100">
+        <button data-agent-tab="settings" data-agent-shape="squircle" data-agent-color="#3B96F3" onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 1.2s" viewBox="0 0 100 100">
             <rect x="14" y="14" width="72" height="72" rx="20" fill="#3B96F3"/>
             <g class="mini-eyes" fill="#FFFFFF">
               <rect x="38" y="36" width="6.5" height="13" rx="3.25"/>
               <rect x="54" y="36" width="6.5" height="13" rx="3.25"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111]">SETTINGS</span>
+          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">SETTINGS</span>
         </button>
 
       </div>
     </div>
 
-    <!-- ==================== BOTTOM-LEFT BLOUB BOT TRIGGER (FULL BODY ANIMATION + STRAIGHT EYES) ==================== -->
+    <!-- ==================== BOTTOM-LEFT BLOUB BOT TRIGGER (TAP OR HOLD-AND-DRAG) ==================== -->
     <div class="fixed bottom-5 left-5 z-50">
-      <button id="bloubBotBtn" onclick="handleBotClick()" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none" aria-label="Bot Menu">
-        <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible">
-          <!-- Breathing ground shadow -->
+      <button id="bloubBotBtn" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none touch-none" aria-label="Bot Menu">
+        <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible pointer-events-none">
           <ellipse id="mainBotShadow" cx="50" cy="93" rx="24" ry="4" fill="rgba(0,0,0,0.12)" />
-          <!-- Animated Actor Group (Float, Sway, Lean, Squish) -->
           <g id="mainBotActor">
             <path id="mainBotBody" d="" fill="#111111" class="transition-colors duration-300"/>
-            <!-- Straight Upright Capsule Eyes (No Tilt!) -->
             <g id="mainBotEyes" fill="#FFFFFF">
               <rect id="botEyeL" x="35" y="33" width="7.5" height="16.5" rx="3.75" />
               <rect id="botEyeR" x="53.5" y="33" width="7.5" height="16.5" rx="3.75" />
@@ -643,7 +652,7 @@
     var unitsCache = {}, selectedUnits = [];
 
     // =========================================================
-    // 64-POINT RADIAL MORPHING + FULL BODY PHYSICS ENGINE
+    // 64-POINT RADIAL MORPHING + SUBTLE BODY PHYSICS
     // =========================================================
     const NUM_POINTS = 64;
     let currentRadii = new Float32Array(NUM_POINTS).fill(38);
@@ -651,7 +660,6 @@
     let squishVel = 0;
     let squishVal = 0;
 
-    // Generate smooth 64-point polar profile for each shape
     function computeShapeRadii(shapeKey) {
       const arr = new Float32Array(NUM_POINTS);
       for (let i = 0; i < NUM_POINTS; i++) {
@@ -663,13 +671,10 @@
           const s = Math.abs(Math.sin(theta));
           arr[i] = 37 / Math.pow(Math.pow(c, 4.2) + Math.pow(s, 4.2), 1 / 4.2);
         } else if (shapeKey === 'hexagon') {
-          // Rounded 6-sided polygon
           const n = 6;
           const a = ((theta + Math.PI / 6) % (2 * Math.PI / n) + (2 * Math.PI / n)) % (2 * Math.PI / n) - Math.PI / n;
-          const polyR = 35 / Math.cos(a * 0.78);
-          arr[i] = polyR;
+          arr[i] = 35 / Math.cos(a * 0.78);
         } else if (shapeKey === 'triangle') {
-          // Rounded soft triangle
           const rot = theta + Math.PI / 2;
           const n = 3;
           const a = ((rot % (2 * Math.PI / n)) + (2 * Math.PI / n)) % (2 * Math.PI / n) - Math.PI / n;
@@ -685,8 +690,7 @@
       const pts = [];
       for (let i = 0; i < NUM_POINTS; i++) {
         const theta = (i / NUM_POINTS) * Math.PI * 2;
-        // Organic subtle liquid ripple on contour
-        const wave = Math.sin(theta * 3 + breathWaveTime * 2.4) * 0.8 + Math.cos(theta * 2 - breathWaveTime * 1.8) * 0.6;
+        const wave = Math.sin(theta * 3 + breathWaveTime * 2.2) * 0.65 + Math.cos(theta * 2 - breathWaveTime * 1.6) * 0.5;
         const r = radii[i] + wave;
         pts.push([cx + Math.cos(theta) * r, cy + Math.sin(theta) * r]);
       }
@@ -701,8 +705,9 @@
       return d + 'Z';
     }
 
+    // Subtle, controlled squish (reduced from 0.42 to 0.13)
     function triggerBotSquish() {
-      squishVel = 0.42; // Impulse for springy jelly bounce
+      squishVel = 0.13;
     }
 
     function setBotAppearance(shapeKey, colorHex) {
@@ -723,17 +728,15 @@
       let targetGazeX = 0, targetGazeY = 0, curGazeX = 0, curGazeY = 0;
       let blinkScaleY = 1;
 
-      // Autonomous gaze drift
       setInterval(() => {
         if (Math.random() < 0.28) {
           targetGazeX = 0; targetGazeY = 0;
         } else {
-          targetGazeX = (Math.random() - 0.5) * 14;
-          targetGazeY = (Math.random() - 0.5) * 9;
+          targetGazeX = (Math.random() - 0.5) * 13;
+          targetGazeY = (Math.random() - 0.5) * 8;
         }
       }, 2200);
 
-      // Autonomous natural blink
       function scheduleBlink() {
         const nextDelay = 2000 + Math.random() * 3400;
         setTimeout(() => {
@@ -755,46 +758,41 @@
       function animateFrame(nowMs) {
         const t = nowMs * 0.001;
 
-        // 1. Smooth radial shape morphing
         for (let i = 0; i < NUM_POINTS; i++) {
-          currentRadii[i] += (targetRadii[i] - currentRadii[i]) * 0.14;
+          currentRadii[i] += (targetRadii[i] - currentRadii[i]) * 0.15;
         }
         bodyPath.setAttribute('d', buildSmoothClosedPath(currentRadii, 50, 50, t));
 
-        // 2. Jelly click squish spring physics
+        // Higher damping (0.66) so click animation settles quickly without over-bouncing
         squishVal += squishVel;
-        squishVel *= 0.78;
-        squishVel -= squishVal * 0.28;
+        squishVel *= 0.66;
+        squishVel -= squishVal * 0.34;
 
-        // 3. Autonomous body float + gentle tilt + gaze lean
         curGazeX += (targetGazeX - curGazeX) * 0.1;
         curGazeY += (targetGazeY - curGazeY) * 0.1;
 
-        const floatY = Math.sin(t * 2.3) * 3.8;
-        const breatheScaleX = 1 + Math.sin(t * 2.3) * 0.025 + squishVal;
-        const breatheScaleY = 1 - Math.sin(t * 2.3) * 0.025 - squishVal * 0.85;
-        const bodyTilt = Math.sin(t * 1.4) * 3.2 + (curGazeX * 0.45);
-        const bodyShiftX = curGazeX * 0.35;
+        const floatY = Math.sin(t * 2.2) * 3.2;
+        const breatheScaleX = 1 + Math.sin(t * 2.2) * 0.018 + squishVal;
+        const breatheScaleY = 1 - Math.sin(t * 2.2) * 0.018 - squishVal * 0.8;
+        const bodyTilt = Math.sin(t * 1.3) * 2.5 + (curGazeX * 0.38);
+        const bodyShiftX = curGazeX * 0.3;
 
         actorGroup.setAttribute(
           'transform',
           `translate(${(50 + bodyShiftX).toFixed(2)}, ${(50 + floatY).toFixed(2)}) rotate(${bodyTilt.toFixed(2)}) scale(${breatheScaleX.toFixed(3)}, ${breatheScaleY.toFixed(3)}) translate(-50, -50)`
         );
 
-        // Shadow reacts to float height
-        const shadowRx = 23 - floatY * 0.8;
+        const shadowRx = 23 - floatY * 0.7;
         shadowEl.setAttribute('rx', shadowRx.toFixed(1));
 
-        // 4. Upright Straight Eyes Parallax + Blink
         eyesGroup.setAttribute(
           'transform',
           `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)}) translate(48, 41) scale(1, ${blinkScaleY}) translate(-48, -41)`
         );
 
-        // 5. Menu mini-bots eye drift
         document.querySelectorAll('.mini-eyes').forEach((el, idx) => {
-          const ox = Math.sin(t * 1.6 + idx * 1.7) * 3.8;
-          const oy = Math.cos(t * 1.3 + idx * 1.3) * 2.2;
+          const ox = Math.sin(t * 1.6 + idx * 1.7) * 3.5;
+          const oy = Math.cos(t * 1.3 + idx * 1.3) * 2.0;
           el.setAttribute('transform', `translate(${ox.toFixed(1)}, ${oy.toFixed(1)})`);
         });
 
@@ -804,23 +802,108 @@
     }
 
     // =========================================================
-    // NAVIGATION LOGIC
+    // TAP + LONG-PRESS DRAG-TO-SELECT GESTURE CONTROLLER
     // =========================================================
-    function handleBotClick() {
-      triggerBotSquish();
+    function initBotGestures() {
+      const botBtn = document.getElementById('bloubBotBtn');
+      let pressTimer = null;
+      let isPointerDown = false;
+      let isDragSession = false;
+      let hoveredAgentBtn = null;
 
-      if (isMenuOpen) {
-        closeAgentMenu();
-        showHomeView();
-        return;
+      function clearAgentHighlights() {
+        document.querySelectorAll('.agent-item').forEach(btn => btn.classList.remove('drag-hover'));
+        hoveredAgentBtn = null;
       }
 
-      if (currentView !== 'home') {
-        showHomeView();
-        return;
+      botBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        isPointerDown = true;
+        isDragSession = false;
+        hoveredAgentBtn = null;
+        triggerBotSquish();
+
+        try { botBtn.setPointerCapture(e.pointerId); } catch (err) {}
+
+        // Hold for 180ms -> automatically pop open the 4 Agent menu for drag-selection
+        pressTimer = setTimeout(() => {
+          if (isPointerDown) {
+            isDragSession = true;
+            if (!isMenuOpen) {
+              openAgentMenu();
+              if (navigator.vibrate) navigator.vibrate(12);
+            }
+          }
+        }, 180);
+      });
+
+      botBtn.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+
+        // If user starts dragging upward/rightward by >14px, open menu immediately
+        if (!isMenuOpen) {
+          const rect = botBtn.getBoundingClientRect();
+          const dist = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
+          if (dist > 18) {
+            clearTimeout(pressTimer);
+            isDragSession = true;
+            openAgentMenu();
+          }
+        }
+
+        if (isMenuOpen) {
+          const elUnderFinger = document.elementFromPoint(e.clientX, e.clientY);
+          const agentBtn = elUnderFinger ? elUnderFinger.closest('[data-agent-tab]') : null;
+
+          if (agentBtn !== hoveredAgentBtn) {
+            clearAgentHighlights();
+            if (agentBtn) {
+              agentBtn.classList.add('drag-hover');
+              hoveredAgentBtn = agentBtn;
+              // Preview the shape & color on the bottom-left bot while hovering!
+              setBotAppearance(agentBtn.dataset.agentShape, agentBtn.dataset.agentColor);
+              if (navigator.vibrate) navigator.vibrate(8);
+            }
+          }
+        }
+      });
+
+      function finishGesture(e) {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        clearTimeout(pressTimer);
+
+        // Case 1: User dragged onto one of the 4 Agent cards and released finger
+        if (isMenuOpen && hoveredAgentBtn) {
+          const tab = hoveredAgentBtn.dataset.agentTab;
+          const shape = hoveredAgentBtn.dataset.agentShape;
+          const color = hoveredAgentBtn.dataset.agentColor;
+          clearAgentHighlights();
+          selectAgent(tab, shape, color);
+          return;
+        }
+
+        clearAgentHighlights();
+
+        // Case 2: Short tap (not a hold-and-drag session)
+        if (!isDragSession) {
+          if (isMenuOpen) {
+            closeAgentMenu();
+            showHomeView();
+          } else if (currentView !== 'home') {
+            showHomeView();
+          } else {
+            openAgentMenu();
+          }
+        }
       }
 
-      openAgentMenu();
+      botBtn.addEventListener('pointerup', finishGesture);
+      botBtn.addEventListener('pointercancel', () => {
+        isPointerDown = false;
+        clearTimeout(pressTimer);
+        clearAgentHighlights();
+      });
     }
 
     function openAgentMenu() {
@@ -934,7 +1017,7 @@
     }
 
     // =========================================================
-    // UPCOMING EVENTS & GOOGLE TASKS (WITH DIAGNOSTICS)
+    // UPCOMING EVENTS & GOOGLE TASKS
     // =========================================================
     function loadUpcomingEvents() {
       const icon = document.getElementById('eventsRefreshIcon');
@@ -1732,6 +1815,7 @@
 
     function sysInit() {
       initAutonomousBotLife();
+      initBotGestures();
       initGsatCountdown();
       initTelemetry();
       renderTags();
