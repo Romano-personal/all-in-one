@@ -11,7 +11,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -23,33 +23,44 @@
       --btn-navy: #141B2D;
     }
 
+    /* Requirement #5: Disable text selection & long-press callout globally */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
     }
 
-    body {
-      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Keep text inputs selectable so typing works normally */
+    input, textarea, select {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
       background-color: var(--bg-main);
       color: var(--ink-black);
-      min-height: 100vh;
-      margin: 0;
+      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
     }
 
     .b-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border-subtle);
-      border-radius: 22px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-      transition: all 0.18s ease;
+      border-radius: 26px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
     }
 
     .b-input {
       background: #F9FAFB;
       border: 1.5px solid var(--border-subtle);
       color: var(--ink-black);
-      border-radius: 12px;
+      border-radius: 14px;
       outline: none;
       transition: border-color 0.15s, background 0.15s;
     }
@@ -61,8 +72,8 @@
     .b-btn-primary {
       background: var(--btn-navy);
       color: #FFFFFF;
-      border-radius: 14px;
-      font-weight: 600;
+      border-radius: 16px;
+      font-weight: 700;
       transition: transform 0.12s ease, opacity 0.15s ease;
     }
     .b-btn-primary:active {
@@ -76,10 +87,10 @@
       background: #F3F4F6;
       border: 1.5px solid transparent;
       color: #374151;
-      border-radius: 10px;
-      font-size: 12px;
+      border-radius: 12px;
+      font-size: 13px;
       font-weight: 600;
-      padding: 6px 11px;
+      padding: 7px 12px;
       transition: all 0.12s ease;
     }
     .b-tag-active {
@@ -89,46 +100,60 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    /* Lighter, more transparent blur when Bot Menu is open */
+    /* Requirement #6: Smooth View Transition Animation */
+    @keyframes viewSmoothIn {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .view-animate {
+      animation: viewSmoothIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Light, high-transparency blur when Bot Menu is open */
     #appContentWrapper {
-      transition: filter 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
+      transition: filter 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
     }
     body.menu-open #appContentWrapper {
       filter: blur(3.5px);
       opacity: 0.55;
-      transform: scale(0.992);
+      transform: scale(0.99);
       pointer-events: none;
-      user-select: none;
     }
 
     /* Agent Overlay Items Staggered Pop */
     .agent-item {
       opacity: 0;
-      transform: translateY(10px) scale(0.96);
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      transform: translateY(12px) scale(0.95);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     body.menu-open .agent-item {
       opacity: 1;
       transform: translateY(0) scale(1);
     }
-    body.menu-open .agent-item:nth-child(1) { transition-delay: 0.02s; }
-    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.05s; }
-    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.08s; }
-    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.11s; }
+    body.menu-open .agent-item:nth-child(1) { transition-delay: 0.015s; }
+    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.045s; }
+    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.075s; }
+    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.105s; }
 
     /* Highlight state when dragging finger over an Agent item */
     .agent-item.drag-hover {
       border-color: #111111 !important;
       background: #FFFFFF !important;
-      transform: scale(1.04) translateX(6px) !important;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09) !important;
+      transform: scale(1.045) translateX(6px) !important;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1) !important;
     }
 
     @keyframes mini-float {
-      0%, 100% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-2.5px) scale(1.02, 0.99); }
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-2.5px); }
     }
     .mini-bot-svg {
       animation: mini-float 2.8s ease-in-out infinite;
@@ -141,89 +166,81 @@
 
 <body class="flex justify-center">
 
-  <div class="w-full max-w-md min-h-screen flex flex-col justify-between px-5 pt-6 pb-28 relative">
+  <!-- MAIN MOBILE FULL-HEIGHT CONTAINER -->
+  <div class="w-full max-w-md min-h-[100dvh] flex flex-col px-5 pt-6 pb-28 relative">
 
-    <!-- ==================== WRAPPED CONTENT (LIGHT BLUR WHEN MENU OPEN) ==================== -->
-    <div id="appContentWrapper" class="space-y-4">
+    <!-- ==================== WRAPPED CONTENT (STRETCHES TO FILL PHONE SCREEN) ==================== -->
+    <div id="appContentWrapper" class="flex-1 flex flex-col">
 
       <!-- HEADER: Hi Romano -->
-      <header class="flex items-center justify-between pt-1 pb-1">
-        <div class="flex items-center gap-2.5">
-          <h1 class="text-2xl font-extrabold tracking-tight text-[#111111]">Hi Romano</h1>
-          <span id="syncDot" class="w-2 h-2 rounded-full bg-[#34C77B] transition-colors" title="Ready"></span>
+      <header class="flex items-center justify-between pt-1 pb-4 shrink-0">
+        <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-extrabold tracking-tight text-[#111111]">Hi Romano</h1>
+          <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-[#34C77B] transition-colors" title="Synced"></span>
         </div>
-        <span id="currentViewBadge" class="text-[11px] font-bold uppercase tracking-widest text-gray-400 hidden">SCHEDULE</span>
+        <span id="currentViewBadge" class="text-xs font-extrabold uppercase tracking-widest text-gray-400 hidden">SCHEDULE</span>
       </header>
 
-      <!-- ==================== VIEW 0: HOME DASHBOARD ==================== -->
-      <main id="viewHome" class="space-y-3.5 block">
+      <!-- ==================== VIEW 0: HOME DASHBOARD (STRETCHES TO FILL SCREEN) ==================== -->
+      <main id="viewHome" class="flex-1 flex flex-col justify-between gap-4 view-animate">
 
-        <!-- 1. GSAT COUNTDOWN -->
-        <div class="b-card p-5 relative overflow-hidden">
+        <!-- 1. GSAT COUNTDOWN (Larger & Fuller) -->
+        <div class="b-card p-6 flex flex-col justify-between shrink-0">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400">GSAT COUNTDOWN</span>
-            <button onclick="promptGsatDate()" class="text-[11px] font-semibold text-gray-400 hover:text-black transition" id="gsatTargetLabel">2027.01.16</button>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">GSAT COUNTDOWN</span>
+            <button onclick="promptGsatDate()" class="text-xs font-bold text-gray-400 hover:text-black transition" id="gsatTargetLabel">2027.01.22</button>
           </div>
-          <div class="mt-2 flex items-baseline gap-2.5">
-            <span id="gsatDaysLeft" class="text-6xl font-extrabold tracking-tighter leading-none text-[#111111]">100</span>
-            <span class="text-lg font-semibold text-gray-400">days</span>
+          <div class="mt-3 flex items-baseline gap-3">
+            <span id="gsatDaysLeft" class="text-7xl font-black tracking-tighter leading-none text-[#111111]">94</span>
+            <span class="text-xl font-bold text-gray-400">days</span>
           </div>
         </div>
 
-        <!-- 2. UPCOMING EVENTS -->
-        <div class="b-card p-5 space-y-3">
+        <!-- 2. UPCOMING EVENTS (3 Slots + Larger Text) -->
+        <div class="b-card p-6 flex flex-col justify-between space-y-3.5 shrink-0">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400">UPCOMING EVENTS</span>
-            <button onclick="loadUpcomingEvents()" class="text-gray-400 hover:text-black text-xs transition" title="Refresh">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">UPCOMING EVENTS</span>
+            <button onclick="loadUpcomingEvents()" class="text-gray-400 hover:text-black text-sm transition p-1" title="Refresh">
               <i class="fa-solid fa-rotate-right" id="eventsRefreshIcon"></i>
             </button>
           </div>
-          <div id="upcomingEventsList" class="space-y-2">
-            <div class="px-3.5 py-2.5 rounded-2xl bg-[#F7F7F7] border border-gray-200/80 flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-400">Syncing calendars...</span>
-            </div>
-            <div class="px-3.5 py-2.5 rounded-2xl bg-[#F7F7F7] border border-gray-200/80 flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-300">—</span>
-            </div>
-          </div>
+          <div id="upcomingEventsList" class="space-y-2.5"></div>
         </div>
 
-        <!-- 3. BOTTOM SPLIT: CLOCK + LOCATION & GOOGLE TASKS TO-DO -->
-        <div class="grid grid-cols-12 gap-3.5">
+        <!-- 3. BOTTOM SPLIT: STRETCHES TO FILL REMAINING VERTICAL SPACE -->
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-[220px]">
           
           <!-- Left Column: Time + Location -->
-          <div class="col-span-5 flex flex-col gap-3.5">
-            <div class="b-card p-4 flex flex-col justify-center items-center flex-1">
-              <div id="homeClock" class="text-2xl font-extrabold tracking-tight text-[#111111]">10:00</div>
-              <div id="homeDate" class="text-[11px] font-semibold text-gray-400 mt-0.5">OCT 18</div>
+          <div class="col-span-5 flex flex-col gap-4">
+            <div class="b-card p-5 flex flex-col justify-center items-center flex-1">
+              <div id="homeClock" class="text-3xl font-extrabold tracking-tight text-[#111111] tabular-nums">21:47</div>
+              <div id="homeDate" class="text-xs font-bold text-gray-400 mt-1">OCT 20</div>
             </div>
 
-            <button onclick="pingSatellite()" class="b-card p-3.5 text-left hover:border-black transition flex flex-col justify-between">
+            <button onclick="pingSatellite()" class="b-card p-4 text-left hover:border-black transition flex flex-col justify-between shrink-0">
               <div class="flex items-center justify-between w-full">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">LOCATION</span>
-                <span id="locPingDot" class="w-1.5 h-1.5 rounded-full bg-[#34C77B]"></span>
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400">LOCATION</span>
+                <span id="locPingDot" class="w-2 h-2 rounded-full bg-[#34C77B]"></span>
               </div>
-              <div id="trackerSubLocation" class="text-xs font-bold text-[#111111] mt-1.5 truncate">24.8, 120.9</div>
+              <div id="trackerSubLocation" class="text-sm font-extrabold text-[#111111] mt-2 truncate">24.8, 121.0</div>
             </button>
           </div>
 
           <!-- Right Column: Google Tasks TO-DO -->
-          <div class="col-span-7 b-card p-4 flex flex-col justify-between min-h-[172px]">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400">TO-DO</span>
-                <button onclick="syncGoogleTasks()" class="text-[11px] text-gray-400 hover:text-black transition" title="Sync Google Tasks">
+          <div class="col-span-7 b-card p-5 flex flex-col justify-between">
+            <div class="flex-1 flex flex-col min-h-0">
+              <div class="flex items-center justify-between mb-3 shrink-0">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">TO-DO</span>
+                <button onclick="syncGoogleTasks()" class="text-xs text-gray-400 hover:text-black transition p-1" title="Sync Google Tasks">
                   <i class="fa-solid fa-rotate" id="tasksSyncIcon"></i>
                 </button>
               </div>
-              <div id="todoListContainer" class="space-y-1.5 max-h-28 overflow-y-auto no-scrollbar pr-0.5">
-                <div class="text-xs text-gray-400 py-2">Syncing Tasks...</div>
-              </div>
+              <div id="todoListContainer" class="space-y-2 overflow-y-auto no-scrollbar pr-0.5 flex-1"></div>
             </div>
 
-            <div class="flex items-center gap-1.5 pt-2 mt-2 border-t border-gray-100">
-              <input type="text" id="newTodoInput" placeholder="New task..." onkeydown="if(event.key==='Enter')addTodoItem()" class="w-full text-xs font-medium bg-transparent outline-none text-[#111111] placeholder-gray-400">
-              <button onclick="addTodoItem()" class="text-gray-400 hover:text-black text-xs px-1 font-bold">+</button>
+            <div class="flex items-center gap-2 pt-3 mt-2 border-t border-gray-100 shrink-0">
+              <input type="text" id="newTodoInput" placeholder="New task..." onkeydown="if(event.key==='Enter')addTodoItem()" class="w-full text-sm font-semibold bg-transparent outline-none text-[#111111] placeholder-gray-400">
+              <button onclick="addTodoItem()" class="text-gray-400 hover:text-black text-base px-1.5 font-bold">+</button>
             </div>
           </div>
 
@@ -231,31 +248,31 @@
       </main>
 
       <!-- ==================== VIEW 1: SCHEDULE ==================== -->
-      <section id="tabSchedule" class="hidden space-y-3.5">
-        <div class="b-card p-4 space-y-3.5">
+      <section id="tabSchedule" class="hidden space-y-4">
+        <div class="b-card p-5 space-y-4">
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400">CALENDAR</label>
-              <button onclick="loadUserCalendars()" class="text-[11px] font-semibold text-gray-400 hover:text-black">Reload</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">CALENDAR</label>
+              <button onclick="loadUserCalendars()" class="text-xs font-bold text-gray-400 hover:text-black">Reload</button>
             </div>
-            <select id="calendarSelect" class="w-full b-input px-3 py-2 text-xs font-semibold">
+            <select id="calendarSelect" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold">
               <option value="primary">Primary</option>
             </select>
           </div>
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400">TITLE</label>
-              <button onclick="openModal('title')" class="text-[11px] font-semibold text-gray-400 hover:text-black">Edit</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TITLE</label>
+              <button onclick="openModal('title')" class="text-xs font-bold text-gray-400 hover:text-black">Edit</button>
             </div>
-            <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto no-scrollbar mb-2" id="titleTags"></div>
-            <input type="text" id="eventTitle" placeholder="Event title..." oninput="clearTitleHighlight()" class="w-full b-input px-3 py-2 text-xs font-semibold">
+            <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar mb-2.5" id="titleTags"></div>
+            <input type="text" id="eventTitle" placeholder="Event title..." oninput="clearTitleHighlight()" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold">
           </div>
 
           <div>
-            <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-1.5">DATE</label>
-            <input type="date" id="eventDate" oninput="clearDateButtonHighlight()" class="w-full b-input px-3 py-2 text-xs font-semibold mb-2">
-            <div class="grid grid-cols-3 gap-1.5">
+            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block mb-1.5">DATE</label>
+            <input type="date" id="eventDate" oninput="clearDateButtonHighlight()" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold mb-2">
+            <div class="grid grid-cols-3 gap-2">
               <button type="button" onclick="handleQuickDateClick(0, this)" class="b-tag text-center date-quick-btn">Today</button>
               <button type="button" onclick="handleQuickDateClick(1, this)" class="b-tag text-center date-quick-btn">+1 Day</button>
               <button type="button" onclick="handleQuickDateClick(2, this)" class="b-tag text-center date-quick-btn">+2 Days</button>
@@ -264,72 +281,72 @@
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400">TIME</label>
-              <button onclick="openModal('time')" class="text-[11px] font-semibold text-gray-400 hover:text-black">Edit</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TIME</label>
+              <button onclick="openModal('time')" class="text-xs font-bold text-gray-400 hover:text-black">Edit</button>
             </div>
-            <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto no-scrollbar mb-2" id="timeTags"></div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar mb-2.5" id="timeTags"></div>
+            <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <span class="text-[10px] font-bold text-gray-400 block mb-1">START</span>
-                <input type="time" id="startTime" class="w-full b-input px-3 py-1.5 text-xs font-semibold">
+                <span class="text-[11px] font-bold text-gray-400 block mb-1">START</span>
+                <input type="time" id="startTime" class="w-full b-input px-3 py-2 text-sm font-semibold">
               </div>
               <div>
-                <span class="text-[10px] font-bold text-gray-400 block mb-1">END</span>
-                <input type="time" id="endTime" class="w-full b-input px-3 py-1.5 text-xs font-semibold">
+                <span class="text-[11px] font-bold text-gray-400 block mb-1">END</span>
+                <input type="time" id="endTime" class="w-full b-input px-3 py-2 text-sm font-semibold">
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-2 pt-1">
-            <input type="text" id="eventLocation" placeholder="Location (optional)" class="w-full b-input px-3 py-2 text-xs">
-            <textarea id="eventDesc" rows="2" placeholder="Notes..." class="w-full b-input px-3 py-2 text-xs"></textarea>
+          <div class="grid grid-cols-1 gap-2.5 pt-1">
+            <input type="text" id="eventLocation" placeholder="Location (optional)" class="w-full b-input px-3.5 py-2.5 text-sm">
+            <textarea id="eventDesc" rows="2" placeholder="Notes..." class="w-full b-input px-3.5 py-2.5 text-sm"></textarea>
           </div>
 
-          <button id="submitBtn" onclick="submitEvent()" class="b-btn-primary w-full py-3 text-xs tracking-wide">
+          <button id="submitBtn" onclick="submitEvent()" class="b-btn-primary w-full py-3.5 text-sm tracking-wide">
             <span class="btn-text">Add Event</span>
           </button>
         </div>
       </section>
 
       <!-- ==================== VIEW 2: TIMETABLE ==================== -->
-      <section id="tabTimetable" class="hidden space-y-3">
-        <div class="b-card p-3 flex items-center justify-between">
-          <button onclick="navigateWeek(-1)" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold">&lt;</button>
+      <section id="tabTimetable" class="hidden space-y-3.5">
+        <div class="b-card p-3.5 flex items-center justify-between">
+          <button onclick="navigateWeek(-1)" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">&lt;</button>
           <div class="text-center cursor-pointer" onclick="navigateWeek(0)">
-            <div id="weekRangeLabel" class="text-xs font-extrabold text-[#111111]">...</div>
-            <div id="weekRelativeLabel" class="text-[10px] font-semibold text-gray-400">Current</div>
+            <div id="weekRangeLabel" class="text-sm font-extrabold text-[#111111]">...</div>
+            <div id="weekRelativeLabel" class="text-[11px] font-semibold text-gray-400">Current</div>
           </div>
           <div class="flex items-center gap-1.5">
-            <button onclick="openSwapModal()" class="px-2.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[11px] font-bold">Swap</button>
-            <button onclick="navigateWeek(1)" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold">&gt;</button>
+            <button onclick="openSwapModal()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">Swap</button>
+            <button onclick="navigateWeek(1)" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">&gt;</button>
           </div>
         </div>
 
-        <div id="activeSwapsBanner" class="hidden px-3.5 py-2 b-card text-xs font-semibold flex justify-between items-center border-amber-300 bg-amber-50/60">
+        <div id="activeSwapsBanner" class="hidden px-4 py-2.5 b-card text-xs font-semibold flex justify-between items-center border-amber-300 bg-amber-50/60">
           <span><span id="swapCountText">0</span> active swaps</span>
-          <button onclick="openSwapListModal()" class="underline font-bold text-[11px]">View</button>
+          <button onclick="openSwapListModal()" class="underline font-bold text-xs">View</button>
         </div>
 
-        <div class="b-card p-3 space-y-2.5">
+        <div class="b-card p-3.5 space-y-3">
           <div class="overflow-x-auto no-scrollbar rounded-xl border border-gray-200">
             <table class="w-full text-center border-collapse table-fixed min-w-[310px]">
               <thead>
-                <tr class="border-b border-gray-200 text-[10px] text-gray-400 bg-gray-50" id="timetableHeaderRow"></tr>
+                <tr class="border-b border-gray-200 text-[11px] text-gray-400 bg-gray-50" id="timetableHeaderRow"></tr>
               </thead>
               <tbody id="timetableBody" class="divide-y divide-gray-100 text-xs"></tbody>
             </table>
           </div>
-          <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="b-btn-primary w-full py-2.5 text-xs">
+          <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="b-btn-primary w-full py-3 text-sm">
             <span class="btn-text">Save Timetable</span>
           </button>
         </div>
       </section>
 
       <!-- ==================== VIEW 3: TRACKER ==================== -->
-      <section id="tabTracker" class="hidden space-y-3.5">
-        <div class="b-card p-4 space-y-3">
-          <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">SUBJECT</label>
-          <div class="grid grid-cols-4 gap-1.5" id="subject-selector">
+      <section id="tabTracker" class="hidden space-y-4">
+        <div class="b-card p-5 space-y-3">
+          <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block">SUBJECT</label>
+          <div class="grid grid-cols-4 gap-2" id="subject-selector">
             <button onclick="setSubject('國文')" class="b-tag text-center" data-subj="國文">國文</button>
             <button onclick="setSubject('英文')" class="b-tag text-center" data-subj="英文">英文</button>
             <button onclick="setSubject('數學')" class="b-tag b-tag-active text-center" data-subj="數學">數學</button>
@@ -340,79 +357,77 @@
           </div>
         </div>
 
-        <div class="b-card p-5 text-center space-y-4">
+        <div class="b-card p-6 text-center space-y-4">
           <div class="flex justify-between items-center text-xs">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-gray-300" id="pulse-dot"></span>
-              <span id="terminal-state" class="font-bold text-gray-400 text-[11px]">IDLE</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-gray-300" id="pulse-dot"></span>
+              <span id="terminal-state" class="font-extrabold text-gray-400 text-xs">IDLE</span>
             </div>
-            <span id="current-track-badge" class="px-2.5 py-0.5 rounded-full bg-gray-100 text-[#111111] font-bold text-xs">數學</span>
+            <span id="current-track-badge" class="px-3 py-1 rounded-full bg-gray-100 text-[#111111] font-extrabold text-xs">數學</span>
           </div>
 
-          <div class="py-3">
-            <div class="text-5xl font-extrabold tracking-tight text-[#111111] tabular-nums" id="timer-display">00:00:00</div>
-            <p class="text-[11px] font-medium text-gray-400 mt-1" id="timer-status">Ready</p>
+          <div class="py-4">
+            <div class="text-5xl font-black tracking-tight text-[#111111] tabular-nums" id="timer-display">00:00:00</div>
+            <p class="text-xs font-semibold text-gray-400 mt-1.5" id="timer-status">Ready</p>
           </div>
 
           <div id="timer-actions">
-            <button id="start-btn" onclick="startTimer()" class="b-btn-primary w-full py-3 text-xs">
+            <button id="start-btn" onclick="startTimer()" class="b-btn-primary w-full py-3.5 text-sm">
               <span class="btn-text">Start</span>
             </button>
-            <div id="running-actions" class="hidden grid grid-cols-2 gap-2">
-              <button id="pause-resume-btn" onclick="togglePauseResume()" class="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-xs text-[#111111]">
+            <div id="running-actions" class="hidden grid grid-cols-2 gap-2.5">
+              <button id="pause-resume-btn" onclick="togglePauseResume()" class="py-3.5 rounded-2xl bg-gray-100 hover:bg-gray-200 font-bold text-sm text-[#111111]">
                 <span class="btn-text">Pause</span>
               </button>
-              <button id="commit-timer-btn" onclick="commitTimer()" class="b-btn-primary py-3 text-xs !bg-[#EA4335]">
+              <button id="commit-timer-btn" onclick="commitTimer()" class="b-btn-primary py-3.5 text-sm !bg-[#EA4335]">
                 <span class="btn-text">Finish</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div class="b-card p-4 space-y-3">
+        <div class="b-card p-5 space-y-3.5">
           <div class="flex justify-between items-center">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">TOPICS & NOTES</span>
-            <button onclick="clearSelectedUnits()" class="text-[11px] font-semibold text-gray-400 hover:text-black">Clear</button>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TOPICS & NOTES</span>
+            <button onclick="clearSelectedUnits()" class="text-xs font-bold text-gray-400 hover:text-black">Clear</button>
           </div>
-          <div id="unit-tag-container" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto no-scrollbar"></div>
-          <div class="text-[11px] text-gray-400">Selected: <span id="selected-units-preview" class="font-semibold text-[#111111]">None</span></div>
+          <div id="unit-tag-container" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar"></div>
+          <div class="text-xs text-gray-400">Selected: <span id="selected-units-preview" class="font-bold text-[#111111]">None</span></div>
 
-          <div class="flex items-center justify-between py-1.5 px-3 rounded-xl bg-gray-50 border border-gray-100">
-            <span class="text-xs font-semibold">Completed</span>
+          <div class="flex items-center justify-between py-2 px-3.5 rounded-xl bg-gray-50 border border-gray-100">
+            <span class="text-xs font-bold">Completed</span>
             <input type="checkbox" id="is-completed" class="w-4 h-4 accent-black" checked>
           </div>
 
-          <input type="text" id="note-input" placeholder="Session notes..." class="w-full b-input px-3 py-2 text-xs">
-          <button id="progress-btn" onclick="saveProgress()" class="b-btn-primary w-full py-2.5 text-xs">
+          <input type="text" id="note-input" placeholder="Session notes..." class="w-full b-input px-3.5 py-2.5 text-sm">
+          <button id="progress-btn" onclick="saveProgress()" class="b-btn-primary w-full py-3 text-sm">
             <span class="btn-text">Save Progress</span>
           </button>
         </div>
       </section>
 
       <!-- ==================== VIEW 4: SETTINGS ==================== -->
-      <section id="tabSettings" class="hidden space-y-3.5">
-        <div class="b-card p-4 space-y-2.5">
+      <section id="tabSettings" class="hidden space-y-4">
+        <div class="b-card p-5 space-y-3">
           <div class="flex justify-between items-center">
-            <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400">VISIBLE CALENDARS (HOME)</label>
-            <button onclick="loadUserCalendars()" class="text-[11px] font-semibold text-gray-400 hover:text-black">Sync</button>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">VISIBLE CALENDARS (HOME)</label>
+            <button onclick="loadUserCalendars()" class="text-xs font-bold text-gray-400 hover:text-black">Sync</button>
           </div>
-          <div id="settingsCalendarCheckboxes" class="space-y-1.5 max-h-44 overflow-y-auto no-scrollbar">
-            <div class="text-xs text-gray-400">Loading calendars...</div>
-          </div>
+          <div id="settingsCalendarCheckboxes" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar"></div>
         </div>
 
-        <div class="b-card p-4 space-y-2.5">
+        <div class="b-card p-5 space-y-3">
           <div class="flex justify-between items-center">
-            <label class="text-[11px] font-bold uppercase tracking-wider text-gray-400">SUBJECT COLORS</label>
-            <button onclick="addCustomSubjectPrompt()" class="text-[11px] font-bold text-[#111111]">+ Add</button>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">SUBJECT COLORS</label>
+            <button onclick="addCustomSubjectPrompt()" class="text-xs font-bold text-[#111111]">+ Add</button>
           </div>
-          <div id="subjectColorList" class="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar"></div>
+          <div id="subjectColorList" class="space-y-2 max-h-52 overflow-y-auto no-scrollbar"></div>
         </div>
 
-        <div class="b-card p-4 space-y-2.5 text-xs font-semibold">
+        <div class="b-card p-5 space-y-3 text-sm font-semibold">
           <div class="flex justify-between items-center">
             <span>Periods / Day</span>
-            <select id="settingTotalPeriods" onchange="updateTotalPeriods(this.value)" class="b-input px-2.5 py-1 text-xs">
+            <select id="settingTotalPeriods" onchange="updateTotalPeriods(this.value)" class="b-input px-3 py-1.5 text-xs font-bold">
               <option value="6">6</option>
               <option value="7">7</option>
               <option value="8" selected>8</option>
@@ -426,78 +441,80 @@
           </div>
         </div>
 
-        <button id="saveSettingsBtn" onclick="saveAllSettingsToCloud()" class="b-btn-primary w-full py-3 text-xs">
+        <button id="saveSettingsBtn" onclick="saveAllSettingsToCloud()" class="b-btn-primary w-full py-3.5 text-sm">
           <span class="btn-text">Save Settings</span>
         </button>
       </section>
 
     </div>
 
-    <!-- ==================== FLOATING AGENT MENU OVERLAY (SUPPORTS TAP & HOLD-DRAG-RELEASE) ==================== -->
-    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-6 bg-white/15">
-      <div class="w-full max-w-xs space-y-3.5">
+    <!-- ==================== FLOATING AGENT MENU OVERLAY ==================== -->
+    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-6 bg-white/10">
+      <div class="w-full max-w-xs space-y-4">
         
         <!-- 1. Circle -> SCHEDULE -->
-        <button data-agent-tab="schedule" data-agent-shape="circle" data-agent-color="#111111" onclick="selectAgent('schedule', 'circle', '#111111')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+        <button data-agent-tab="schedule" data-agent-shape="circle" data-agent-color="#111111" onclick="selectAgent('schedule', 'circle', '#111111')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
           <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" viewBox="0 0 100 100">
-            <path d="M50,10 A40,40 0 1,1 49.9,10 Z" fill="#111111"/>
+            <path d="M 50,12 A 38,38 0 1,1 49.99,12 Z" fill="#111111"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="37" y="34" width="7" height="15" rx="3.5"/>
-              <rect x="54" y="34" width="7" height="15" rx="3.5"/>
+              <rect x="36" y="34" width="7.5" height="16" rx="3.75"/>
+              <rect x="54" y="34" width="7.5" height="16" rx="3.75"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">SCHEDULE</span>
+          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">SCHEDULE</span>
         </button>
 
         <!-- 2. Triangle -> TIMETABLE -->
-        <button data-agent-tab="timetable" data-agent-shape="triangle" data-agent-color="#34C77B" onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+        <button data-agent-tab="timetable" data-agent-shape="triangle" data-agent-color="#34C77B" onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
           <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.4s" viewBox="0 0 100 100">
-            <path d="M43,15 Q50,5 57,15 L86,72 Q92,84 79,84 L21,84 Q8,84 14,72 Z" fill="#34C77B"/>
+            <path d="M 43,16 Q 50,6 57,16 L 86,72 Q 92,84 79,84 L 21,84 Q 8,84 14,72 Z" fill="#34C77B"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="38" y="47" width="6.5" height="13" rx="3.25"/>
-              <rect x="53" y="47" width="6.5" height="13" rx="3.25"/>
+              <rect x="38" y="47" width="6.5" height="13.5" rx="3.25"/>
+              <rect x="53" y="47" width="6.5" height="13.5" rx="3.25"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">TIMETABLE</span>
+          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">TIMETABLE</span>
         </button>
 
         <!-- 3. Hexagon -> TRACKER -->
-        <button data-agent-tab="tracker" data-agent-shape="hexagon" data-agent-color="#F28B30" onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+        <button data-agent-tab="tracker" data-agent-shape="hexagon" data-agent-color="#F28B30" onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
           <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.8s" viewBox="0 0 100 100">
-            <path d="M28,14 L72,14 L92,50 L72,86 L28,86 L8,50 Z" stroke="#F28B30" stroke-width="8" stroke-linejoin="round" fill="#F28B30"/>
+            <path d="M 29,15 L 71,15 L 91,50 L 71,85 L 29,85 L 9,50 Z" stroke="#F28B30" stroke-width="8" stroke-linejoin="round" fill="#F28B30"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="36" y="36" width="7" height="14" rx="3.5"/>
-              <rect x="53" y="36" width="7" height="14" rx="3.5"/>
+              <rect x="36" y="36" width="7" height="15" rx="3.5"/>
+              <rect x="53" y="36" width="7" height="15" rx="3.5"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">TRACKER</span>
+          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">TRACKER</span>
         </button>
 
         <!-- 4. Squircle -> SETTINGS -->
-        <button data-agent-tab="settings" data-agent-shape="squircle" data-agent-color="#3B96F3" onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full b-card p-3.5 flex items-center gap-4 hover:border-black active:scale-95">
+        <button data-agent-tab="settings" data-agent-shape="squircle" data-agent-color="#3B96F3" onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
           <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 1.2s" viewBox="0 0 100 100">
-            <rect x="14" y="14" width="72" height="72" rx="20" fill="#3B96F3"/>
+            <path d="M 32,14 L 68,14 Q 86,14 86,32 L 86,68 Q 86,86 68,86 L 32,86 Q 14,86 14,68 L 14,32 Q 14,14 32,14 Z" fill="#3B96F3"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="38" y="36" width="6.5" height="13" rx="3.25"/>
-              <rect x="54" y="36" width="6.5" height="13" rx="3.25"/>
+              <rect x="37" y="36" width="7" height="15" rx="3.5"/>
+              <rect x="54" y="36" width="7" height="15" rx="3.5"/>
             </g>
           </svg>
-          <span class="text-base font-extrabold tracking-tight text-[#111111] pointer-events-none">SETTINGS</span>
+          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">SETTINGS</span>
         </button>
 
       </div>
     </div>
 
-    <!-- ==================== BOTTOM-LEFT BLOUB BOT TRIGGER (TAP OR HOLD-AND-DRAG) ==================== -->
+    <!-- ==================== BOTTOM-LEFT CLEAN GEOMETRIC BLOUB BOT ==================== -->
     <div class="fixed bottom-5 left-5 z-50">
       <button id="bloubBotBtn" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none touch-none" aria-label="Bot Menu">
         <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible pointer-events-none">
-          <ellipse id="mainBotShadow" cx="50" cy="93" rx="24" ry="4" fill="rgba(0,0,0,0.12)" />
+          <ellipse id="mainBotShadow" cx="50" cy="93" rx="23" ry="4" fill="rgba(0,0,0,0.11)" />
           <g id="mainBotActor">
-            <path id="mainBotBody" d="" fill="#111111" class="transition-colors duration-300"/>
+            <!-- Crisp Geometric Path (No Jelly Distortion!) -->
+            <path id="mainBotBody" d="M 50,12 A 38,38 0 1,1 49.99,12 Z" fill="#111111" stroke="#111111" stroke-width="0" stroke-linejoin="round" class="transition-colors duration-300"/>
+            <!-- Straight Upright Capsule Eyes -->
             <g id="mainBotEyes" fill="#FFFFFF">
-              <rect id="botEyeL" x="35" y="33" width="7.5" height="16.5" rx="3.75" />
-              <rect id="botEyeR" x="53.5" y="33" width="7.5" height="16.5" rx="3.75" />
+              <rect id="botEyeL" x="35.5" y="34" width="7.5" height="16.5" rx="3.75" />
+              <rect id="botEyeR" x="54" y="34" width="7.5" height="16.5" rx="3.75" />
             </g>
           </g>
         </svg>
@@ -571,12 +588,11 @@
 
   <script>
     // =========================================================
-    // GAS API QUEUE BRIDGE
+    // FAST GAS API BRIDGE + LOCAL STORAGE INSTANT CACHE
     // =========================================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwO5uOOWyuU3wmYwcZuiTpM7JlUTBtcgPtZrsVvG5DWjJJo5sY7-ciN9zSdm0GhGRWj/exec";
 
-    let backendQueue = [];
-    let isBackendProcessing = false;
+    let activeRequests = 0;
 
     function setSyncIndicator(busy) {
       const dot = document.getElementById('syncDot');
@@ -584,161 +600,155 @@
       dot.style.backgroundColor = busy ? '#F5B82E' : '#34C77B';
     }
 
-    function processBackendQueue() {
-      if (isBackendProcessing || backendQueue.length === 0) return;
-      isBackendProcessing = true;
+    // Parallel-friendly, low-latency API caller (no 250ms artificial bottleneck)
+    function callBackend(action, payload, onSuccess, onFailure) {
+      activeRequests++;
       setSyncIndicator(true);
-      const task = backendQueue.shift();
 
       fetch(GAS_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: task.action, payload: task.payload })
+        body: JSON.stringify({ action: action, payload: payload })
       })
       .then(res => res.json())
       .then(data => {
-        if (data.success && task.onSuccess) task.onSuccess(data.data);
-        else if (!data.success && task.onFailure) task.onFailure(new Error(data.message || "API Error"));
+        if (data.success && onSuccess) onSuccess(data.data);
+        else if (!data.success && onFailure) onFailure(new Error(data.message || "API Error"));
       })
       .catch(err => {
-        if (task.onFailure) task.onFailure(err);
+        if (onFailure) onFailure(err);
       })
       .finally(() => {
-        isBackendProcessing = false;
-        setSyncIndicator(backendQueue.length > 0);
-        setTimeout(processBackendQueue, 250);
+        activeRequests = Math.max(0, activeRequests - 1);
+        setSyncIndicator(activeRequests > 0);
       });
     }
 
-    function callBackend(action, payload, onSuccess, onFailure) {
-      backendQueue.push({ action, payload, onSuccess, onFailure });
-      processBackendQueue();
-    }
-
     // =========================================================
-    // STORAGE & STATE
+    // STORAGE & STATE (INSTANT CACHEHYDRATION)
     // =========================================================
     var EvStore = {
       get: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
       set: function(k, v) { try { localStorage.setItem(k, v); } catch(e) {} },
-      del: function(k) { try { localStorage.removeItem(k, v); } catch(e) {} }
+      del: function(k) { try { localStorage.removeItem(k); } catch(e) {} },
+      getJSON: function(k, fallback) {
+        try {
+          const raw = localStorage.getItem(k);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch(e) { return fallback; }
+      },
+      setJSON: function(k, obj) {
+        try { localStorage.setItem(k, JSON.stringify(obj)); } catch(e) {}
+      }
     };
 
     var currentView = 'home';
+    var currentBotShape = 'circle';
+    var currentBotColor = '#111111';
     var isMenuOpen = false;
 
-    var allUserCalendars = [];
-    var visibleCalendarIds = JSON.parse(EvStore.get('romano_visible_cals') || '["primary"]');
+    var allUserCalendars = EvStore.getJSON('romano_cache_cals', []);
+    var visibleCalendarIds = EvStore.getJSON('romano_visible_cals', ['primary']);
+    var cachedUpcomingEvents = EvStore.getJSON('romano_cache_events', []);
+    var todoItems = EvStore.getJSON('romano_cache_tasks', []);
 
-    var dbTitles = ["國文作業", "國文考試", "數學作業", "數學考試", "英文作業", "英文考試", "物理作業", "物理考試", "化學作業", "化學考試", "自習", "讀書"];
-    var dbTimes = [
+    var dbTitles = EvStore.getJSON('romano_cache_titles', ["國文作業", "國文考試", "數學作業", "數學考試", "英文作業", "英文考試", "物理作業", "物理考試", "化學作業", "化學考試", "自習", "讀書"]);
+    var dbTimes = EvStore.getJSON('romano_cache_times', [
       { label: "P1", start: "08:10", end: "09:00" }, { label: "P2", start: "09:10", end: "10:00" },
       { label: "P3", start: "10:10", end: "11:00" }, { label: "P4", start: "11:10", end: "12:00" },
       { label: "P5", start: "13:15", end: "14:05" }, { label: "P6", start: "14:15", end: "15:05" },
       { label: "P7", start: "15:15", end: "16:05" }, { label: "P8", start: "16:10", end: "17:00" }
-    ];
-    var dbSubjects = ["國文", "英文", "數學", "物理", "化學", "生物", "地科", "歷史", "地理", "公民", "體育", "自習"];
-    var dbSubjectColors = {
+    ]);
+    var dbSubjects = EvStore.getJSON('romano_cache_subjects', ["國文", "英文", "數學", "物理", "化學", "生物", "地科", "歷史", "地理", "公民", "體育", "自習"]);
+    var dbSubjectColors = EvStore.getJSON('romano_cache_subj_colors', {
       "國文": "#EA4335", "英文": "#3B96F3", "數學": "#F28B30", "物理": "#34C77B",
       "化學": "#7B61FF", "生物": "#2CC597", "地科": "#8C6239", "體育": "#E5489A"
-    };
-    var appSettings = { totalPeriods: 8, showSwapPulse: true };
+    });
+    var appSettings = EvStore.getJSON('romano_cache_settings', { totalPeriods: 8, showSwapPulse: true });
+    var timetableData = EvStore.getJSON('romano_cache_timetable', Array(10).fill(null).map(() => Array(5).fill('')));
+    var swapRecords = EvStore.getJSON('romano_cache_swaps', []);
+    var unitsCache = EvStore.getJSON('romano_cache_units', {});
+
     var currentWeekOffset = 0, editingTimeIndex = null, selectedTitle = null, selectedDateOffset = null, selectedTimeLabel = null;
     var periodTimes = dbTimes.slice();
-    var timetableData = Array(10).fill(null).map(() => Array(5).fill(''));
-    var swapRecords = [], currentSwapMode = 'two', multiSwapSteps = [];
+    var currentSwapMode = 'two', multiSwapSteps = [];
     var currentSubject = '數學';
     var timerState = 'IDLE', currentSegmentStartMs = null, accumulatedMs = 0, timerInterval = null;
-    var unitsCache = {}, selectedUnits = [];
+    var selectedUnits = [];
 
     // =========================================================
-    // 64-POINT RADIAL MORPHING + SUBTLE BODY PHYSICS
+    // REQUIREMENT #1: CRISP GEOMETRIC SHAPES (NO JELLY WAVES)
     // =========================================================
-    const NUM_POINTS = 64;
-    let currentRadii = new Float32Array(NUM_POINTS).fill(38);
-    let targetRadii = new Float32Array(NUM_POINTS).fill(38);
-    let squishVel = 0;
-    let squishVal = 0;
-
-    function computeShapeRadii(shapeKey) {
-      const arr = new Float32Array(NUM_POINTS);
-      for (let i = 0; i < NUM_POINTS; i++) {
-        const theta = (i / NUM_POINTS) * Math.PI * 2;
-        if (shapeKey === 'circle') {
-          arr[i] = 38;
-        } else if (shapeKey === 'squircle') {
-          const c = Math.abs(Math.cos(theta));
-          const s = Math.abs(Math.sin(theta));
-          arr[i] = 37 / Math.pow(Math.pow(c, 4.2) + Math.pow(s, 4.2), 1 / 4.2);
-        } else if (shapeKey === 'hexagon') {
-          const n = 6;
-          const a = ((theta + Math.PI / 6) % (2 * Math.PI / n) + (2 * Math.PI / n)) % (2 * Math.PI / n) - Math.PI / n;
-          arr[i] = 35 / Math.cos(a * 0.78);
-        } else if (shapeKey === 'triangle') {
-          const rot = theta + Math.PI / 2;
-          const n = 3;
-          const a = ((rot % (2 * Math.PI / n)) + (2 * Math.PI / n)) % (2 * Math.PI / n) - Math.PI / n;
-          arr[i] = 29 / Math.cos(a * 0.68);
-        } else {
-          arr[i] = 38;
-        }
+    const CRISP_BOT_SHAPES = {
+      circle: {
+        d: "M 50,12 A 38,38 0 1,1 49.99,12 Z",
+        strokeWidth: 0,
+        eyeY: 34
+      },
+      triangle: {
+        d: "M 43,16 Q 50,6 57,16 L 86,72 Q 92,84 79,84 L 21,84 Q 8,84 14,72 Z",
+        strokeWidth: 0,
+        eyeY: 46
+      },
+      hexagon: {
+        d: "M 29,15 L 71,15 L 91,50 L 71,85 L 29,85 L 9,50 Z",
+        strokeWidth: 8,
+        eyeY: 35
+      },
+      squircle: {
+        d: "M 32,14 L 68,14 Q 86,14 86,32 L 86,68 Q 86,86 68,86 L 32,86 Q 14,86 14,68 L 14,32 Q 14,14 32,14 Z",
+        strokeWidth: 0,
+        eyeY: 35
       }
-      return arr;
-    }
+    };
 
-    function buildSmoothClosedPath(radii, cx, cy, breathWaveTime) {
-      const pts = [];
-      for (let i = 0; i < NUM_POINTS; i++) {
-        const theta = (i / NUM_POINTS) * Math.PI * 2;
-        const wave = Math.sin(theta * 3 + breathWaveTime * 2.2) * 0.65 + Math.cos(theta * 2 - breathWaveTime * 1.6) * 0.5;
-        const r = radii[i] + wave;
-        pts.push([cx + Math.cos(theta) * r, cy + Math.sin(theta) * r]);
-      }
-      let d = `M ${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)} `;
-      for (let i = 0; i < NUM_POINTS; i++) {
-        const p1 = pts[(i + 1) % NUM_POINTS];
-        const p2 = pts[(i + 2) % NUM_POINTS];
-        const midX = (p1[0] + p2[0]) / 2;
-        const midY = (p1[1] + p2[1]) / 2;
-        d += `Q ${p1[0].toFixed(2)},${p1[1].toFixed(2)} ${midX.toFixed(2)},${midY.toFixed(2)} `;
-      }
-      return d + 'Z';
-    }
+    let pressScale = 1;
+    let targetPressScale = 1;
 
-    // Subtle, controlled squish (reduced from 0.42 to 0.13)
-    function triggerBotSquish() {
-      squishVel = 0.13;
+    function triggerBotTapEffect() {
+      targetPressScale = 0.93;
+      setTimeout(() => { targetPressScale = 1; }, 130);
     }
 
     function setBotAppearance(shapeKey, colorHex) {
-      targetRadii = computeShapeRadii(shapeKey);
+      const cfg = CRISP_BOT_SHAPES[shapeKey] || CRISP_BOT_SHAPES.circle;
       const body = document.getElementById('mainBotBody');
-      if (body) body.setAttribute('fill', colorHex);
+      const eyeL = document.getElementById('botEyeL');
+      const eyeR = document.getElementById('botEyeR');
+      if (!body) return;
+
+      body.setAttribute('d', cfg.d);
+      body.setAttribute('fill', colorHex);
+      body.setAttribute('stroke', colorHex);
+      body.setAttribute('stroke-width', cfg.strokeWidth);
+
+      if (eyeL && eyeR) {
+        eyeL.setAttribute('y', cfg.eyeY);
+        eyeR.setAttribute('y', cfg.eyeY);
+      }
     }
 
     function initAutonomousBotLife() {
       const actorGroup = document.getElementById('mainBotActor');
-      const bodyPath = document.getElementById('mainBotBody');
       const eyesGroup = document.getElementById('mainBotEyes');
       const shadowEl = document.getElementById('mainBotShadow');
 
-      targetRadii = computeShapeRadii('circle');
-      currentRadii.set(targetRadii);
+      setBotAppearance('circle', '#111111');
 
       let targetGazeX = 0, targetGazeY = 0, curGazeX = 0, curGazeY = 0;
       let blinkScaleY = 1;
 
       setInterval(() => {
-        if (Math.random() < 0.28) {
+        if (Math.random() < 0.3) {
           targetGazeX = 0; targetGazeY = 0;
         } else {
-          targetGazeX = (Math.random() - 0.5) * 13;
-          targetGazeY = (Math.random() - 0.5) * 8;
+          targetGazeX = (Math.random() - 0.5) * 11;
+          targetGazeY = (Math.random() - 0.5) * 7;
         }
-      }, 2200);
+      }, 2400);
 
       function scheduleBlink() {
-        const nextDelay = 2000 + Math.random() * 3400;
+        const nextDelay = 2200 + Math.random() * 3400;
         setTimeout(() => {
           blinkScaleY = 0.08;
           setTimeout(() => {
@@ -746,10 +756,10 @@
             if (Math.random() < 0.25) {
               setTimeout(() => {
                 blinkScaleY = 0.08;
-                setTimeout(() => { blinkScaleY = 1; }, 105);
-              }, 120);
+                setTimeout(() => { blinkScaleY = 1; }, 100);
+              }, 115);
             }
-          }, 115);
+          }, 110);
           scheduleBlink();
         }, nextDelay);
       }
@@ -758,41 +768,30 @@
       function animateFrame(nowMs) {
         const t = nowMs * 0.001;
 
-        for (let i = 0; i < NUM_POINTS; i++) {
-          currentRadii[i] += (targetRadii[i] - currentRadii[i]) * 0.15;
-        }
-        bodyPath.setAttribute('d', buildSmoothClosedPath(currentRadii, 50, 50, t));
-
-        // Higher damping (0.66) so click animation settles quickly without over-bouncing
-        squishVal += squishVel;
-        squishVel *= 0.66;
-        squishVel -= squishVal * 0.34;
-
+        pressScale += (targetPressScale - pressScale) * 0.25;
         curGazeX += (targetGazeX - curGazeX) * 0.1;
         curGazeY += (targetGazeY - curGazeY) * 0.1;
 
-        const floatY = Math.sin(t * 2.2) * 3.2;
-        const breatheScaleX = 1 + Math.sin(t * 2.2) * 0.018 + squishVal;
-        const breatheScaleY = 1 - Math.sin(t * 2.2) * 0.018 - squishVal * 0.8;
-        const bodyTilt = Math.sin(t * 1.3) * 2.5 + (curGazeX * 0.38);
-        const bodyShiftX = curGazeX * 0.3;
+        // Clean vertical float + subtle gaze lean (no shape distortion)
+        const floatY = Math.sin(t * 2.1) * 2.8;
+        const bodyShiftX = curGazeX * 0.22;
 
         actorGroup.setAttribute(
           'transform',
-          `translate(${(50 + bodyShiftX).toFixed(2)}, ${(50 + floatY).toFixed(2)}) rotate(${bodyTilt.toFixed(2)}) scale(${breatheScaleX.toFixed(3)}, ${breatheScaleY.toFixed(3)}) translate(-50, -50)`
+          `translate(${(50 + bodyShiftX).toFixed(2)}, ${(50 + floatY).toFixed(2)}) scale(${pressScale.toFixed(3)}) translate(-50, -50)`
         );
 
-        const shadowRx = 23 - floatY * 0.7;
+        const shadowRx = 23 - floatY * 0.6;
         shadowEl.setAttribute('rx', shadowRx.toFixed(1));
 
         eyesGroup.setAttribute(
           'transform',
-          `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)}) translate(48, 41) scale(1, ${blinkScaleY}) translate(-48, -41)`
+          `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)}) translate(48, 42) scale(1, ${blinkScaleY}) translate(-48, -42)`
         );
 
         document.querySelectorAll('.mini-eyes').forEach((el, idx) => {
-          const ox = Math.sin(t * 1.6 + idx * 1.7) * 3.5;
-          const oy = Math.cos(t * 1.3 + idx * 1.3) * 2.0;
+          const ox = Math.sin(t * 1.5 + idx * 1.7) * 3.2;
+          const oy = Math.cos(t * 1.2 + idx * 1.3) * 1.8;
           el.setAttribute('transform', `translate(${ox.toFixed(1)}, ${oy.toFixed(1)})`);
         });
 
@@ -802,13 +801,13 @@
     }
 
     // =========================================================
-    // TAP + LONG-PRESS DRAG-TO-SELECT GESTURE CONTROLLER
+    // REQUIREMENT #6: TAP + HOLD-DRAG-RELEASE (RETURNS TO CURRENT VIEW IF NOT SELECTED)
     // =========================================================
     function initBotGestures() {
       const botBtn = document.getElementById('bloubBotBtn');
       let pressTimer = null;
       let isPointerDown = false;
-      let isDragSession = false;
+      let isHoldSession = false;
       let hoveredAgentBtn = null;
 
       function clearAgentHighlights() {
@@ -819,34 +818,33 @@
       botBtn.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         isPointerDown = true;
-        isDragSession = false;
+        isHoldSession = false;
         hoveredAgentBtn = null;
-        triggerBotSquish();
+        triggerBotTapEffect();
 
         try { botBtn.setPointerCapture(e.pointerId); } catch (err) {}
 
-        // Hold for 180ms -> automatically pop open the 4 Agent menu for drag-selection
+        // Hold for 170ms -> pop open the 4 Agent menu
         pressTimer = setTimeout(() => {
           if (isPointerDown) {
-            isDragSession = true;
+            isHoldSession = true;
             if (!isMenuOpen) {
               openAgentMenu();
-              if (navigator.vibrate) navigator.vibrate(12);
+              if (navigator.vibrate) navigator.vibrate(10);
             }
           }
-        }, 180);
+        }, 170);
       });
 
       botBtn.addEventListener('pointermove', (e) => {
         if (!isPointerDown) return;
 
-        // If user starts dragging upward/rightward by >14px, open menu immediately
         if (!isMenuOpen) {
           const rect = botBtn.getBoundingClientRect();
           const dist = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
-          if (dist > 18) {
+          if (dist > 16) {
             clearTimeout(pressTimer);
-            isDragSession = true;
+            isHoldSession = true;
             openAgentMenu();
           }
         }
@@ -860,20 +858,22 @@
             if (agentBtn) {
               agentBtn.classList.add('drag-hover');
               hoveredAgentBtn = agentBtn;
-              // Preview the shape & color on the bottom-left bot while hovering!
               setBotAppearance(agentBtn.dataset.agentShape, agentBtn.dataset.agentColor);
-              if (navigator.vibrate) navigator.vibrate(8);
+              if (navigator.vibrate) navigator.vibrate(6);
+            } else {
+              // Restore current view's bot appearance when finger leaves cards
+              setBotAppearance(currentBotShape, currentBotColor);
             }
           }
         }
       });
 
-      function finishGesture(e) {
+      function finishGesture() {
         if (!isPointerDown) return;
         isPointerDown = false;
         clearTimeout(pressTimer);
 
-        // Case 1: User dragged onto one of the 4 Agent cards and released finger
+        // Case 1: Finger released over one of the 4 Agent items -> navigate to it
         if (isMenuOpen && hoveredAgentBtn) {
           const tab = hoveredAgentBtn.dataset.agentTab;
           const shape = hoveredAgentBtn.dataset.agentShape;
@@ -885,16 +885,21 @@
 
         clearAgentHighlights();
 
-        // Case 2: Short tap (not a hold-and-drag session)
-        if (!isDragSession) {
-          if (isMenuOpen) {
-            closeAgentMenu();
-            showHomeView();
-          } else if (currentView !== 'home') {
-            showHomeView();
-          } else {
-            openAgentMenu();
-          }
+        // Case 2: It was a Long-Press / Drag session, but released on empty space
+        // -> Close menu and stay on current view!
+        if (isHoldSession) {
+          closeAgentMenu();
+          setBotAppearance(currentBotShape, currentBotColor);
+          return;
+        }
+
+        // Case 3: Short Tap
+        if (isMenuOpen) {
+          closeAgentMenu();
+        } else if (currentView !== 'home') {
+          showHomeView();
+        } else {
+          openAgentMenu();
         }
       }
 
@@ -903,6 +908,7 @@
         isPointerDown = false;
         clearTimeout(pressTimer);
         clearAgentHighlights();
+        if (isHoldSession) closeAgentMenu();
       });
     }
 
@@ -925,30 +931,49 @@
     function handleOverlayClick(e) {
       if (e.target.id === 'agentOverlay') {
         closeAgentMenu();
+        setBotAppearance(currentBotShape, currentBotColor);
       }
+    }
+
+    function animateSectionEntry(el) {
+      el.classList.remove('view-animate');
+      void el.offsetWidth;
+      el.classList.add('view-animate');
     }
 
     function showHomeView() {
       currentView = 'home';
+      currentBotShape = 'circle';
+      currentBotColor = '#111111';
+
       ['Schedule', 'Timetable', 'Tracker', 'Settings'].forEach(name => {
         document.getElementById('tab' + name).classList.add('hidden');
       });
-      document.getElementById('viewHome').classList.remove('hidden');
+      const homeEl = document.getElementById('viewHome');
+      homeEl.classList.remove('hidden');
+      animateSectionEntry(homeEl);
+
       document.getElementById('currentViewBadge').classList.add('hidden');
       setBotAppearance('circle', '#111111');
       loadUpcomingEvents();
     }
 
     function selectAgent(tabName, shapeKey, colorHex) {
-      triggerBotSquish();
+      triggerBotTapEffect();
       closeAgentMenu();
       currentView = tabName;
+      currentBotShape = shapeKey;
+      currentBotColor = colorHex;
 
       document.getElementById('viewHome').classList.add('hidden');
       ['schedule', 'timetable', 'tracker', 'settings'].forEach(t => {
         const el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
-        if (t === tabName) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (t === tabName) {
+          el.classList.remove('hidden');
+          animateSectionEntry(el);
+        } else {
+          el.classList.add('hidden');
+        }
       });
 
       const badge = document.getElementById('currentViewBadge');
@@ -964,7 +989,7 @@
     // HOME: GSAT COUNTDOWN, CLOCK, LOCATION
     // =========================================================
     function initGsatCountdown() {
-      const savedDate = EvStore.get('romano_gsat_date') || '2027-01-16';
+      const savedDate = EvStore.get('romano_gsat_date') || '2027-01-22';
       updateGsatDisplay(savedDate);
     }
 
@@ -978,7 +1003,7 @@
     }
 
     function promptGsatDate() {
-      const current = EvStore.get('romano_gsat_date') || '2027-01-16';
+      const current = EvStore.get('romano_gsat_date') || '2027-01-22';
       const next = prompt('Target GSAT Date (YYYY-MM-DD):', current);
       if (next && /^\d{4}-\d{2}-\d{2}$/.test(next.trim())) {
         EvStore.set('romano_gsat_date', next.trim());
@@ -997,6 +1022,9 @@
       }
       updateTime();
       setInterval(updateTime, 10000);
+
+      const savedLoc = EvStore.get('romano_last_loc');
+      if (savedLoc) document.getElementById('trackerSubLocation').innerText = savedLoc;
       pingSatellite(true);
     }
 
@@ -1006,9 +1034,9 @@
       if (!navigator.geolocation) return;
 
       navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude.toFixed(1);
-        const lon = pos.coords.longitude.toFixed(1);
-        document.getElementById('trackerSubLocation').innerText = `${lat}, ${lon}`;
+        const locStr = `${pos.coords.latitude.toFixed(1)}, ${pos.coords.longitude.toFixed(1)}`;
+        document.getElementById('trackerSubLocation').innerText = locStr;
+        EvStore.set('romano_last_loc', locStr);
         if (dot) dot.style.backgroundColor = '#34C77B';
         if (!silent) showToast('Location updated');
       }, () => {
@@ -1017,7 +1045,7 @@
     }
 
     // =========================================================
-    // UPCOMING EVENTS & GOOGLE TASKS
+    // UPCOMING EVENTS & GOOGLE TASKS (INSTANT CACHE + SYNC)
     // =========================================================
     function loadUpcomingEvents() {
       const icon = document.getElementById('eventsRefreshIcon');
@@ -1026,11 +1054,13 @@
       callBackend('getUpcomingEvents', { calendarIds: visibleCalendarIds, maxResults: 3 },
         function(events) {
           if (icon) icon.classList.remove('fa-spin');
-          renderUpcomingEvents(events || []);
+          cachedUpcomingEvents = events || [];
+          EvStore.setJSON('romano_cache_events', cachedUpcomingEvents);
+          renderUpcomingEvents(cachedUpcomingEvents);
         },
         function() {
           if (icon) icon.classList.remove('fa-spin');
-          renderUpcomingEvents([]);
+          renderUpcomingEvents(cachedUpcomingEvents);
         }
       );
     }
@@ -1040,28 +1070,28 @@
       if (!box) return;
       box.innerHTML = '';
 
-      if (!events || events.length === 0) {
-        box.innerHTML = `
-          <div class="px-3.5 py-3 rounded-2xl bg-[#F7F7F7] text-xs font-medium text-gray-400">No upcoming events</div>
-          <div class="px-3.5 py-3 rounded-2xl bg-[#F7F7F7] text-xs font-medium text-gray-300">—</div>
-        `;
-        return;
-      }
-
-      events.slice(0, 3).forEach(ev => {
-        box.innerHTML += `
-          <div class="px-3.5 py-2.5 rounded-2xl bg-[#F7F7F7] border border-gray-200/70 flex items-center justify-between gap-2">
-            <div class="truncate">
-              <div class="text-xs font-bold text-[#111111] truncate">${ev.title}</div>
-              <div class="text-[10px] font-semibold text-gray-400 truncate">${ev.calendarName || ''}</div>
+      const list = events || [];
+      for (let i = 0; i < 3; i++) {
+        const ev = list[i];
+        if (ev) {
+          box.innerHTML += `
+            <div class="px-4 py-3 rounded-2xl bg-[#F7F7F7] border border-gray-200/75 flex items-center justify-between gap-3">
+              <div class="truncate">
+                <div class="text-sm font-bold text-[#111111] truncate">${ev.title}</div>
+                <div class="text-[11px] font-semibold text-gray-400 truncate">${ev.calendarName || ''}</div>
+              </div>
+              <span class="text-xs font-extrabold text-gray-500 shrink-0">${ev.timeLabel || ''}</span>
             </div>
-            <span class="text-[11px] font-bold text-gray-500 shrink-0">${ev.timeLabel || ''}</span>
-          </div>
-        `;
-      });
+          `;
+        } else {
+          box.innerHTML += `
+            <div class="px-4 py-3.5 rounded-2xl bg-[#F7F7F7] border border-gray-200/50 flex items-center justify-between">
+              <span class="text-sm font-semibold text-gray-300">${i === 0 ? 'No upcoming events' : '—'}</span>
+            </div>
+          `;
+        }
+      }
     }
-
-    var todoItems = [];
 
     function syncGoogleTasks() {
       const icon = document.getElementById('tasksSyncIcon');
@@ -1072,14 +1102,17 @@
           if (icon) icon.classList.remove('fa-spin');
           if (Array.isArray(tasks)) {
             todoItems = tasks;
+            EvStore.setJSON('romano_cache_tasks', todoItems);
             renderTodos();
           }
         },
         function(err) {
           if (icon) icon.classList.remove('fa-spin');
-          const container = document.getElementById('todoListContainer');
-          if (container) {
-            container.innerHTML = `<div class="text-[11px] text-red-500 py-1 leading-tight">${err.message || 'Tasks auth needed'}</div>`;
+          if (!todoItems.length) {
+            const container = document.getElementById('todoListContainer');
+            if (container) {
+              container.innerHTML = `<div class="text-xs text-red-500 py-1 leading-tight">${err.message || 'Tasks sync error'}</div>`;
+            }
           }
         }
       );
@@ -1091,15 +1124,15 @@
       container.innerHTML = '';
 
       if (!todoItems.length) {
-        container.innerHTML = '<div class="text-xs text-gray-400 py-2">All clear</div>';
+        container.innerHTML = '<div class="text-sm font-medium text-gray-300 py-2">All clear</div>';
         return;
       }
 
       todoItems.forEach((item, idx) => {
         container.innerHTML += `
-          <label class="flex items-center gap-2 py-1 cursor-pointer group">
-            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodoItem('${item.id}', '${item.listId || ''}', this.checked, ${idx})" class="w-3.5 h-3.5 rounded accent-black cursor-pointer shrink-0">
-            <span class="text-xs font-semibold truncate ${item.done ? 'line-through text-gray-300' : 'text-[#111111]'}">${item.title}</span>
+          <label class="flex items-center gap-2.5 py-1.5 cursor-pointer group">
+            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodoItem('${item.id}', '${item.listId || ''}', this.checked, ${idx})" class="w-4 h-4 rounded accent-black cursor-pointer shrink-0">
+            <span class="text-sm font-bold truncate ${item.done ? 'line-through text-gray-300' : 'text-[#111111]'}">${item.title}</span>
           </label>
         `;
       });
@@ -1113,12 +1146,14 @@
 
       const tempItem = { id: 'TEMP_' + Date.now(), listId: '', title: title, done: false };
       todoItems.unshift(tempItem);
+      EvStore.setJSON('romano_cache_tasks', todoItems);
       renderTodos();
 
       callBackend('addGoogleTask', { title: title }, function(created) {
         if (created && created.id) {
           tempItem.id = created.id;
           tempItem.listId = created.listId || '';
+          EvStore.setJSON('romano_cache_tasks', todoItems);
         }
       }, function(err) {
         showToast(err.message);
@@ -1132,39 +1167,202 @@
       callBackend('toggleGoogleTask', { id: taskId, listId: listId, completed: isChecked }, function() {
         setTimeout(() => {
           todoItems = todoItems.filter(t => !t.done);
+          EvStore.setJSON('romano_cache_tasks', todoItems);
           renderTodos();
-        }, 450);
+        }, 350);
       });
     }
 
     // =========================================================
-    // CALENDARS, SCHEDULE, TIMETABLE, TRACKER, SETTINGS
+    // REQUIREMENT #3: FIX TRACKER TIMER DUPLICATE LOGGING BUG
     // =========================================================
-    function loadUserCalendars() {
+    function clearAllTimerStorage() {
+      EvStore.del('gsat_timer_state');
+      EvStore.del('gsat_timer_subject');
+      EvStore.del('gsat_timer_accumulated');
+      EvStore.del('gsat_timer_segment_start');
+    }
+
+    function checkPersistedTimer() {
+      var st = EvStore.get('gsat_timer_state');
+      if (st === 'RUNNING' || st === 'PAUSED') {
+        timerState = st;
+        currentSubject = EvStore.get('gsat_timer_subject') || '數學';
+        accumulatedMs = parseInt(EvStore.get('gsat_timer_accumulated') || '0', 10);
+        var savedStart = EvStore.get('gsat_timer_segment_start');
+        currentSegmentStartMs = savedStart ? parseInt(savedStart, 10) : null;
+        updateSubjectUI(currentSubject);
+        if (timerState === 'RUNNING') {
+          setUIRunning();
+          updateClockDisplay();
+          timerInterval = setInterval(updateClockDisplay, 1000);
+        } else {
+          setUIPaused();
+          updateClockDisplay();
+        }
+      } else {
+        clearAllTimerStorage();
+      }
+    }
+
+    function saveTimerStorage() {
+      EvStore.set('gsat_timer_state', timerState);
+      EvStore.set('gsat_timer_subject', currentSubject);
+      EvStore.set('gsat_timer_accumulated', accumulatedMs.toString());
+      if (currentSegmentStartMs) EvStore.set('gsat_timer_segment_start', currentSegmentStartMs.toString());
+      else EvStore.del('gsat_timer_segment_start');
+    }
+
+    function getTotalElapsedMs() {
+      var total = accumulatedMs;
+      if (timerState === 'RUNNING' && currentSegmentStartMs) total += (Date.now() - currentSegmentStartMs);
+      return total;
+    }
+
+    function updateClockDisplay() {
+      var s = Math.floor(getTotalElapsedMs() / 1000);
+      document.getElementById('timer-display').innerText =
+        String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
+        String(Math.floor((s % 3600) / 60)).padStart(2, '0') + ':' +
+        String(s % 60).padStart(2, '0');
+    }
+
+    function updateSubjectUI(subj) {
+      document.getElementById('current-track-badge').innerText = subj;
+      document.querySelectorAll('#subject-selector button').forEach(b => {
+        b.classList.toggle('b-tag-active', b.dataset.subj === subj);
+      });
+      renderUnitTags();
+    }
+
+    function setSubject(subj) {
+      if (timerState !== 'IDLE') { showToast('Stop timer first'); return; }
+      currentSubject = subj;
+      selectedUnits = [];
+      updateSubjectUI(subj);
+    }
+
+    function startTimer() {
+      timerState = 'RUNNING';
+      currentSegmentStartMs = Date.now();
+      accumulatedMs = 0;
+      saveTimerStorage();
+      setUIRunning();
+      updateClockDisplay();
+      timerInterval = setInterval(updateClockDisplay, 1000);
+    }
+
+    function togglePauseResume() {
+      if (timerState === 'RUNNING') {
+        clearInterval(timerInterval);
+        accumulatedMs += (Date.now() - currentSegmentStartMs);
+        currentSegmentStartMs = null;
+        timerState = 'PAUSED';
+        saveTimerStorage();
+        setUIPaused();
+      } else {
+        currentSegmentStartMs = Date.now();
+        timerState = 'RUNNING';
+        saveTimerStorage();
+        setUIRunning();
+        timerInterval = setInterval(updateClockDisplay, 1000);
+      }
+    }
+
+    // Immediately wipe local storage and reset UI BEFORE async network call
+    // so reopening the app NEVER prompts to log the same session twice!
+    function commitTimer() {
+      clearInterval(timerInterval);
+      var elapsedMs = getTotalElapsedMs();
+      var hours = elapsedMs / (1000 * 60 * 60);
+      var subjToLog = currentSubject;
+
+      // 1. Immediately clear persisted state & reset UI
+      clearAllTimerStorage();
+      resetTimerUI();
+
+      if (hours <= 0.0005) {
+        showToast('Session cleared');
+        return;
+      }
+
+      showToast(`Logging +${hours.toFixed(2)}h...`);
+
+      // 2. Send to Google Sheet in background
+      callBackend('apiRecordTime', { subject: subjToLog, elapsedHours: hours },
+        function() {
+          showToast(`+${hours.toFixed(2)}h saved`);
+        },
+        function(err) {
+          showToast('Sync error: ' + err.message);
+        }
+      );
+    }
+
+    function resetTimerUI() {
+      clearAllTimerStorage();
+      timerState = 'IDLE';
+      currentSegmentStartMs = null;
+      accumulatedMs = 0;
+      document.getElementById('start-btn').classList.remove('hidden');
+      document.getElementById('running-actions').classList.add('hidden');
+      document.getElementById('terminal-state').innerText = 'IDLE';
+      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-gray-300';
+      document.getElementById('timer-status').innerText = 'Ready';
+      document.getElementById('timer-display').innerText = '00:00:00';
+    }
+
+    function setUIRunning() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('running-actions').classList.remove('hidden');
+      setBtnText('pause-resume-btn', 'Pause');
+      document.getElementById('terminal-state').innerText = 'ACTIVE';
+      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-[#34C77B] animate-ping';
+      document.getElementById('timer-status').innerText = `Studying ${currentSubject}`;
+    }
+
+    function setUIPaused() {
+      document.getElementById('start-btn').classList.add('hidden');
+      document.getElementById('running-actions').classList.remove('hidden');
+      setBtnText('pause-resume-btn', 'Resume');
+      document.getElementById('terminal-state').innerText = 'PAUSED';
+      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-[#F5B82E]';
+      document.getElementById('timer-status').innerText = 'Paused';
+    }
+
+    // =========================================================
+    // CALENDARS, SCHEDULE, TIMETABLE, SETTINGS
+    // =========================================================
+    function applyCalendarsList(calendars) {
+      if (!calendars || !calendars.length) return;
+      allUserCalendars = calendars;
+      EvStore.setJSON('romano_cache_cals', calendars);
+
       const select = document.getElementById('calendarSelect');
+      if (select) {
+        select.innerHTML = '';
+        const savedCalId = EvStore.get('cal_selected_calendar');
+        calendars.forEach(cal => {
+          const opt = document.createElement('option');
+          opt.value = cal.id;
+          opt.innerText = cal.name;
+          if (savedCalId && cal.id === savedCalId) opt.selected = true;
+          select.appendChild(opt);
+        });
+        select.onchange = () => EvStore.set('cal_selected_calendar', select.value);
+      }
+
+      if (!EvStore.get('romano_visible_cals')) {
+        visibleCalendarIds = calendars.map(c => c.id);
+        EvStore.setJSON('romano_visible_cals', visibleCalendarIds);
+      }
+
+      renderCalendarVisibilitySettings();
+    }
+
+    function loadUserCalendars() {
       callBackend('getUserCalendars', null, function(calendars) {
-        if (!calendars || !calendars.length) return;
-        allUserCalendars = calendars;
-
-        if (select) {
-          select.innerHTML = '';
-          const savedCalId = EvStore.get('cal_selected_calendar');
-          calendars.forEach(cal => {
-            const opt = document.createElement('option');
-            opt.value = cal.id;
-            opt.innerText = cal.name;
-            if (savedCalId && cal.id === savedCalId) opt.selected = true;
-            select.appendChild(opt);
-          });
-          select.onchange = () => EvStore.set('cal_selected_calendar', select.value);
-        }
-
-        if (!EvStore.get('romano_visible_cals')) {
-          visibleCalendarIds = calendars.map(c => c.id);
-          EvStore.set('romano_visible_cals', JSON.stringify(visibleCalendarIds));
-        }
-
-        renderCalendarVisibilitySettings();
+        applyCalendarsList(calendars);
         loadUpcomingEvents();
       });
     }
@@ -1180,8 +1378,8 @@
       allUserCalendars.forEach(cal => {
         const checked = visibleCalendarIds.includes(cal.id);
         box.innerHTML += `
-          <label class="flex items-center justify-between p-2 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer">
-            <span class="text-xs font-semibold truncate pr-2">${cal.name}</span>
+          <label class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer">
+            <span class="text-xs font-bold truncate pr-2">${cal.name}</span>
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCalendarVisibility('${cal.id}', this.checked)" class="w-4 h-4 accent-black">
           </label>
         `;
@@ -1194,7 +1392,7 @@
       } else if (!isChecked) {
         visibleCalendarIds = visibleCalendarIds.filter(id => id !== calId);
       }
-      EvStore.set('romano_visible_cals', JSON.stringify(visibleCalendarIds));
+      EvStore.setJSON('romano_visible_cals', visibleCalendarIds);
       loadUpcomingEvents();
     }
 
@@ -1220,20 +1418,19 @@
       if (!t) return;
       t.innerText = msg;
       t.classList.remove('hidden');
-      setTimeout(() => t.classList.add('hidden'), 2400);
+      setTimeout(() => t.classList.add('hidden'), 2200);
     }
 
-    function syncFromCloudSheet() {
-      callBackend('getPresetsData', null, function(data) {
-        if (data.titles && data.titles.length) dbTitles = data.titles;
-        if (data.times && data.times.length) { dbTimes = data.times; periodTimes = data.times; }
-        if (data.subjects && data.subjects.length) dbSubjects = data.subjects;
-        if (data.subjectColors) dbSubjectColors = data.subjectColors;
-        if (data.settings) appSettings = data.settings;
-        renderTags();
-        if (currentView === 'timetable') renderTimetableGrid();
-        if (currentView === 'settings') renderSettingsTab();
-      });
+    function applyPresetsData(data) {
+      if (!data) return;
+      if (data.titles && data.titles.length) { dbTitles = data.titles; EvStore.setJSON('romano_cache_titles', dbTitles); }
+      if (data.times && data.times.length) { dbTimes = data.times; periodTimes = data.times; EvStore.setJSON('romano_cache_times', dbTimes); }
+      if (data.subjects && data.subjects.length) { dbSubjects = data.subjects; EvStore.setJSON('romano_cache_subjects', dbSubjects); }
+      if (data.subjectColors) { dbSubjectColors = data.subjectColors; EvStore.setJSON('romano_cache_subj_colors', dbSubjectColors); }
+      if (data.settings) { appSettings = data.settings; EvStore.setJSON('romano_cache_settings', appSettings); }
+      renderTags();
+      if (currentView === 'timetable') renderTimetableGrid();
+      if (currentView === 'settings') renderSettingsTab();
     }
 
     function renderTags() {
@@ -1363,6 +1560,8 @@
     function closeModal() {
       document.getElementById('manageModal').classList.add('hidden');
       editingTimeIndex = null;
+      EvStore.setJSON('romano_cache_titles', dbTitles);
+      EvStore.setJSON('romano_cache_times', dbTimes);
       renderTags();
       callBackend('savePresetsData', { titles: dbTitles, times: dbTimes });
     }
@@ -1468,7 +1667,7 @@
             display = (timetableData[swapIn.fromPeriod - 1] && timetableData[swapIn.fromPeriod - 1][origIdx]) || raw;
             dot = '<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500"></span>';
           }
-          tdHtml += `<td class="p-1"><div onclick="editTimetableCell(${p},${d2})" class="relative min-h-[38px] rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer transition" style="${getSubjectStyle(display)}">${display || '·'}${dot}</div></td>`;
+          tdHtml += `<td class="p-1"><div onclick="editTimetableCell(${p},${d2})" class="relative min-h-[40px] rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer transition" style="${getSubjectStyle(display)}">${display || '·'}${dot}</div></td>`;
         }
         tr.innerHTML = tdHtml;
         tbody.appendChild(tr);
@@ -1481,6 +1680,7 @@
       if (next !== null) {
         if (!timetableData[p]) timetableData[p] = ['', '', '', '', ''];
         timetableData[p][d] = next.trim();
+        EvStore.setJSON('romano_cache_timetable', timetableData);
         renderTimetableGrid();
       }
     }
@@ -1505,6 +1705,7 @@
       var btn = document.getElementById('syncMatrixBtn');
       btn.disabled = true;
       setBtnText('syncMatrixBtn', 'Saving...');
+      EvStore.setJSON('romano_cache_timetable', timetableData);
       callBackend('saveTimetableData', timetableData,
         function() {
           showToast('Timetable saved');
@@ -1516,15 +1717,6 @@
           setBtnText('syncMatrixBtn', 'Save Timetable');
         }
       );
-    }
-
-    function syncTimetableFromCloud() {
-      callBackend('getTimetableData', null, function(data) {
-        if (Array.isArray(data)) {
-          timetableData = data;
-          if (currentView === 'timetable') renderTimetableGrid();
-        }
-      });
     }
 
     function openSwapModal() {
@@ -1579,15 +1771,11 @@
           swapRecords.push({ id: `S_${Date.now()}_${i}`, fromDate: from.date, fromPeriod: from.period, toDate: to.date, toPeriod: to.period, note, chainGroup: groupId });
         }
       }
+      EvStore.setJSON('romano_cache_swaps', swapRecords);
       callBackend('saveSwapRecords', swapRecords);
       renderTimetableGrid();
       closeSwapModal();
       showToast('Swap saved');
-    }
-    function syncSwapsFromCloud() {
-      callBackend('getSwapRecords', null, function(data) {
-        if (Array.isArray(data)) swapRecords = data;
-      });
     }
     function openSwapListModal() {
       var c = document.getElementById('swapListModalContent');
@@ -1602,132 +1790,15 @@
       var target = swapRecords[idx];
       if (target.chainGroup) swapRecords = swapRecords.filter(r => r.chainGroup !== target.chainGroup);
       else swapRecords.splice(idx, 1);
+      EvStore.setJSON('romano_cache_swaps', swapRecords);
       callBackend('saveSwapRecords', swapRecords);
       renderTimetableGrid();
       openSwapListModal();
     }
 
-    function checkPersistedTimer() {
-      var st = EvStore.get('gsat_timer_state');
-      if (st === 'RUNNING' || st === 'PAUSED') {
-        timerState = st;
-        currentSubject = EvStore.get('gsat_timer_subject') || '數學';
-        accumulatedMs = parseInt(EvStore.get('gsat_timer_accumulated') || '0', 10);
-        var savedStart = EvStore.get('gsat_timer_segment_start');
-        currentSegmentStartMs = savedStart ? parseInt(savedStart, 10) : null;
-        updateSubjectUI(currentSubject);
-        if (timerState === 'RUNNING') {
-          setUIRunning();
-          updateClockDisplay();
-          timerInterval = setInterval(updateClockDisplay, 1000);
-        } else {
-          setUIPaused();
-          updateClockDisplay();
-        }
-      }
-    }
-    function saveTimerStorage() {
-      EvStore.set('gsat_timer_state', timerState);
-      EvStore.set('gsat_timer_subject', currentSubject);
-      EvStore.set('gsat_timer_accumulated', accumulatedMs.toString());
-      if (currentSegmentStartMs) EvStore.set('gsat_timer_segment_start', currentSegmentStartMs.toString());
-      else EvStore.del('gsat_timer_segment_start');
-    }
-    function getTotalElapsedMs() {
-      var total = accumulatedMs;
-      if (timerState === 'RUNNING' && currentSegmentStartMs) total += (Date.now() - currentSegmentStartMs);
-      return total;
-    }
-    function updateClockDisplay() {
-      var s = Math.floor(getTotalElapsedMs() / 1000);
-      document.getElementById('timer-display').innerText =
-        String(Math.floor(s / 3600)).padStart(2, '0') + ':' +
-        String(Math.floor((s % 3600) / 60)).padStart(2, '0') + ':' +
-        String(s % 60).padStart(2, '0');
-    }
-    function updateSubjectUI(subj) {
-      document.getElementById('current-track-badge').innerText = subj;
-      document.querySelectorAll('#subject-selector button').forEach(b => {
-        b.classList.toggle('b-tag-active', b.dataset.subj === subj);
-      });
-      renderUnitTags();
-    }
-    function setSubject(subj) {
-      if (timerState !== 'IDLE') { showToast('Stop timer first'); return; }
-      currentSubject = subj;
-      selectedUnits = [];
-      updateSubjectUI(subj);
-    }
-    function startTimer() {
-      timerState = 'RUNNING';
-      currentSegmentStartMs = Date.now();
-      accumulatedMs = 0;
-      saveTimerStorage();
-      setUIRunning();
-      updateClockDisplay();
-      timerInterval = setInterval(updateClockDisplay, 1000);
-    }
-    function togglePauseResume() {
-      if (timerState === 'RUNNING') {
-        clearInterval(timerInterval);
-        accumulatedMs += (Date.now() - currentSegmentStartMs);
-        currentSegmentStartMs = null;
-        timerState = 'PAUSED';
-        saveTimerStorage();
-        setUIPaused();
-      } else {
-        currentSegmentStartMs = Date.now();
-        timerState = 'RUNNING';
-        saveTimerStorage();
-        setUIRunning();
-        timerInterval = setInterval(updateClockDisplay, 1000);
-      }
-    }
-    function commitTimer() {
-      clearInterval(timerInterval);
-      var hours = getTotalElapsedMs() / (1000 * 60 * 60);
-      var btn = document.getElementById('commit-timer-btn');
-      btn.disabled = true;
-      callBackend('apiRecordTime', { subject: currentSubject, elapsedHours: hours },
-        function() {
-          showToast(`+${hours.toFixed(2)}h logged`);
-          resetTimerUI(btn);
-        },
-        function() { btn.disabled = false; }
-      );
-    }
-    function resetTimerUI(btn) {
-      EvStore.del('gsat_timer_state');
-      timerState = 'IDLE';
-      currentSegmentStartMs = null;
-      accumulatedMs = 0;
-      document.getElementById('start-btn').classList.remove('hidden');
-      document.getElementById('running-actions').classList.add('hidden');
-      document.getElementById('terminal-state').innerText = 'IDLE';
-      document.getElementById('pulse-dot').className = 'w-2 h-2 rounded-full bg-gray-300';
-      document.getElementById('timer-status').innerText = 'Ready';
-      document.getElementById('timer-display').innerText = '00:00:00';
-      if (btn) btn.disabled = false;
-    }
-    function setUIRunning() {
-      document.getElementById('start-btn').classList.add('hidden');
-      document.getElementById('running-actions').classList.remove('hidden');
-      setBtnText('pause-resume-btn', 'Pause');
-      document.getElementById('terminal-state').innerText = 'ACTIVE';
-      document.getElementById('pulse-dot').className = 'w-2 h-2 rounded-full bg-[#34C77B] animate-ping';
-      document.getElementById('timer-status').innerText = `Studying ${currentSubject}`;
-    }
-    function setUIPaused() {
-      document.getElementById('start-btn').classList.add('hidden');
-      document.getElementById('running-actions').classList.remove('hidden');
-      setBtnText('pause-resume-btn', 'Resume');
-      document.getElementById('terminal-state').innerText = 'PAUSED';
-      document.getElementById('pulse-dot').className = 'w-2 h-2 rounded-full bg-[#F5B82E]';
-      document.getElementById('timer-status').innerText = 'Paused';
-    }
-
     function renderUnitTags() {
       var c = document.getElementById('unit-tag-container');
+      if (!c) return;
       c.innerHTML = '';
       var list = unitsCache[currentSubject] || [];
       if (!list.length) {
@@ -1777,7 +1848,7 @@
           `<button onclick="updateSubjectHexColor('${sub}','${sw}')" class="w-4 h-4 rounded-full border ${c.toLowerCase()===sw.toLowerCase()?'scale-125 ring-1 ring-black':'border-transparent'}" style="background:${sw}"></button>`
         ).join('');
         list.innerHTML += `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-gray-50 text-xs font-semibold">
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 text-xs font-bold">
             <span>${sub}</span>
             <div class="flex items-center gap-1">${dots}<button onclick="removeSubject(${idx})" class="ml-1.5 text-gray-400 hover:text-red-500">✕</button></div>
           </div>`;
@@ -1785,6 +1856,7 @@
     }
     function updateSubjectHexColor(sub, hex) {
       dbSubjectColors[sub] = hex;
+      EvStore.setJSON('romano_cache_subj_colors', dbSubjectColors);
       renderSettingsTab();
       renderTimetableGrid();
     }
@@ -1793,6 +1865,7 @@
       if (name && name.trim() && !dbSubjects.includes(name.trim())) {
         dbSubjects.push(name.trim());
         dbSubjectColors[name.trim()] = '#3B96F3';
+        EvStore.setJSON('romano_cache_subjects', dbSubjects);
         renderSettingsTab();
       }
     }
@@ -1800,10 +1873,19 @@
       var name = dbSubjects[idx];
       dbSubjects.splice(idx, 1);
       delete dbSubjectColors[name];
+      EvStore.setJSON('romano_cache_subjects', dbSubjects);
       renderSettingsTab();
     }
-    function updateTotalPeriods(val) { appSettings.totalPeriods = parseInt(val) || 8; renderTimetableGrid(); }
-    function toggleSwapPulse(checked) { appSettings.showSwapPulse = checked; renderTimetableGrid(); }
+    function updateTotalPeriods(val) {
+      appSettings.totalPeriods = parseInt(val) || 8;
+      EvStore.setJSON('romano_cache_settings', appSettings);
+      renderTimetableGrid();
+    }
+    function toggleSwapPulse(checked) {
+      appSettings.showSwapPulse = checked;
+      EvStore.setJSON('romano_cache_settings', appSettings);
+      renderTimetableGrid();
+    }
     function saveAllSettingsToCloud() {
       var btn = document.getElementById('saveSettingsBtn');
       btn.disabled = true;
@@ -1813,24 +1895,83 @@
       );
     }
 
+    // =========================================================
+    // REQUIREMENT #2: INSTANT BOOT + SINGLE-ROUNDTRIP SYNC
+    // =========================================================
+    function fallbackParallelSync() {
+      loadUserCalendars();
+      syncGoogleTasks();
+      callBackend('getPresetsData', null, applyPresetsData);
+      callBackend('getTimetableData', null, function(data) {
+        if (Array.isArray(data)) {
+          timetableData = data;
+          EvStore.setJSON('romano_cache_timetable', data);
+          if (currentView === 'timetable') renderTimetableGrid();
+        }
+      });
+      callBackend('getSwapRecords', null, function(data) {
+        if (Array.isArray(data)) {
+          swapRecords = data;
+          EvStore.setJSON('romano_cache_swaps', data);
+        }
+      });
+      callBackend('apiGetSubjectUnits', null, function(data) {
+        if (data) {
+          unitsCache = data;
+          EvStore.setJSON('romano_cache_units', data);
+          renderUnitTags();
+        }
+      });
+    }
+
     function sysInit() {
+      // 1. Instant 0.01s Render from Local Cache
       initAutonomousBotLife();
       initBotGestures();
       initGsatCountdown();
       initTelemetry();
+      renderUpcomingEvents(cachedUpcomingEvents);
+      renderTodos();
       renderTags();
+      renderUnitTags();
+      if (allUserCalendars.length) applyCalendarsList(allUserCalendars);
       checkPersistedTimer();
 
-      setTimeout(() => {
-        loadUserCalendars();
-        syncGoogleTasks();
-        syncFromCloudSheet();
-        syncTimetableFromCloud();
-        syncSwapsFromCloud();
-        callBackend('apiGetSubjectUnits', null, function(data) {
-          if (data) { unitsCache = data; renderUnitTags(); }
-        });
-      }, 60);
+      // 2. Single-Batch Cloud Sync (Automatically falls back to parallel sync if GAS not updated yet)
+      callBackend('getInitialBundle', { calendarIds: visibleCalendarIds, maxResults: 3 },
+        function(bundle) {
+          if (!bundle) { fallbackParallelSync(); return; }
+          if (bundle.calendars) applyCalendarsList(bundle.calendars);
+          if (bundle.upcomingEvents) {
+            cachedUpcomingEvents = bundle.upcomingEvents;
+            EvStore.setJSON('romano_cache_events', cachedUpcomingEvents);
+            renderUpcomingEvents(cachedUpcomingEvents);
+          }
+          if (bundle.tasks) {
+            todoItems = bundle.tasks;
+            EvStore.setJSON('romano_cache_tasks', todoItems);
+            renderTodos();
+          }
+          if (bundle.presets) applyPresetsData(bundle.presets);
+          if (Array.isArray(bundle.timetable)) {
+            timetableData = bundle.timetable;
+            EvStore.setJSON('romano_cache_timetable', timetableData);
+          }
+          if (Array.isArray(bundle.swaps)) {
+            swapRecords = bundle.swaps;
+            EvStore.setJSON('romano_cache_swaps', swapRecords);
+          }
+          if (bundle.units) {
+            unitsCache = bundle.units;
+            EvStore.setJSON('romano_cache_units', unitsCache);
+            renderUnitTags();
+          }
+        },
+        function() {
+          // If 'getInitialBundle' isn't in Code.gs yet, run parallel fetch immediately
+          fallbackParallelSync();
+        }
+      );
     }
 
     sysInit();
