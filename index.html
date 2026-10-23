@@ -7,7 +7,8 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="theme-color" content="#F7F7F7">
+  <meta name="theme-color" content="#F7F7F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0B0E" media="(prefers-color-scheme: dark)">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,12 +19,41 @@
     :root {
       --bg-main: #F7F7F7;
       --bg-card: #FFFFFF;
+      --bg-subtle: #F3F4F6;
+      --bg-input: #F9FAFB;
       --border-subtle: #E5E7EB;
-      --ink-black: #111111;
-      --btn-navy: #141B2D;
+      --border-active: #111111;
+      --ink-primary: #111111;
+      --ink-secondary: #6B7280;
+      --ink-muted: #9CA3AF;
+      --btn-primary-bg: #141B2D;
+      --btn-primary-text: #FFFFFF;
+      --menu-backdrop: rgba(247, 247, 247, 0.25);
+      --menu-text-idle: rgba(17, 17, 17, 0.42);
+      --schedule-active-color: #111111;
     }
 
-    /* Requirement #5: Disable text selection & long-press callout globally */
+    /* Requirement #3: Auto Sync System Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-main: #0B0B0E;
+        --bg-card: #151519;
+        --bg-subtle: #1F1F25;
+        --bg-input: #1C1C22;
+        --border-subtle: #27272F;
+        --border-active: #FFFFFF;
+        --ink-primary: #F4F4F6;
+        --ink-secondary: #9CA3AF;
+        --ink-muted: #6B7280;
+        --btn-primary-bg: #F4F4F6;
+        --btn-primary-text: #0B0B0E;
+        --menu-backdrop: rgba(11, 11, 14, 0.35);
+        --menu-text-idle: rgba(244, 244, 246, 0.42);
+        --schedule-active-color: #FFFFFF;
+      }
+    }
+
+    /* Global No-Select & Native App Touch Feel */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -32,7 +62,6 @@
       -webkit-touch-callout: none;
     }
 
-    /* Keep text inputs selectable so typing works normally */
     input, textarea, select {
       -webkit-user-select: text;
       user-select: text;
@@ -43,35 +72,41 @@
       margin: 0;
       padding: 0;
       background-color: var(--bg-main);
-      color: var(--ink-black);
+      color: var(--ink-primary);
       font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     .b-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border-subtle);
       border-radius: 26px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
-      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+      transition: background-color 0.2s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .b-subtle-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
     }
 
     .b-input {
-      background: #F9FAFB;
+      background: var(--bg-input);
       border: 1.5px solid var(--border-subtle);
-      color: var(--ink-black);
+      color: var(--ink-primary);
       border-radius: 14px;
       outline: none;
       transition: border-color 0.15s, background 0.15s;
     }
     .b-input:focus {
-      background: #FFFFFF;
-      border-color: var(--ink-black);
+      background: var(--bg-card);
+      border-color: var(--border-active);
     }
 
     .b-btn-primary {
-      background: var(--btn-navy);
-      color: #FFFFFF;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
       border-radius: 16px;
       font-weight: 700;
       transition: transform 0.12s ease, opacity 0.15s ease;
@@ -84,9 +119,9 @@
     }
 
     .b-tag {
-      background: #F3F4F6;
+      background: var(--bg-subtle);
       border: 1.5px solid transparent;
-      color: #374151;
+      color: var(--ink-secondary);
       border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
@@ -94,13 +129,13 @@
       transition: all 0.12s ease;
     }
     .b-tag-active {
-      background: #FFFFFF !important;
-      border-color: var(--ink-black) !important;
-      color: var(--ink-black) !important;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background: var(--bg-card) !important;
+      border-color: var(--border-active) !important;
+      color: var(--ink-primary) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    /* Requirement #6: Smooth View Transition Animation */
+    /* Smooth View Transition Animation */
     @keyframes viewSmoothIn {
       0% {
         opacity: 0;
@@ -112,48 +147,74 @@
       }
     }
     .view-animate {
-      animation: viewSmoothIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: viewSmoothIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    /* Light, high-transparency blur when Bot Menu is open */
+    /* High-transparency light blur when Bot Menu is open */
     #appContentWrapper {
       transition: filter 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
     }
     body.menu-open #appContentWrapper {
-      filter: blur(3.5px);
-      opacity: 0.55;
+      filter: blur(4px);
+      opacity: 0.32;
       transform: scale(0.99);
       pointer-events: none;
     }
 
-    /* Agent Overlay Items Staggered Pop */
+    /* Requirement #5: Borderless / Boxless Pure Text + Bot Menu Items */
+    #agentOverlay {
+      background: var(--menu-backdrop);
+    }
+
     .agent-item {
       opacity: 0;
       transform: translateY(12px) scale(0.95);
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(10px);
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
     }
     body.menu-open .agent-item {
       opacity: 1;
       transform: translateY(0) scale(1);
     }
     body.menu-open .agent-item:nth-child(1) { transition-delay: 0.015s; }
-    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.045s; }
-    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.075s; }
-    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.105s; }
+    body.menu-open .agent-item:nth-child(2) { transition-delay: 0.04s; }
+    body.menu-open .agent-item:nth-child(3) { transition-delay: 0.065s; }
+    body.menu-open .agent-item:nth-child(4) { transition-delay: 0.09s; }
 
-    /* Highlight state when dragging finger over an Agent item */
+    .agent-label {
+      color: var(--menu-text-idle);
+      transition: color 0.16s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.16s ease;
+    }
+
+    /* When dragging/hovering over an Agent item: text lights up in its signature color & scales up */
     .agent-item.drag-hover {
-      border-color: #111111 !important;
-      background: #FFFFFF !important;
-      transform: scale(1.045) translateX(6px) !important;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1) !important;
+      transform: scale(1.1) translateX(10px) !important;
+    }
+    .agent-item[data-agent-tab="schedule"].drag-hover .agent-label,
+    .agent-item[data-agent-tab="schedule"]:hover .agent-label {
+      color: var(--schedule-active-color) !important;
+    }
+    .agent-item[data-agent-tab="timetable"].drag-hover .agent-label,
+    .agent-item[data-agent-tab="timetable"]:hover .agent-label {
+      color: #34C77B !important;
+      text-shadow: 0 4px 18px rgba(52, 199, 123, 0.28);
+    }
+    .agent-item[data-agent-tab="tracker"].drag-hover .agent-label,
+    .agent-item[data-agent-tab="tracker"]:hover .agent-label {
+      color: #F28B30 !important;
+      text-shadow: 0 4px 18px rgba(242, 139, 48, 0.28);
+    }
+    .agent-item[data-agent-tab="settings"].drag-hover .agent-label,
+    .agent-item[data-agent-tab="settings"]:hover .agent-label {
+      color: #3B96F3 !important;
+      text-shadow: 0 4px 18px rgba(59, 150, 243, 0.28);
     }
 
     @keyframes mini-float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-2.5px); }
+      50% { transform: translateY(-3px); }
     }
     .mini-bot-svg {
       animation: mini-float 2.8s ease-in-out infinite;
@@ -169,78 +230,79 @@
   <!-- MAIN MOBILE FULL-HEIGHT CONTAINER -->
   <div class="w-full max-w-md min-h-[100dvh] flex flex-col px-5 pt-6 pb-28 relative">
 
-    <!-- ==================== WRAPPED CONTENT (STRETCHES TO FILL PHONE SCREEN) ==================== -->
+    <!-- ==================== WRAPPED CONTENT ==================== -->
     <div id="appContentWrapper" class="flex-1 flex flex-col">
 
       <!-- HEADER: Hi Romano -->
       <header class="flex items-center justify-between pt-1 pb-4 shrink-0">
         <div class="flex items-center gap-3">
-          <h1 class="text-3xl font-extrabold tracking-tight text-[#111111]">Hi Romano</h1>
+          <h1 class="text-3xl font-extrabold tracking-tight">Hi Romano</h1>
           <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-[#34C77B] transition-colors" title="Synced"></span>
         </div>
-        <span id="currentViewBadge" class="text-xs font-extrabold uppercase tracking-widest text-gray-400 hidden">SCHEDULE</span>
+        <span id="currentViewBadge" class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)] hidden">SCHEDULE</span>
       </header>
 
-      <!-- ==================== VIEW 0: HOME DASHBOARD (STRETCHES TO FILL SCREEN) ==================== -->
+      <!-- ==================== VIEW 0: HOME DASHBOARD ==================== -->
       <main id="viewHome" class="flex-1 flex flex-col justify-between gap-4 view-animate">
 
-        <!-- 1. GSAT COUNTDOWN (Larger & Fuller) -->
+        <!-- 1. GSAT COUNTDOWN -->
         <div class="b-card p-6 flex flex-col justify-between shrink-0">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">GSAT COUNTDOWN</span>
-            <button onclick="promptGsatDate()" class="text-xs font-bold text-gray-400 hover:text-black transition" id="gsatTargetLabel">2027.01.22</button>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">GSAT COUNTDOWN</span>
+            <button onclick="promptGsatDate()" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition" id="gsatTargetLabel">2027.01.22</button>
           </div>
           <div class="mt-3 flex items-baseline gap-3">
-            <span id="gsatDaysLeft" class="text-7xl font-black tracking-tighter leading-none text-[#111111]">94</span>
-            <span class="text-xl font-bold text-gray-400">days</span>
+            <span id="gsatDaysLeft" class="text-7xl font-black tracking-tighter leading-none">91</span>
+            <span class="text-xl font-bold text-[var(--ink-muted)]">days</span>
           </div>
         </div>
 
-        <!-- 2. UPCOMING EVENTS (3 Slots + Larger Text) -->
+        <!-- 2. UPCOMING EVENTS -->
         <div class="b-card p-6 flex flex-col justify-between space-y-3.5 shrink-0">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">UPCOMING EVENTS</span>
-            <button onclick="loadUpcomingEvents()" class="text-gray-400 hover:text-black text-sm transition p-1" title="Refresh">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">UPCOMING EVENTS</span>
+            <button onclick="loadUpcomingEvents()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-sm transition p-1" title="Refresh">
               <i class="fa-solid fa-rotate-right" id="eventsRefreshIcon"></i>
             </button>
           </div>
           <div id="upcomingEventsList" class="space-y-2.5"></div>
         </div>
 
-        <!-- 3. BOTTOM SPLIT: STRETCHES TO FILL REMAINING VERTICAL SPACE -->
+        <!-- 3. BOTTOM SPLIT: NEXT CLASS (Plan A) & GOOGLE TASKS TO-DO -->
         <div class="grid grid-cols-12 gap-4 flex-1 min-h-[220px]">
           
-          <!-- Left Column: Time + Location -->
-          <div class="col-span-5 flex flex-col gap-4">
-            <div class="b-card p-5 flex flex-col justify-center items-center flex-1">
-              <div id="homeClock" class="text-3xl font-extrabold tracking-tight text-[#111111] tabular-nums">21:47</div>
-              <div id="homeDate" class="text-xs font-bold text-gray-400 mt-1">OCT 20</div>
+          <!-- Left Column (Plan A): NEXT CLASS / TODAY TIMETABLE WIDGET -->
+          <div onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="col-span-5 b-card p-5 flex flex-col justify-between cursor-pointer active:scale-95 transition">
+            <div>
+              <div class="flex items-center justify-between">
+                <span id="nextClassHeader" class="text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">NEXT CLASS</span>
+                <span id="nextClassDot" class="w-2 h-2 rounded-full bg-[#34C77B]"></span>
+              </div>
+              <div id="nextClassPeriod" class="text-xs font-extrabold text-[#34C77B] mt-2">P1 · 08:10</div>
+              <div id="nextClassSubject" class="text-2xl font-black tracking-tight mt-0.5 truncate">—</div>
             </div>
 
-            <button onclick="pingSatellite()" class="b-card p-4 text-left hover:border-black transition flex flex-col justify-between shrink-0">
-              <div class="flex items-center justify-between w-full">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400">LOCATION</span>
-                <span id="locPingDot" class="w-2 h-2 rounded-full bg-[#34C77B]"></span>
-              </div>
-              <div id="trackerSubLocation" class="text-sm font-extrabold text-[#111111] mt-2 truncate">24.8, 121.0</div>
-            </button>
+            <div class="pt-3 mt-2 border-t border-[var(--border-subtle)]">
+              <div class="text-[10px] font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">FOLLOWING</div>
+              <div id="followingClassInfo" class="text-xs font-bold text-[var(--ink-secondary)] mt-0.5 truncate">Tap for timetable</div>
+            </div>
           </div>
 
           <!-- Right Column: Google Tasks TO-DO -->
           <div class="col-span-7 b-card p-5 flex flex-col justify-between">
             <div class="flex-1 flex flex-col min-h-0">
               <div class="flex items-center justify-between mb-3 shrink-0">
-                <span class="text-xs font-extrabold uppercase tracking-widest text-gray-400">TO-DO</span>
-                <button onclick="syncGoogleTasks()" class="text-xs text-gray-400 hover:text-black transition p-1" title="Sync Google Tasks">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">TO-DO</span>
+                <button onclick="syncGoogleTasks()" class="text-xs text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition p-1" title="Sync Google Tasks">
                   <i class="fa-solid fa-rotate" id="tasksSyncIcon"></i>
                 </button>
               </div>
               <div id="todoListContainer" class="space-y-2 overflow-y-auto no-scrollbar pr-0.5 flex-1"></div>
             </div>
 
-            <div class="flex items-center gap-2 pt-3 mt-2 border-t border-gray-100 shrink-0">
-              <input type="text" id="newTodoInput" placeholder="New task..." onkeydown="if(event.key==='Enter')addTodoItem()" class="w-full text-sm font-semibold bg-transparent outline-none text-[#111111] placeholder-gray-400">
-              <button onclick="addTodoItem()" class="text-gray-400 hover:text-black text-base px-1.5 font-bold">+</button>
+            <div class="flex items-center gap-2 pt-3 mt-2 border-t border-[var(--border-subtle)] shrink-0">
+              <input type="text" id="newTodoInput" placeholder="New task..." onkeydown="if(event.key==='Enter')addTodoItem()" class="w-full text-sm font-semibold bg-transparent outline-none placeholder-[var(--ink-muted)]">
+              <button onclick="addTodoItem()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-base px-1.5 font-bold">+</button>
             </div>
           </div>
 
@@ -252,25 +314,31 @@
         <div class="b-card p-5 space-y-4">
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">CALENDAR</label>
-              <button onclick="loadUserCalendars()" class="text-xs font-bold text-gray-400 hover:text-black">Reload</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">CALENDAR</label>
+              <button onclick="loadUserCalendars()" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">Reload</button>
             </div>
             <select id="calendarSelect" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold">
               <option value="primary">Primary</option>
             </select>
           </div>
 
+          <!-- Requirement #2: Warning Symbol ⚠️ Toggle Button -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TITLE</label>
-              <button onclick="openModal('title')" class="text-xs font-bold text-gray-400 hover:text-black">Edit</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">TITLE</label>
+              <button onclick="openModal('title')" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">Edit</button>
             </div>
             <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar mb-2.5" id="titleTags"></div>
-            <input type="text" id="eventTitle" placeholder="Event title..." oninput="clearTitleHighlight()" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold">
+            <div class="flex items-center gap-2">
+              <input type="text" id="eventTitle" placeholder="Event title..." oninput="clearTitleHighlight()" class="flex-1 b-input px-3.5 py-2.5 text-sm font-semibold">
+              <button type="button" onclick="toggleWarningSymbol()" title="Wrap with ⚠️" class="b-input px-3.5 py-2.5 text-sm font-extrabold hover:border-[var(--border-active)] active:scale-95 transition shrink-0">
+                ⚠️
+              </button>
+            </div>
           </div>
 
           <div>
-            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block mb-1.5">DATE</label>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)] block mb-1.5">DATE</label>
             <input type="date" id="eventDate" oninput="clearDateButtonHighlight()" class="w-full b-input px-3.5 py-2.5 text-sm font-semibold mb-2">
             <div class="grid grid-cols-3 gap-2">
               <button type="button" onclick="handleQuickDateClick(0, this)" class="b-tag text-center date-quick-btn">Today</button>
@@ -281,17 +349,17 @@
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TIME</label>
-              <button onclick="openModal('time')" class="text-xs font-bold text-gray-400 hover:text-black">Edit</button>
+              <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">TIME</label>
+              <button onclick="openModal('time')" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">Edit</button>
             </div>
             <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar mb-2.5" id="timeTags"></div>
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <span class="text-[11px] font-bold text-gray-400 block mb-1">START</span>
+                <span class="text-[11px] font-bold text-[var(--ink-muted)] block mb-1">START</span>
                 <input type="time" id="startTime" class="w-full b-input px-3 py-2 text-sm font-semibold">
               </div>
               <div>
-                <span class="text-[11px] font-bold text-gray-400 block mb-1">END</span>
+                <span class="text-[11px] font-bold text-[var(--ink-muted)] block mb-1">END</span>
                 <input type="time" id="endTime" class="w-full b-input px-3 py-2 text-sm font-semibold">
               </div>
             </div>
@@ -311,29 +379,29 @@
       <!-- ==================== VIEW 2: TIMETABLE ==================== -->
       <section id="tabTimetable" class="hidden space-y-3.5">
         <div class="b-card p-3.5 flex items-center justify-between">
-          <button onclick="navigateWeek(-1)" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">&lt;</button>
+          <button onclick="navigateWeek(-1)" class="px-3.5 py-2 rounded-xl b-subtle-box text-xs font-bold">&lt;</button>
           <div class="text-center cursor-pointer" onclick="navigateWeek(0)">
-            <div id="weekRangeLabel" class="text-sm font-extrabold text-[#111111]">...</div>
-            <div id="weekRelativeLabel" class="text-[11px] font-semibold text-gray-400">Current</div>
+            <div id="weekRangeLabel" class="text-sm font-extrabold">...</div>
+            <div id="weekRelativeLabel" class="text-[11px] font-semibold text-[var(--ink-muted)]">Current</div>
           </div>
           <div class="flex items-center gap-1.5">
-            <button onclick="openSwapModal()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">Swap</button>
-            <button onclick="navigateWeek(1)" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold">&gt;</button>
+            <button onclick="openSwapModal()" class="px-3 py-2 rounded-xl b-subtle-box text-xs font-bold">Swap</button>
+            <button onclick="navigateWeek(1)" class="px-3.5 py-2 rounded-xl b-subtle-box text-xs font-bold">&gt;</button>
           </div>
         </div>
 
-        <div id="activeSwapsBanner" class="hidden px-4 py-2.5 b-card text-xs font-semibold flex justify-between items-center border-amber-300 bg-amber-50/60">
-          <span><span id="swapCountText">0</span> active swaps</span>
+        <div id="activeSwapsBanner" class="hidden px-4 py-2.5 b-card text-xs font-semibold flex justify-between items-center border-amber-400/60">
+          <span class="text-amber-500 font-bold"><span id="swapCountText">0</span> active swaps</span>
           <button onclick="openSwapListModal()" class="underline font-bold text-xs">View</button>
         </div>
 
         <div class="b-card p-3.5 space-y-3">
-          <div class="overflow-x-auto no-scrollbar rounded-xl border border-gray-200">
+          <div class="overflow-x-auto no-scrollbar rounded-xl border border-[var(--border-subtle)]">
             <table class="w-full text-center border-collapse table-fixed min-w-[310px]">
               <thead>
-                <tr class="border-b border-gray-200 text-[11px] text-gray-400 bg-gray-50" id="timetableHeaderRow"></tr>
+                <tr class="border-b border-[var(--border-subtle)] text-[11px] text-[var(--ink-muted)] b-subtle-box" id="timetableHeaderRow"></tr>
               </thead>
-              <tbody id="timetableBody" class="divide-y divide-gray-100 text-xs"></tbody>
+              <tbody id="timetableBody" class="divide-y divide-[var(--border-subtle)] text-xs"></tbody>
             </table>
           </div>
           <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="b-btn-primary w-full py-3 text-sm">
@@ -342,10 +410,10 @@
         </div>
       </section>
 
-      <!-- ==================== VIEW 3: TRACKER ==================== -->
+      <!-- ==================== VIEW 3: TRACKER (WITH GSAT QUICK LOG) ==================== -->
       <section id="tabTracker" class="hidden space-y-4">
         <div class="b-card p-5 space-y-3">
-          <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block">SUBJECT</label>
+          <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)] block">SUBJECT</label>
           <div class="grid grid-cols-4 gap-2" id="subject-selector">
             <button onclick="setSubject('國文')" class="b-tag text-center" data-subj="國文">國文</button>
             <button onclick="setSubject('英文')" class="b-tag text-center" data-subj="英文">英文</button>
@@ -357,44 +425,67 @@
           </div>
         </div>
 
+        <!-- Live Stopwatch Card -->
         <div class="b-card p-6 text-center space-y-4">
           <div class="flex justify-between items-center text-xs">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-gray-300" id="pulse-dot"></span>
-              <span id="terminal-state" class="font-extrabold text-gray-400 text-xs">IDLE</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-gray-400" id="pulse-dot"></span>
+              <span id="terminal-state" class="font-extrabold text-[var(--ink-muted)] text-xs">IDLE</span>
             </div>
-            <span id="current-track-badge" class="px-3 py-1 rounded-full bg-gray-100 text-[#111111] font-extrabold text-xs">數學</span>
+            <span id="current-track-badge" class="px-3 py-1 rounded-full b-subtle-box font-extrabold text-xs">數學</span>
           </div>
 
-          <div class="py-4">
-            <div class="text-5xl font-black tracking-tight text-[#111111] tabular-nums" id="timer-display">00:00:00</div>
-            <p class="text-xs font-semibold text-gray-400 mt-1.5" id="timer-status">Ready</p>
+          <div class="py-3">
+            <div class="text-5xl font-black tracking-tight tabular-nums" id="timer-display">00:00:00</div>
+            <p class="text-xs font-semibold text-[var(--ink-muted)] mt-1.5" id="timer-status">Ready</p>
           </div>
 
           <div id="timer-actions">
             <button id="start-btn" onclick="startTimer()" class="b-btn-primary w-full py-3.5 text-sm">
-              <span class="btn-text">Start</span>
+              <span class="btn-text">Start Timer</span>
             </button>
             <div id="running-actions" class="hidden grid grid-cols-2 gap-2.5">
-              <button id="pause-resume-btn" onclick="togglePauseResume()" class="py-3.5 rounded-2xl bg-gray-100 hover:bg-gray-200 font-bold text-sm text-[#111111]">
+              <button id="pause-resume-btn" onclick="togglePauseResume()" class="py-3.5 rounded-2xl b-subtle-box font-bold text-sm">
                 <span class="btn-text">Pause</span>
               </button>
-              <button id="commit-timer-btn" onclick="commitTimer()" class="b-btn-primary py-3.5 text-sm !bg-[#EA4335]">
+              <button id="commit-timer-btn" onclick="commitTimer()" class="b-btn-primary py-3.5 text-sm !bg-[#EA4335] !text-white">
                 <span class="btn-text">Finish</span>
               </button>
             </div>
           </div>
         </div>
 
+        <!-- Requirement #1: QUICK LOG FOR GSAT PRACTICE PAPERS -->
+        <div class="b-card p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">QUICK LOG (PRACTICE PAPER)</span>
+            <span class="text-[11px] font-bold text-[#F28B30]" id="quickLogSubjHint">數學</span>
+          </div>
+          <!-- GSAT Exam Duration Presets -->
+          <div class="grid grid-cols-5 gap-1.5">
+            <button onclick="quickLogMinutes(110)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Sci / Soc (110m)">+110m</button>
+            <button onclick="quickLogMinutes(100)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Math / Eng (100m)">+100m</button>
+            <button onclick="quickLogMinutes(90)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Chinese (90m)">+90m</button>
+            <button onclick="quickLogMinutes(60)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+60m</button>
+            <button onclick="quickLogMinutes(30)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+30m</button>
+          </div>
+          <!-- Custom Minutes Input -->
+          <div class="flex items-center gap-2 pt-1">
+            <input type="number" id="customQuickMinutes" placeholder="Custom mins (e.g. 45)..." min="1" max="600" class="flex-1 b-input px-3.5 py-2 text-sm font-semibold">
+            <button onclick="quickLogCustom()" class="b-btn-primary px-4 py-2 text-xs shrink-0">+ Log</button>
+          </div>
+        </div>
+
+        <!-- Topics & Notes -->
         <div class="b-card p-5 space-y-3.5">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-gray-400">TOPICS & NOTES</span>
-            <button onclick="clearSelectedUnits()" class="text-xs font-bold text-gray-400 hover:text-black">Clear</button>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">TOPICS & NOTES</span>
+            <button onclick="clearSelectedUnits()" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">Clear</button>
           </div>
           <div id="unit-tag-container" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar"></div>
-          <div class="text-xs text-gray-400">Selected: <span id="selected-units-preview" class="font-bold text-[#111111]">None</span></div>
+          <div class="text-xs text-[var(--ink-muted)]">Selected: <span id="selected-units-preview" class="font-bold text-[var(--ink-primary)]">None</span></div>
 
-          <div class="flex items-center justify-between py-2 px-3.5 rounded-xl bg-gray-50 border border-gray-100">
+          <div class="flex items-center justify-between py-2 px-3.5 rounded-xl b-subtle-box">
             <span class="text-xs font-bold">Completed</span>
             <input type="checkbox" id="is-completed" class="w-4 h-4 accent-black" checked>
           </div>
@@ -410,16 +501,16 @@
       <section id="tabSettings" class="hidden space-y-4">
         <div class="b-card p-5 space-y-3">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">VISIBLE CALENDARS (HOME)</label>
-            <button onclick="loadUserCalendars()" class="text-xs font-bold text-gray-400 hover:text-black">Sync</button>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">VISIBLE CALENDARS (HOME)</label>
+            <button onclick="loadUserCalendars()" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">Sync</button>
           </div>
           <div id="settingsCalendarCheckboxes" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar"></div>
         </div>
 
         <div class="b-card p-5 space-y-3">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-extrabold uppercase tracking-wider text-gray-400">SUBJECT COLORS</label>
-            <button onclick="addCustomSubjectPrompt()" class="text-xs font-bold text-[#111111]">+ Add</button>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">SUBJECT COLORS</label>
+            <button onclick="addCustomSubjectPrompt()" class="text-xs font-bold">+ Add</button>
           </div>
           <div id="subjectColorList" class="space-y-2 max-h-52 overflow-y-auto no-scrollbar"></div>
         </div>
@@ -448,73 +539,83 @@
 
     </div>
 
-    <!-- ==================== FLOATING AGENT MENU OVERLAY ==================== -->
-    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-6 bg-white/10">
-      <div class="w-full max-w-xs space-y-4">
+    <!-- ==================== REQUIREMENT #5: BOXLESS FLOATING AGENT MENU (COLOR ON DRAG) ==================== -->
+    <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-8">
+      <div class="w-full max-w-xs space-y-6">
         
         <!-- 1. Circle -> SCHEDULE -->
-        <button data-agent-tab="schedule" data-agent-shape="circle" data-agent-color="#111111" onclick="selectAgent('schedule', 'circle', '#111111')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" viewBox="0 0 100 100">
-            <path d="M 50,12 A 38,38 0 1,1 49.99,12 Z" fill="#111111"/>
-            <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="36" y="34" width="7.5" height="16" rx="3.75"/>
-              <rect x="54" y="34" width="7.5" height="16" rx="3.75"/>
+        <button data-agent-tab="schedule" data-agent-shape="circle" data-agent-color="default" onclick="selectAgent('schedule', 'circle', 'default')" class="agent-item w-full py-2 flex items-center gap-5 text-left">
+          <svg class="w-14 h-14 shrink-0 mini-bot-svg pointer-events-none" viewBox="0 0 100 100">
+            <path id="menuCircleBody" d="M 50,10 A 40,40 0 1,1 49.99,10 Z" fill="#111111"/>
+            <g class="mini-eyes" fill="#FFFFFF" id="menuCircleEyes">
+              <g transform="translate(55, 38) rotate(-25)">
+                <rect x="-12" y="-9" width="8.5" height="19" rx="4.25"/>
+                <rect x="6" y="-9" width="7.5" height="18" rx="3.75"/>
+              </g>
             </g>
           </svg>
-          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">SCHEDULE</span>
+          <span class="agent-label text-3xl font-black tracking-tight pointer-events-none">SCHEDULE</span>
         </button>
 
         <!-- 2. Triangle -> TIMETABLE -->
-        <button data-agent-tab="timetable" data-agent-shape="triangle" data-agent-color="#34C77B" onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.4s" viewBox="0 0 100 100">
+        <button data-agent-tab="timetable" data-agent-shape="triangle" data-agent-color="#34C77B" onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="agent-item w-full py-2 flex items-center gap-5 text-left">
+          <svg class="w-14 h-14 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.4s" viewBox="0 0 100 100">
             <path d="M 43,16 Q 50,6 57,16 L 86,72 Q 92,84 79,84 L 21,84 Q 8,84 14,72 Z" fill="#34C77B"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="38" y="47" width="6.5" height="13.5" rx="3.25"/>
-              <rect x="53" y="47" width="6.5" height="13.5" rx="3.25"/>
+              <g transform="translate(52, 52) rotate(-25)">
+                <rect x="-11" y="-8" width="7.5" height="16.5" rx="3.75"/>
+                <rect x="5" y="-8" width="6.8" height="15.5" rx="3.4"/>
+              </g>
             </g>
           </svg>
-          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">TIMETABLE</span>
+          <span class="agent-label text-3xl font-black tracking-tight pointer-events-none">TIMETABLE</span>
         </button>
 
         <!-- 3. Hexagon -> TRACKER -->
-        <button data-agent-tab="tracker" data-agent-shape="hexagon" data-agent-color="#F28B30" onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.8s" viewBox="0 0 100 100">
+        <button data-agent-tab="tracker" data-agent-shape="hexagon" data-agent-color="#F28B30" onclick="selectAgent('tracker', 'hexagon', '#F28B30')" class="agent-item w-full py-2 flex items-center gap-5 text-left">
+          <svg class="w-14 h-14 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 0.8s" viewBox="0 0 100 100">
             <path d="M 29,15 L 71,15 L 91,50 L 71,85 L 29,85 L 9,50 Z" stroke="#F28B30" stroke-width="8" stroke-linejoin="round" fill="#F28B30"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="36" y="36" width="7" height="15" rx="3.5"/>
-              <rect x="53" y="36" width="7" height="15" rx="3.5"/>
+              <g transform="translate(54, 41) rotate(-25)">
+                <rect x="-12" y="-9" width="8" height="18" rx="4"/>
+                <rect x="6" y="-9" width="7" height="17" rx="3.5"/>
+              </g>
             </g>
           </svg>
-          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">TRACKER</span>
+          <span class="agent-label text-3xl font-black tracking-tight pointer-events-none">TRACKER</span>
         </button>
 
         <!-- 4. Squircle -> SETTINGS -->
-        <button data-agent-tab="settings" data-agent-shape="squircle" data-agent-color="#3B96F3" onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full b-card p-4 flex items-center gap-4 hover:border-black active:scale-95">
-          <svg class="w-12 h-12 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 1.2s" viewBox="0 0 100 100">
+        <button data-agent-tab="settings" data-agent-shape="squircle" data-agent-color="#3B96F3" onclick="selectAgent('settings', 'squircle', '#3B96F3')" class="agent-item w-full py-2 flex items-center gap-5 text-left">
+          <svg class="w-14 h-14 shrink-0 mini-bot-svg pointer-events-none" style="animation-delay: 1.2s" viewBox="0 0 100 100">
             <path d="M 32,14 L 68,14 Q 86,14 86,32 L 86,68 Q 86,86 68,86 L 32,86 Q 14,86 14,68 L 14,32 Q 14,14 32,14 Z" fill="#3B96F3"/>
             <g class="mini-eyes" fill="#FFFFFF">
-              <rect x="37" y="36" width="7" height="15" rx="3.5"/>
-              <rect x="54" y="36" width="7" height="15" rx="3.5"/>
+              <g transform="translate(55, 41) rotate(-25)">
+                <rect x="-12" y="-9" width="8" height="18" rx="4"/>
+                <rect x="6" y="-9" width="7" height="17" rx="3.5"/>
+              </g>
             </g>
           </svg>
-          <span class="text-lg font-extrabold tracking-tight text-[#111111] pointer-events-none">SETTINGS</span>
+          <span class="agent-label text-3xl font-black tracking-tight pointer-events-none">SETTINGS</span>
         </button>
 
       </div>
     </div>
 
-    <!-- ==================== BOTTOM-LEFT CLEAN GEOMETRIC BLOUB BOT ==================== -->
+    <!-- ==================== BOTTOM-LEFT BLOUB BOT (EXACT -25° TILTED EYES + WIDE GAZE ANGLE) ==================== -->
     <div class="fixed bottom-5 left-5 z-50">
       <button id="bloubBotBtn" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none touch-none" aria-label="Bot Menu">
         <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible pointer-events-none">
-          <ellipse id="mainBotShadow" cx="50" cy="93" rx="23" ry="4" fill="rgba(0,0,0,0.11)" />
+          <ellipse id="mainBotShadow" cx="50" cy="94" rx="23" ry="4" fill="rgba(0,0,0,0.14)" />
           <g id="mainBotActor">
-            <!-- Crisp Geometric Path (No Jelly Distortion!) -->
-            <path id="mainBotBody" d="M 50,12 A 38,38 0 1,1 49.99,12 Z" fill="#111111" stroke="#111111" stroke-width="0" stroke-linejoin="round" class="transition-colors duration-300"/>
-            <!-- Straight Upright Capsule Eyes -->
-            <g id="mainBotEyes" fill="#FFFFFF">
-              <rect id="botEyeL" x="35.5" y="34" width="7.5" height="16.5" rx="3.75" />
-              <rect id="botEyeR" x="54" y="34" width="7.5" height="16.5" rx="3.75" />
+            <path id="mainBotBody" d="M 50,10 A 40,40 0 1,1 49.99,10 Z" fill="#111111" stroke="#111111" stroke-width="0" stroke-linejoin="round" class="transition-colors duration-300"/>
+            <!-- Outer group moves across sphere surface; Inner group holds the -25° tilt + blink -->
+            <g id="mainBotEyesOuter" transform="translate(56, 39)">
+              <g id="mainBotEyesInner" transform="rotate(-25)" fill="#FFFFFF">
+                <!-- Left eye & slightly foreshortened right eye matching the reference image -->
+                <rect id="botEyeL" x="-13" y="-10" width="9" height="20.5" rx="4.5" />
+                <rect id="botEyeR" x="6" y="-10" width="8" height="19.5" rx="4" />
+              </g>
             </g>
           </g>
         </svg>
@@ -527,37 +628,37 @@
   </div>
 
   <!-- ==================== MODALS ==================== -->
-  <div id="manageModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="manageModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="b-card p-5 max-w-sm w-full space-y-3">
       <div class="flex justify-between items-center">
         <h3 id="modalTitle" class="text-xs font-extrabold uppercase tracking-wider">Presets</h3>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-black text-sm font-bold">✕</button>
+        <button onclick="closeModal()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-sm font-bold">✕</button>
       </div>
       <div id="modalBody"></div>
       <button onclick="closeModal()" class="b-btn-primary w-full py-2.5 text-xs">Done</button>
     </div>
   </div>
 
-  <div id="swapModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="swapModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="b-card p-5 max-w-sm w-full space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-xs font-extrabold uppercase tracking-wider">Swap Class</h3>
-        <button onclick="closeSwapModal()" class="text-gray-400 hover:text-black text-sm font-bold">✕</button>
+        <button onclick="closeSwapModal()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-sm font-bold">✕</button>
       </div>
-      <div class="grid grid-cols-2 gap-1.5 p-1 bg-gray-100 rounded-xl text-xs font-bold">
-        <button id="swapModeTwoBtn" onclick="switchSwapMode('two')" class="py-1.5 rounded-lg bg-white shadow-xs">2-Way</button>
-        <button id="swapModeMultiBtn" onclick="switchSwapMode('multi')" class="py-1.5 rounded-lg text-gray-500">Multi</button>
+      <div class="grid grid-cols-2 gap-1.5 p-1 b-subtle-box rounded-xl text-xs font-bold">
+        <button id="swapModeTwoBtn" onclick="switchSwapMode('two')" class="py-1.5 rounded-lg bg-[var(--bg-card)] shadow-xs">2-Way</button>
+        <button id="swapModeMultiBtn" onclick="switchSwapMode('multi')" class="py-1.5 rounded-lg text-[var(--ink-muted)]">Multi</button>
       </div>
       <div id="swapModeTwoView" class="space-y-2 text-xs">
-        <div class="p-2.5 bg-gray-50 rounded-xl space-y-1.5">
-          <div class="font-bold text-gray-400 text-[10px]">FROM</div>
+        <div class="p-2.5 b-subtle-box rounded-xl space-y-1.5">
+          <div class="font-bold text-[var(--ink-muted)] text-[10px]">FROM</div>
           <div class="grid grid-cols-2 gap-1.5">
             <input type="date" id="swapA_Date" class="b-input px-2 py-1 text-xs">
             <select id="swapA_Period" class="b-input px-2 py-1 text-xs"></select>
           </div>
         </div>
-        <div class="p-2.5 bg-gray-50 rounded-xl space-y-1.5">
-          <div class="font-bold text-gray-400 text-[10px]">TO</div>
+        <div class="p-2.5 b-subtle-box rounded-xl space-y-1.5">
+          <div class="font-bold text-[var(--ink-muted)] text-[10px]">TO</div>
           <div class="grid grid-cols-2 gap-1.5">
             <input type="date" id="swapB_Date" class="b-input px-2 py-1 text-xs">
             <select id="swapB_Period" class="b-input px-2 py-1 text-xs"></select>
@@ -566,8 +667,8 @@
       </div>
       <div id="swapModeMultiView" class="hidden space-y-2 text-xs">
         <div class="flex justify-between items-center">
-          <span class="text-[11px] font-bold text-gray-400">Nodes</span>
-          <button onclick="addMultiSwapStep()" class="text-black font-bold text-xs">+ Node</button>
+          <span class="text-[11px] font-bold text-[var(--ink-muted)]">Nodes</span>
+          <button onclick="addMultiSwapStep()" class="font-bold text-xs">+ Node</button>
         </div>
         <div id="multiSwapStepsContainer" class="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar"></div>
       </div>
@@ -576,11 +677,11 @@
     </div>
   </div>
 
-  <div id="swapListModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="swapListModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="b-card p-5 max-w-sm w-full space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-xs font-extrabold uppercase tracking-wider">Active Swaps</h3>
-        <button onclick="closeSwapListModal()" class="text-gray-400 hover:text-black text-sm font-bold">✕</button>
+        <button onclick="closeSwapListModal()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-sm font-bold">✕</button>
       </div>
       <div id="swapListModalContent" class="space-y-1.5 max-h-52 overflow-y-auto no-scrollbar"></div>
     </div>
@@ -600,7 +701,6 @@
       dot.style.backgroundColor = busy ? '#F5B82E' : '#34C77B';
     }
 
-    // Parallel-friendly, low-latency API caller (no 250ms artificial bottleneck)
     function callBackend(action, payload, onSuccess, onFailure) {
       activeRequests++;
       setSyncIndicator(true);
@@ -625,7 +725,7 @@
     }
 
     // =========================================================
-    // STORAGE & STATE (INSTANT CACHEHYDRATION)
+    // STORAGE & STATE
     // =========================================================
     var EvStore = {
       get: function(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
@@ -644,7 +744,7 @@
 
     var currentView = 'home';
     var currentBotShape = 'circle';
-    var currentBotColor = '#111111';
+    var currentBotColor = 'default';
     var isMenuOpen = false;
 
     var allUserCalendars = EvStore.getJSON('romano_cache_cals', []);
@@ -654,10 +754,10 @@
 
     var dbTitles = EvStore.getJSON('romano_cache_titles', ["國文作業", "國文考試", "數學作業", "數學考試", "英文作業", "英文考試", "物理作業", "物理考試", "化學作業", "化學考試", "自習", "讀書"]);
     var dbTimes = EvStore.getJSON('romano_cache_times', [
-      { label: "P1", start: "08:10", end: "09:00" }, { label: "P2", start: "09:10", end: "10:00" },
-      { label: "P3", start: "10:10", end: "11:00" }, { label: "P4", start: "11:10", end: "12:00" },
-      { label: "P5", start: "13:15", end: "14:05" }, { label: "P6", start: "14:15", end: "15:05" },
-      { label: "P7", start: "15:15", end: "16:05" }, { label: "P8", start: "16:10", end: "17:00" }
+      { label: "第一節", start: "08:10", end: "09:00" }, { label: "第二節", start: "09:10", end: "10:00" },
+      { label: "第三節", start: "10:10", end: "11:00" }, { label: "第四節", start: "11:10", end: "12:00" },
+      { label: "第五節", start: "13:15", end: "14:05" }, { label: "第六節", start: "14:15", end: "15:05" },
+      { label: "第七節", start: "15:15", end: "16:05" }, { label: "第八節", start: "16:10", end: "17:00" }
     ]);
     var dbSubjects = EvStore.getJSON('romano_cache_subjects', ["國文", "英文", "數學", "物理", "化學", "生物", "地科", "歷史", "地理", "公民", "體育", "自習"]);
     var dbSubjectColors = EvStore.getJSON('romano_cache_subj_colors', {
@@ -677,33 +777,42 @@
     var selectedUnits = [];
 
     // =========================================================
-    // REQUIREMENT #1: CRISP GEOMETRIC SHAPES (NO JELLY WAVES)
+    // DARK MODE + WIDE-ANGLE -25° TILTED EYES BOT ENGINE
     // =========================================================
     const CRISP_BOT_SHAPES = {
       circle: {
-        d: "M 50,12 A 38,38 0 1,1 49.99,12 Z",
+        d: "M 50,10 A 40,40 0 1,1 49.99,10 Z",
         strokeWidth: 0,
-        eyeY: 34
+        baseEyeX: 55,
+        baseEyeY: 39
       },
       triangle: {
         d: "M 43,16 Q 50,6 57,16 L 86,72 Q 92,84 79,84 L 21,84 Q 8,84 14,72 Z",
         strokeWidth: 0,
-        eyeY: 46
+        baseEyeX: 52,
+        baseEyeY: 54
       },
       hexagon: {
         d: "M 29,15 L 71,15 L 91,50 L 71,85 L 29,85 L 9,50 Z",
         strokeWidth: 8,
-        eyeY: 35
+        baseEyeX: 54,
+        baseEyeY: 42
       },
       squircle: {
         d: "M 32,14 L 68,14 Q 86,14 86,32 L 86,68 Q 86,86 68,86 L 32,86 Q 14,86 14,68 L 14,32 Q 14,14 32,14 Z",
         strokeWidth: 0,
-        eyeY: 35
+        baseEyeX: 54,
+        baseEyeY: 42
       }
     };
 
     let pressScale = 1;
     let targetPressScale = 1;
+    let activeShapeCfg = CRISP_BOT_SHAPES.circle;
+
+    function isSystemDark() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
 
     function triggerBotTapEffect() {
       targetPressScale = 0.93;
@@ -711,41 +820,71 @@
     }
 
     function setBotAppearance(shapeKey, colorHex) {
-      const cfg = CRISP_BOT_SHAPES[shapeKey] || CRISP_BOT_SHAPES.circle;
+      activeShapeCfg = CRISP_BOT_SHAPES[shapeKey] || CRISP_BOT_SHAPES.circle;
       const body = document.getElementById('mainBotBody');
-      const eyeL = document.getElementById('botEyeL');
-      const eyeR = document.getElementById('botEyeR');
-      if (!body) return;
+      const eyesInner = document.getElementById('mainBotEyesInner');
+      if (!body || !eyesInner) return;
 
-      body.setAttribute('d', cfg.d);
-      body.setAttribute('fill', colorHex);
-      body.setAttribute('stroke', colorHex);
-      body.setAttribute('stroke-width', cfg.strokeWidth);
+      const dark = isSystemDark();
+      let resolvedBodyColor = colorHex;
+      let resolvedEyeColor = '#FFFFFF';
 
-      if (eyeL && eyeR) {
-        eyeL.setAttribute('y', cfg.eyeY);
-        eyeR.setAttribute('y', cfg.eyeY);
+      // Default Circle Bot inverts cleanly in Dark Mode (White Ball + Black Eyes)
+      if (!colorHex || colorHex === 'default' || colorHex === '#111111') {
+        resolvedBodyColor = dark ? '#F4F4F6' : '#111111';
+        resolvedEyeColor = dark ? '#111111' : '#FFFFFF';
       }
+
+      body.setAttribute('d', activeShapeCfg.d);
+      body.setAttribute('fill', resolvedBodyColor);
+      body.setAttribute('stroke', resolvedBodyColor);
+      body.setAttribute('stroke-width', activeShapeCfg.strokeWidth);
+      eyesInner.setAttribute('fill', resolvedEyeColor);
+
+      // Sync Schedule Mini Bot in Menu
+      const menuCircleBody = document.getElementById('menuCircleBody');
+      const menuCircleEyes = document.getElementById('menuCircleEyes');
+      if (menuCircleBody && menuCircleEyes) {
+        menuCircleBody.setAttribute('fill', dark ? '#F4F4F6' : '#111111');
+        menuCircleEyes.setAttribute('fill', dark ? '#111111' : '#FFFFFF');
+      }
+    }
+
+    // Listen for live OS Dark/Light mode switches
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        setBotAppearance(currentBotShape, currentBotColor);
+      });
     }
 
     function initAutonomousBotLife() {
       const actorGroup = document.getElementById('mainBotActor');
-      const eyesGroup = document.getElementById('mainBotEyes');
+      const eyesOuter = document.getElementById('mainBotEyesOuter');
+      const eyesInner = document.getElementById('mainBotEyesInner');
       const shadowEl = document.getElementById('mainBotShadow');
 
-      setBotAppearance('circle', '#111111');
+      setBotAppearance('circle', 'default');
 
-      let targetGazeX = 0, targetGazeY = 0, curGazeX = 0, curGazeY = 0;
+      // Start with the signature wide upper-right gaze from your screenshot!
+      let targetGazeX = 6, targetGazeY = -5, curGazeX = 6, curGazeY = -5;
+      let targetTilt = -25, curTilt = -25;
       let blinkScaleY = 1;
 
+      // Wide-angle expressive gaze targets
+      const GAZE_POSES = [
+        { x: 7.5, y: -5.5, tilt: -26 }, // Signature upper-right look (matches screenshot!)
+        { x: 9.0, y: -2.0, tilt: -23 }, // Far right look
+        { x: -9.5, y: -4.5, tilt: -18 }, // Upper-left look
+        { x: 0, y: 0, tilt: -24 },       // Center neutral with signature -24° tilt
+        { x: 5.5, y: 4.5, tilt: -25 }    // Lower-right look
+      ];
+
       setInterval(() => {
-        if (Math.random() < 0.3) {
-          targetGazeX = 0; targetGazeY = 0;
-        } else {
-          targetGazeX = (Math.random() - 0.5) * 11;
-          targetGazeY = (Math.random() - 0.5) * 7;
-        }
-      }, 2400);
+        const pose = GAZE_POSES[Math.floor(Math.random() * GAZE_POSES.length)];
+        targetGazeX = pose.x + (Math.random() - 0.5) * 3;
+        targetGazeY = pose.y + (Math.random() - 0.5) * 2;
+        targetTilt = pose.tilt;
+      }, 2500);
 
       function scheduleBlink() {
         const nextDelay = 2200 + Math.random() * 3400;
@@ -769,10 +908,10 @@
         const t = nowMs * 0.001;
 
         pressScale += (targetPressScale - pressScale) * 0.25;
-        curGazeX += (targetGazeX - curGazeX) * 0.1;
-        curGazeY += (targetGazeY - curGazeY) * 0.1;
+        curGazeX += (targetGazeX - curGazeX) * 0.09;
+        curGazeY += (targetGazeY - curGazeY) * 0.09;
+        curTilt += (targetTilt - curTilt) * 0.09;
 
-        // Clean vertical float + subtle gaze lean (no shape distortion)
         const floatY = Math.sin(t * 2.1) * 2.8;
         const bodyShiftX = curGazeX * 0.22;
 
@@ -784,14 +923,15 @@
         const shadowRx = 23 - floatY * 0.6;
         shadowEl.setAttribute('rx', shadowRx.toFixed(1));
 
-        eyesGroup.setAttribute(
-          'transform',
-          `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)}) translate(48, 42) scale(1, ${blinkScaleY}) translate(-48, -42)`
-        );
+        // Position eyes on sphere surface + apply -25° tilt and blink along the tilted axis
+        const ex = activeShapeCfg.baseEyeX + curGazeX;
+        const ey = activeShapeCfg.baseEyeY + curGazeY;
+        eyesOuter.setAttribute('transform', `translate(${ex.toFixed(2)}, ${ey.toFixed(2)})`);
+        eyesInner.setAttribute('transform', `rotate(${curTilt.toFixed(1)}) scale(1, ${blinkScaleY})`);
 
         document.querySelectorAll('.mini-eyes').forEach((el, idx) => {
-          const ox = Math.sin(t * 1.5 + idx * 1.7) * 3.2;
-          const oy = Math.cos(t * 1.2 + idx * 1.3) * 1.8;
+          const ox = Math.sin(t * 1.5 + idx * 1.7) * 3.8;
+          const oy = Math.cos(t * 1.2 + idx * 1.3) * 2.2;
           el.setAttribute('transform', `translate(${ox.toFixed(1)}, ${oy.toFixed(1)})`);
         });
 
@@ -801,7 +941,167 @@
     }
 
     // =========================================================
-    // REQUIREMENT #6: TAP + HOLD-DRAG-RELEASE (RETURNS TO CURRENT VIEW IF NOT SELECTED)
+    // REQUIREMENT #4 (PLAN A): NEXT CLASS / TODAY TIMETABLE WIDGET
+    // =========================================================
+    function parseTimeToMins(timeStr) {
+      if (!timeStr) return 0;
+      const parts = timeStr.split(':');
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
+    }
+
+    function getEffectiveSubjectForDate(dateObj, periodIdx) {
+      const dayOfWeek = dateObj.getDay(); // 1..5
+      if (dayOfWeek < 1 || dayOfWeek > 5) return '';
+      const dIdx = dayOfWeek - 1;
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+
+      const raw = (timetableData[periodIdx] && timetableData[periodIdx][dIdx]) ? timetableData[periodIdx][dIdx] : '';
+      const swapIn = swapRecords.find(r => r.toDate === dateStr && r.toPeriod === (periodIdx + 1));
+      if (swapIn) {
+        const origIdx = getWeekdayIndex(swapIn.fromDate);
+        return (timetableData[swapIn.fromPeriod - 1] && timetableData[swapIn.fromPeriod - 1][origIdx]) || raw;
+      }
+      return raw;
+    }
+
+    function updateNextClassWidget() {
+      const headerEl = document.getElementById('nextClassHeader');
+      const dotEl = document.getElementById('nextClassDot');
+      const periodEl = document.getElementById('nextClassPeriod');
+      const subjEl = document.getElementById('nextClassSubject');
+      const followEl = document.getElementById('followingClassInfo');
+      if (!subjEl) return;
+
+      const now = new Date();
+      const day = now.getDay();
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+      const totalPeriods = appSettings.totalPeriods || 8;
+
+      // Helper to find classes on a given date
+      function getDaySchedule(targetDate) {
+        const list = [];
+        for (let p = 0; p < totalPeriods; p++) {
+          const tInfo = periodTimes[p] || { label: `P${p + 1}`, start: '08:10', end: '09:00' };
+          const subj = getEffectiveSubjectForDate(targetDate, p);
+          if (subj) {
+            list.push({
+              period: p + 1,
+              label: `P${p + 1}`,
+              start: tInfo.start,
+              end: tInfo.end,
+              startMins: parseTimeToMins(tInfo.start),
+              endMins: parseTimeToMins(tInfo.end),
+              subject: subj
+            });
+          }
+        }
+        return list;
+      }
+
+      // Weekday (Mon-Fri): Check current or upcoming period today
+      if (day >= 1 && day <= 5) {
+        const todayClasses = getDaySchedule(now);
+        const currentOrNextIdx = todayClasses.findIndex(c => nowMins <= c.endMins);
+
+        if (currentOrNextIdx !== -1) {
+          const curr = todayClasses[currentOrNextIdx];
+          const isOngoing = nowMins >= curr.startMins && nowMins <= curr.endMins;
+          const color = dbSubjectColors[curr.subject] || '#34C77B';
+
+          headerEl.innerText = isOngoing ? 'NOW IN CLASS' : 'NEXT CLASS';
+          dotEl.style.backgroundColor = color;
+          periodEl.style.color = color;
+          periodEl.innerText = `${curr.label} · ${curr.start}`;
+          subjEl.innerText = curr.subject;
+
+          const nextOne = todayClasses[currentOrNextIdx + 1];
+          followEl.innerText = nextOne ? `${nextOne.label} ${nextOne.subject} (${nextOne.start})` : 'Last class today';
+          return;
+        }
+      }
+
+      // After school or Weekend -> Show next school day's first class
+      let nextSchoolDate = new Date(now);
+      nextSchoolDate.setDate(now.getDate() + 1);
+      while (nextSchoolDate.getDay() === 0 || nextSchoolDate.getDay() === 6) {
+        nextSchoolDate.setDate(nextSchoolDate.getDate() + 1);
+      }
+
+      const nextDayClasses = getDaySchedule(nextSchoolDate);
+      const dayLabel = (nextSchoolDate.getDay() === 1 && (day === 5 || day === 6 || day === 0)) ? 'MON' : 'TOMORROW';
+
+      if (nextDayClasses.length > 0) {
+        const first = nextDayClasses[0];
+        const second = nextDayClasses[1];
+        const color = dbSubjectColors[first.subject] || '#3B96F3';
+
+        headerEl.innerText = `${dayLabel} FIRST`;
+        dotEl.style.backgroundColor = color;
+        periodEl.style.color = color;
+        periodEl.innerText = `${first.label} · ${first.start}`;
+        subjEl.innerText = first.subject;
+        followEl.innerText = second ? `Then: ${second.label} ${second.subject}` : 'Tap for timetable';
+      } else {
+        headerEl.innerText = 'TIMETABLE';
+        dotEl.style.backgroundColor = '#34C77B';
+        periodEl.style.color = '#34C77B';
+        periodEl.innerText = 'NO CLASSES';
+        subjEl.innerText = 'Free';
+        followEl.innerText = 'Tap to edit matrix';
+      }
+    }
+
+    // =========================================================
+    // REQUIREMENT #1: QUICK LOG FOR GSAT PRACTICE PAPERS
+    // =========================================================
+    function quickLogMinutes(mins) {
+  if (!mins || mins <= 0) return;
+  const subj = currentSubject;
+  const hours = mins / 60;
+
+  // 跳出確認視窗，按取消就不會送出
+  if (!confirm(`Log +${mins} mins (${hours.toFixed(2)}h) to ${subj}?`)) return;
+
+  showToast(`Logging +${mins}m (${subj})...`);
+
+  callBackend('apiRecordTime', { subject: subj, elapsedHours: hours },
+    function() {
+      showToast(`+${mins}m (${hours.toFixed(2)}h) logged to ${subj}`);
+    },
+    function(err) {
+      showToast('Error: ' + err.message);
+    }
+  );
+}
+
+    // =========================================================
+    // REQUIREMENT #2: WARNING SYMBOL ⚠️ WRAPPER BUTTON
+    // =========================================================
+    function toggleWarningSymbol() {
+      const input = document.getElementById('eventTitle');
+      if (!input) return;
+      let val = input.value.trim();
+
+      if (!val) {
+        input.value = '⚠️⚠️';
+        input.focus();
+        input.setSelectionRange(2, 2);
+        return;
+      }
+
+      if (val.startsWith('⚠️') && val.endsWith('⚠️') && val.length >= 4) {
+        input.value = val.slice(2, -2).trim();
+      } else {
+        val = val.replace(/^⚠️\s*/, '').replace(/\s*⚠️$/, '');
+        input.value = `⚠️${val}⚠️`;
+      }
+    }
+
+    // =========================================================
+    // GESTURE CONTROLLER: TAP + HOLD-DRAG-RELEASE
     // =========================================================
     function initBotGestures() {
       const botBtn = document.getElementById('bloubBotBtn');
@@ -824,7 +1124,6 @@
 
         try { botBtn.setPointerCapture(e.pointerId); } catch (err) {}
 
-        // Hold for 170ms -> pop open the 4 Agent menu
         pressTimer = setTimeout(() => {
           if (isPointerDown) {
             isHoldSession = true;
@@ -861,7 +1160,6 @@
               setBotAppearance(agentBtn.dataset.agentShape, agentBtn.dataset.agentColor);
               if (navigator.vibrate) navigator.vibrate(6);
             } else {
-              // Restore current view's bot appearance when finger leaves cards
               setBotAppearance(currentBotShape, currentBotColor);
             }
           }
@@ -873,7 +1171,6 @@
         isPointerDown = false;
         clearTimeout(pressTimer);
 
-        // Case 1: Finger released over one of the 4 Agent items -> navigate to it
         if (isMenuOpen && hoveredAgentBtn) {
           const tab = hoveredAgentBtn.dataset.agentTab;
           const shape = hoveredAgentBtn.dataset.agentShape;
@@ -885,15 +1182,12 @@
 
         clearAgentHighlights();
 
-        // Case 2: It was a Long-Press / Drag session, but released on empty space
-        // -> Close menu and stay on current view!
         if (isHoldSession) {
           closeAgentMenu();
           setBotAppearance(currentBotShape, currentBotColor);
           return;
         }
 
-        // Case 3: Short Tap
         if (isMenuOpen) {
           closeAgentMenu();
         } else if (currentView !== 'home') {
@@ -944,7 +1238,7 @@
     function showHomeView() {
       currentView = 'home';
       currentBotShape = 'circle';
-      currentBotColor = '#111111';
+      currentBotColor = 'default';
 
       ['Schedule', 'Timetable', 'Tracker', 'Settings'].forEach(name => {
         document.getElementById('tab' + name).classList.add('hidden');
@@ -954,7 +1248,8 @@
       animateSectionEntry(homeEl);
 
       document.getElementById('currentViewBadge').classList.add('hidden');
-      setBotAppearance('circle', '#111111');
+      setBotAppearance('circle', 'default');
+      updateNextClassWidget();
       loadUpcomingEvents();
     }
 
@@ -986,7 +1281,7 @@
     }
 
     // =========================================================
-    // HOME: GSAT COUNTDOWN, CLOCK, LOCATION
+    // HOME: GSAT COUNTDOWN
     // =========================================================
     function initGsatCountdown() {
       const savedDate = EvStore.get('romano_gsat_date') || '2027-01-22';
@@ -1011,41 +1306,8 @@
       }
     }
 
-    function initTelemetry() {
-      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-      function updateTime() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('homeClock').innerText = `${h}:${m}`;
-        document.getElementById('homeDate').innerText = `${months[now.getMonth()]} ${now.getDate()}`;
-      }
-      updateTime();
-      setInterval(updateTime, 10000);
-
-      const savedLoc = EvStore.get('romano_last_loc');
-      if (savedLoc) document.getElementById('trackerSubLocation').innerText = savedLoc;
-      pingSatellite(true);
-    }
-
-    function pingSatellite(silent) {
-      const dot = document.getElementById('locPingDot');
-      if (dot) dot.style.backgroundColor = '#F5B82E';
-      if (!navigator.geolocation) return;
-
-      navigator.geolocation.getCurrentPosition(pos => {
-        const locStr = `${pos.coords.latitude.toFixed(1)}, ${pos.coords.longitude.toFixed(1)}`;
-        document.getElementById('trackerSubLocation').innerText = locStr;
-        EvStore.set('romano_last_loc', locStr);
-        if (dot) dot.style.backgroundColor = '#34C77B';
-        if (!silent) showToast('Location updated');
-      }, () => {
-        if (dot) dot.style.backgroundColor = '#EA4335';
-      });
-    }
-
     // =========================================================
-    // UPCOMING EVENTS & GOOGLE TASKS (INSTANT CACHE + SYNC)
+    // UPCOMING EVENTS & GOOGLE TASKS
     // =========================================================
     function loadUpcomingEvents() {
       const icon = document.getElementById('eventsRefreshIcon');
@@ -1075,18 +1337,18 @@
         const ev = list[i];
         if (ev) {
           box.innerHTML += `
-            <div class="px-4 py-3 rounded-2xl bg-[#F7F7F7] border border-gray-200/75 flex items-center justify-between gap-3">
+            <div class="px-4 py-3 rounded-2xl b-subtle-box flex items-center justify-between gap-3">
               <div class="truncate">
-                <div class="text-sm font-bold text-[#111111] truncate">${ev.title}</div>
-                <div class="text-[11px] font-semibold text-gray-400 truncate">${ev.calendarName || ''}</div>
+                <div class="text-sm font-bold truncate">${ev.title}</div>
+                <div class="text-[11px] font-semibold text-[var(--ink-muted)] truncate">${ev.calendarName || ''}</div>
               </div>
-              <span class="text-xs font-extrabold text-gray-500 shrink-0">${ev.timeLabel || ''}</span>
+              <span class="text-xs font-extrabold text-[var(--ink-secondary)] shrink-0">${ev.timeLabel || ''}</span>
             </div>
           `;
         } else {
           box.innerHTML += `
-            <div class="px-4 py-3.5 rounded-2xl bg-[#F7F7F7] border border-gray-200/50 flex items-center justify-between">
-              <span class="text-sm font-semibold text-gray-300">${i === 0 ? 'No upcoming events' : '—'}</span>
+            <div class="px-4 py-3.5 rounded-2xl b-subtle-box flex items-center justify-between opacity-60">
+              <span class="text-sm font-semibold text-[var(--ink-muted)]">${i === 0 ? 'No upcoming events' : '—'}</span>
             </div>
           `;
         }
@@ -1124,7 +1386,7 @@
       container.innerHTML = '';
 
       if (!todoItems.length) {
-        container.innerHTML = '<div class="text-sm font-medium text-gray-300 py-2">All clear</div>';
+        container.innerHTML = '<div class="text-sm font-medium text-[var(--ink-muted)] py-2">All clear</div>';
         return;
       }
 
@@ -1132,7 +1394,7 @@
         container.innerHTML += `
           <label class="flex items-center gap-2.5 py-1.5 cursor-pointer group">
             <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodoItem('${item.id}', '${item.listId || ''}', this.checked, ${idx})" class="w-4 h-4 rounded accent-black cursor-pointer shrink-0">
-            <span class="text-sm font-bold truncate ${item.done ? 'line-through text-gray-300' : 'text-[#111111]'}">${item.title}</span>
+            <span class="text-sm font-bold truncate ${item.done ? 'line-through text-[var(--ink-muted)]' : ''}">${item.title}</span>
           </label>
         `;
       });
@@ -1174,7 +1436,7 @@
     }
 
     // =========================================================
-    // REQUIREMENT #3: FIX TRACKER TIMER DUPLICATE LOGGING BUG
+    // TRACKER TIMER & PROGRESS
     // =========================================================
     function clearAllTimerStorage() {
       EvStore.del('gsat_timer_state');
@@ -1229,6 +1491,8 @@
 
     function updateSubjectUI(subj) {
       document.getElementById('current-track-badge').innerText = subj;
+      const qHint = document.getElementById('quickLogSubjHint');
+      if (qHint) qHint.innerText = subj;
       document.querySelectorAll('#subject-selector button').forEach(b => {
         b.classList.toggle('b-tag-active', b.dataset.subj === subj);
       });
@@ -1269,15 +1533,12 @@
       }
     }
 
-    // Immediately wipe local storage and reset UI BEFORE async network call
-    // so reopening the app NEVER prompts to log the same session twice!
     function commitTimer() {
       clearInterval(timerInterval);
       var elapsedMs = getTotalElapsedMs();
       var hours = elapsedMs / (1000 * 60 * 60);
       var subjToLog = currentSubject;
 
-      // 1. Immediately clear persisted state & reset UI
       clearAllTimerStorage();
       resetTimerUI();
 
@@ -1288,7 +1549,6 @@
 
       showToast(`Logging +${hours.toFixed(2)}h...`);
 
-      // 2. Send to Google Sheet in background
       callBackend('apiRecordTime', { subject: subjToLog, elapsedHours: hours },
         function() {
           showToast(`+${hours.toFixed(2)}h saved`);
@@ -1307,7 +1567,7 @@
       document.getElementById('start-btn').classList.remove('hidden');
       document.getElementById('running-actions').classList.add('hidden');
       document.getElementById('terminal-state').innerText = 'IDLE';
-      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-gray-300';
+      document.getElementById('pulse-dot').className = 'w-2.5 h-2.5 rounded-full bg-gray-400';
       document.getElementById('timer-status').innerText = 'Ready';
       document.getElementById('timer-display').innerText = '00:00:00';
     }
@@ -1371,14 +1631,14 @@
       const box = document.getElementById('settingsCalendarCheckboxes');
       if (!box) return;
       if (!allUserCalendars.length) {
-        box.innerHTML = '<div class="text-xs text-gray-400">No calendars loaded</div>';
+        box.innerHTML = '<div class="text-xs text-[var(--ink-muted)]">No calendars loaded</div>';
         return;
       }
       box.innerHTML = '';
       allUserCalendars.forEach(cal => {
         const checked = visibleCalendarIds.includes(cal.id);
         box.innerHTML += `
-          <label class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer">
+          <label class="flex items-center justify-between p-2.5 rounded-xl b-subtle-box cursor-pointer">
             <span class="text-xs font-bold truncate pr-2">${cal.name}</span>
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCalendarVisibility('${cal.id}', this.checked)" class="w-4 h-4 accent-black">
           </label>
@@ -1429,6 +1689,7 @@
       if (data.subjectColors) { dbSubjectColors = data.subjectColors; EvStore.setJSON('romano_cache_subj_colors', dbSubjectColors); }
       if (data.settings) { appSettings = data.settings; EvStore.setJSON('romano_cache_settings', appSettings); }
       renderTags();
+      updateNextClassWidget();
       if (currentView === 'timetable') renderTimetableGrid();
       if (currentView === 'settings') renderSettingsTab();
     }
@@ -1551,7 +1812,7 @@
       } else {
         editingTimeIndex = null;
         title.innerText = 'Time Slots';
-        body.innerHTML = '<div class="space-y-1.5"><input type="text" id="newTimeLabel" placeholder="Label" class="w-full b-input px-3 py-1.5 text-xs"><div class="grid grid-cols-2 gap-1.5"><input type="time" id="newTimeStart" value="08:10" class="b-input px-2 py-1 text-xs"><input type="time" id="newTimeEnd" value="09:00" class="b-input px-2 py-1 text-xs"></div><button id="saveTimeSlotBtn" onclick="saveTimeSlot()" class="b-btn-primary w-full py-2 text-xs"><span class="btn-text">Add Slot</span></button></div><div class="flex flex-col gap-1.5 max-h-36 overflow-y-auto pt-2 mt-2 border-t border-gray-100 no-scrollbar" id="modalTimeTags"></div>';
+        body.innerHTML = '<div class="space-y-1.5"><input type="text" id="newTimeLabel" placeholder="Label" class="w-full b-input px-3 py-1.5 text-xs"><div class="grid grid-cols-2 gap-1.5"><input type="time" id="newTimeStart" value="08:10" class="b-input px-2 py-1 text-xs"><input type="time" id="newTimeEnd" value="09:00" class="b-input px-2 py-1 text-xs"></div><button id="saveTimeSlotBtn" onclick="saveTimeSlot()" class="b-btn-primary w-full py-2 text-xs"><span class="btn-text">Add Slot</span></button></div><div class="flex flex-col gap-1.5 max-h-36 overflow-y-auto pt-2 mt-2 border-t border-[var(--border-subtle)] no-scrollbar" id="modalTimeTags"></div>';
         renderModalTimeTags();
       }
       modal.classList.remove('hidden');
@@ -1563,6 +1824,7 @@
       EvStore.setJSON('romano_cache_titles', dbTitles);
       EvStore.setJSON('romano_cache_times', dbTimes);
       renderTags();
+      updateNextClassWidget();
       callBackend('savePresetsData', { titles: dbTitles, times: dbTimes });
     }
 
@@ -1582,7 +1844,7 @@
       var c = document.getElementById('modalTitleTags');
       c.innerHTML = '';
       dbTitles.forEach((t, i) => {
-        c.innerHTML += `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-semibold">${t}<button onclick="removeTitle(${i})" class="text-gray-400 hover:text-black">✕</button></span>`;
+        c.innerHTML += `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 b-subtle-box rounded-lg text-xs font-semibold">${t}<button onclick="removeTitle(${i})" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)]">✕</button></span>`;
       });
     }
 
@@ -1607,7 +1869,7 @@
       var c = document.getElementById('modalTimeTags');
       c.innerHTML = '';
       dbTimes.forEach((t, i) => {
-        c.innerHTML += `<div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs font-semibold"><span>${t.label} (${t.start}-${t.end})</span><button onclick="removeTime(${i})" class="text-red-500">Del</button></div>`;
+        c.innerHTML += `<div class="flex items-center justify-between p-2 b-subtle-box rounded-lg text-xs font-semibold"><span>${t.label} (${t.start}-${t.end})</span><button onclick="removeTime(${i})" class="text-red-500">Del</button></div>`;
       });
     }
 
@@ -1630,9 +1892,9 @@
     }
 
     function getSubjectStyle(subject) {
-      if (!subject) return 'background:#F9FAFB; color:#D1D5DB;';
-      var hex = dbSubjectColors[subject] || '#111111';
-      return `background:${hex}15; color:${hex}; border:1.5px solid ${hex}40;`;
+      if (!subject) return 'background:var(--bg-input); color:var(--ink-muted);';
+      var hex = dbSubjectColors[subject] || '#3B96F3';
+      return `background:${hex}1F; color:${hex}; border:1.5px solid ${hex}4D;`;
     }
 
     function renderTimetableGrid() {
@@ -1647,7 +1909,7 @@
 
       headerRow.innerHTML = '<th class="p-1.5 w-10">#</th>';
       for (var d = 0; d < 5; d++) {
-        headerRow.innerHTML += `<th class="p-1.5"><div class="font-bold text-[#111111]">${days[d]}</div><div class="text-[9px] text-gray-400">${weekDates[d].slice(8)}</div></th>`;
+        headerRow.innerHTML += `<th class="p-1.5"><div class="font-bold text-[var(--ink-primary)]">${days[d]}</div><div class="text-[9px] text-[var(--ink-muted)]">${weekDates[d].slice(8)}</div></th>`;
       }
 
       updateSwapsBanner(weekDates);
@@ -1655,7 +1917,7 @@
 
       for (var p = 0; p < totalPeriods; p++) {
         var tr = document.createElement('tr');
-        var tdHtml = `<td class="p-1 text-[10px] font-bold text-gray-400 bg-gray-50/60">P${p + 1}</td>`;
+        var tdHtml = `<td class="p-1 text-[10px] font-bold text-[var(--ink-muted)] b-subtle-box">P${p + 1}</td>`;
         for (var d2 = 0; d2 < 5; d2++) {
           var dateStr = weekDates[d2];
           var raw = (timetableData[p] && timetableData[p][d2]) ? timetableData[p][d2] : '';
@@ -1682,6 +1944,7 @@
         timetableData[p][d] = next.trim();
         EvStore.setJSON('romano_cache_timetable', timetableData);
         renderTimetableGrid();
+        updateNextClassWidget();
       }
     }
 
@@ -1706,6 +1969,7 @@
       btn.disabled = true;
       setBtnText('syncMatrixBtn', 'Saving...');
       EvStore.setJSON('romano_cache_timetable', timetableData);
+      updateNextClassWidget();
       callBackend('saveTimetableData', timetableData,
         function() {
           showToast('Timetable saved');
@@ -1774,6 +2038,7 @@
       EvStore.setJSON('romano_cache_swaps', swapRecords);
       callBackend('saveSwapRecords', swapRecords);
       renderTimetableGrid();
+      updateNextClassWidget();
       closeSwapModal();
       showToast('Swap saved');
     }
@@ -1781,7 +2046,7 @@
       var c = document.getElementById('swapListModalContent');
       c.innerHTML = '';
       swapRecords.forEach((r, idx) => {
-        c.innerHTML += `<div class="p-2.5 bg-gray-50 rounded-xl flex justify-between items-center text-xs"><span>${r.fromDate.slice(5)} P${r.fromPeriod} → ${r.toDate.slice(5)} P${r.toPeriod}</span><button onclick="deleteSwapRecord(${idx})" class="text-red-500 font-bold">Del</button></div>`;
+        c.innerHTML += `<div class="p-2.5 b-subtle-box rounded-xl flex justify-between items-center text-xs"><span>${r.fromDate.slice(5)} P${r.fromPeriod} → ${r.toDate.slice(5)} P${r.toPeriod}</span><button onclick="deleteSwapRecord(${idx})" class="text-red-500 font-bold">Del</button></div>`;
       });
       document.getElementById('swapListModal').classList.remove('hidden');
     }
@@ -1793,6 +2058,7 @@
       EvStore.setJSON('romano_cache_swaps', swapRecords);
       callBackend('saveSwapRecords', swapRecords);
       renderTimetableGrid();
+      updateNextClassWidget();
       openSwapListModal();
     }
 
@@ -1802,7 +2068,7 @@
       c.innerHTML = '';
       var list = unitsCache[currentSubject] || [];
       if (!list.length) {
-        c.innerHTML = '<span class="text-xs text-gray-400">No topics loaded</span>';
+        c.innerHTML = '<span class="text-xs text-[var(--ink-muted)]">No topics loaded</span>';
         return;
       }
       list.forEach(u => {
@@ -1843,14 +2109,14 @@
       var list = document.getElementById('subjectColorList');
       list.innerHTML = '';
       dbSubjects.forEach((sub, idx) => {
-        var c = dbSubjectColors[sub] || '#111111';
+        var c = dbSubjectColors[sub] || '#3B96F3';
         var dots = BLOUB_SWATCHES.map(sw =>
-          `<button onclick="updateSubjectHexColor('${sub}','${sw}')" class="w-4 h-4 rounded-full border ${c.toLowerCase()===sw.toLowerCase()?'scale-125 ring-1 ring-black':'border-transparent'}" style="background:${sw}"></button>`
+          `<button onclick="updateSubjectHexColor('${sub}','${sw}')" class="w-4 h-4 rounded-full border ${c.toLowerCase()===sw.toLowerCase()?'scale-125 ring-1 ring-[var(--border-active)]':'border-transparent'}" style="background:${sw}"></button>`
         ).join('');
         list.innerHTML += `
-          <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 text-xs font-bold">
+          <div class="flex items-center justify-between p-2.5 rounded-xl b-subtle-box text-xs font-bold">
             <span>${sub}</span>
-            <div class="flex items-center gap-1">${dots}<button onclick="removeSubject(${idx})" class="ml-1.5 text-gray-400 hover:text-red-500">✕</button></div>
+            <div class="flex items-center gap-1">${dots}<button onclick="removeSubject(${idx})" class="ml-1.5 text-[var(--ink-muted)] hover:text-red-500">✕</button></div>
           </div>`;
       });
     }
@@ -1859,6 +2125,7 @@
       EvStore.setJSON('romano_cache_subj_colors', dbSubjectColors);
       renderSettingsTab();
       renderTimetableGrid();
+      updateNextClassWidget();
     }
     function addCustomSubjectPrompt() {
       var name = prompt('Subject name:');
@@ -1880,6 +2147,7 @@
       appSettings.totalPeriods = parseInt(val) || 8;
       EvStore.setJSON('romano_cache_settings', appSettings);
       renderTimetableGrid();
+      updateNextClassWidget();
     }
     function toggleSwapPulse(checked) {
       appSettings.showSwapPulse = checked;
@@ -1896,7 +2164,7 @@
     }
 
     // =========================================================
-    // REQUIREMENT #2: INSTANT BOOT + SINGLE-ROUNDTRIP SYNC
+    // INSTANT BOOT + CLOUD SYNC
     // =========================================================
     function fallbackParallelSync() {
       loadUserCalendars();
@@ -1906,6 +2174,7 @@
         if (Array.isArray(data)) {
           timetableData = data;
           EvStore.setJSON('romano_cache_timetable', data);
+          updateNextClassWidget();
           if (currentView === 'timetable') renderTimetableGrid();
         }
       });
@@ -1913,6 +2182,7 @@
         if (Array.isArray(data)) {
           swapRecords = data;
           EvStore.setJSON('romano_cache_swaps', data);
+          updateNextClassWidget();
         }
       });
       callBackend('apiGetSubjectUnits', null, function(data) {
@@ -1925,19 +2195,19 @@
     }
 
     function sysInit() {
-      // 1. Instant 0.01s Render from Local Cache
       initAutonomousBotLife();
       initBotGestures();
       initGsatCountdown();
-      initTelemetry();
       renderUpcomingEvents(cachedUpcomingEvents);
       renderTodos();
       renderTags();
       renderUnitTags();
+      updateNextClassWidget();
+      setInterval(updateNextClassWidget, 30000);
+
       if (allUserCalendars.length) applyCalendarsList(allUserCalendars);
       checkPersistedTimer();
 
-      // 2. Single-Batch Cloud Sync (Automatically falls back to parallel sync if GAS not updated yet)
       callBackend('getInitialBundle', { calendarIds: visibleCalendarIds, maxResults: 3 },
         function(bundle) {
           if (!bundle) { fallbackParallelSync(); return; }
@@ -1966,9 +2236,9 @@
             EvStore.setJSON('romano_cache_units', unitsCache);
             renderUnitTags();
           }
+          updateNextClassWidget();
         },
         function() {
-          // If 'getInitialBundle' isn't in Code.gs yet, run parallel fetch immediately
           fallbackParallelSync();
         }
       );
