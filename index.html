@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Hi Romano</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#F7F7F7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0B0B0E" media="(prefers-color-scheme: dark)">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,6 +18,7 @@
 
   <style>
     :root {
+      color-scheme: light dark;
       --bg-main: #F7F7F7;
       --bg-card: #FFFFFF;
       --bg-subtle: #F3F4F6;
@@ -33,7 +35,7 @@
       --schedule-active-color: #111111;
     }
 
-    /* Requirement #3: Auto Sync System Dark Mode */
+    /* Auto Sync System Dark Mode */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-main: #0B0B0E;
@@ -68,7 +70,8 @@
     }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
+      min-height: 100dvh;
       margin: 0;
       padding: 0;
       background-color: var(--bg-main);
@@ -76,6 +79,16 @@
       font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
       transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Full-bleed fixed background layer to prevent white bottom bar in PWA Dark Mode */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -60px;
+      background-color: var(--bg-main);
+      z-index: -999;
+      pointer-events: none;
     }
 
     .b-card {
@@ -161,7 +174,7 @@
       pointer-events: none;
     }
 
-    /* Requirement #5: Borderless / Boxless Pure Text + Bot Menu Items */
+    /* Borderless / Boxless Pure Text + Bot Menu Items */
     #agentOverlay {
       background: var(--menu-backdrop);
     }
@@ -268,10 +281,10 @@
           <div id="upcomingEventsList" class="space-y-2.5"></div>
         </div>
 
-        <!-- 3. BOTTOM SPLIT: NEXT CLASS (Plan A) & GOOGLE TASKS TO-DO -->
+        <!-- 3. BOTTOM SPLIT: NEXT CLASS & GOOGLE TASKS TO-DO -->
         <div class="grid grid-cols-12 gap-4 flex-1 min-h-[220px]">
           
-          <!-- Left Column (Plan A): NEXT CLASS / TODAY TIMETABLE WIDGET -->
+          <!-- Left Column: NEXT CLASS / TODAY TIMETABLE WIDGET -->
           <div onclick="selectAgent('timetable', 'triangle', '#34C77B')" class="col-span-5 b-card p-5 flex flex-col justify-between cursor-pointer active:scale-95 transition">
             <div>
               <div class="flex items-center justify-between">
@@ -322,7 +335,6 @@
             </select>
           </div>
 
-          <!-- Requirement #2: Warning Symbol ⚠️ Toggle Button -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
               <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">TITLE</label>
@@ -376,7 +388,7 @@
         </div>
       </section>
 
-      <!-- ==================== VIEW 2: TIMETABLE ==================== -->
+      <!-- ==================== VIEW 2: TIMETABLE (READ-ONLY CELLS) ==================== -->
       <section id="tabTimetable" class="hidden space-y-3.5">
         <div class="b-card p-3.5 flex items-center justify-between">
           <button onclick="navigateWeek(-1)" class="px-3.5 py-2 rounded-xl b-subtle-box text-xs font-bold">&lt;</button>
@@ -404,13 +416,13 @@
               <tbody id="timetableBody" class="divide-y divide-[var(--border-subtle)] text-xs"></tbody>
             </table>
           </div>
-          <button id="syncMatrixBtn" onclick="saveTimetableToCloud()" class="b-btn-primary w-full py-3 text-sm">
-            <span class="btn-text">Save Timetable</span>
+          <button id="syncMatrixBtn" onclick="syncTimetableFromCloud()" class="b-btn-primary w-full py-3 text-sm">
+            <span class="btn-text">Sync Timetable</span>
           </button>
         </div>
       </section>
 
-      <!-- ==================== VIEW 3: TRACKER (WITH GSAT QUICK LOG) ==================== -->
+      <!-- ==================== VIEW 3: TRACKER ==================== -->
       <section id="tabTracker" class="hidden space-y-4">
         <div class="b-card p-5 space-y-3">
           <label class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)] block">SUBJECT</label>
@@ -455,7 +467,7 @@
           </div>
         </div>
 
-        <!-- Requirement #1: QUICK LOG FOR GSAT PRACTICE PAPERS -->
+        <!-- QUICK LOG FOR GSAT PRACTICE PAPERS -->
         <div class="b-card p-5 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-muted)]">QUICK LOG (PRACTICE PAPER)</span>
@@ -463,16 +475,16 @@
           </div>
           <!-- GSAT Exam Duration Presets -->
           <div class="grid grid-cols-5 gap-1.5">
-            <button onclick="quickLogMinutes(110)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Sci / Soc (110m)">+110m</button>
-            <button onclick="quickLogMinutes(100)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Math / Eng (100m)">+100m</button>
-            <button onclick="quickLogMinutes(90)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Chinese (90m)">+90m</button>
-            <button onclick="quickLogMinutes(60)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+60m</button>
-            <button onclick="quickLogMinutes(30)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+30m</button>
+            <button type="button" onclick="quickLogMinutes(110)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Sci / Soc (110m)">+110m</button>
+            <button type="button" onclick="quickLogMinutes(100)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Math / Eng (100m)">+100m</button>
+            <button type="button" onclick="quickLogMinutes(90)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95" title="Chinese (90m)">+90m</button>
+            <button type="button" onclick="quickLogMinutes(60)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+60m</button>
+            <button type="button" onclick="quickLogMinutes(30)" class="b-tag py-2.5 text-center font-extrabold hover:border-[var(--border-active)] active:scale-95">+30m</button>
           </div>
           <!-- Custom Minutes Input -->
           <div class="flex items-center gap-2 pt-1">
-            <input type="number" id="customQuickMinutes" placeholder="Custom mins (e.g. 45)..." min="1" max="600" class="flex-1 b-input px-3.5 py-2 text-sm font-semibold">
-            <button onclick="quickLogCustom()" class="b-btn-primary px-4 py-2 text-xs shrink-0">+ Log</button>
+            <input type="number" id="customQuickMinutes" inputmode="numeric" placeholder="Custom mins (e.g. 45)..." min="1" max="600" onkeydown="if(event.key==='Enter')quickLogCustom()" class="flex-1 b-input px-3.5 py-2 text-sm font-semibold">
+            <button type="button" onclick="quickLogCustom()" class="b-btn-primary px-4 py-2 text-xs shrink-0">+ Log</button>
           </div>
         </div>
 
@@ -539,7 +551,7 @@
 
     </div>
 
-    <!-- ==================== REQUIREMENT #5: BOXLESS FLOATING AGENT MENU (COLOR ON DRAG) ==================== -->
+    <!-- ==================== BOXLESS FLOATING AGENT MENU ==================== -->
     <div id="agentOverlay" onclick="handleOverlayClick(event)" class="fixed inset-0 z-40 hidden flex-col justify-center items-center px-8">
       <div class="w-full max-w-xs space-y-6">
         
@@ -602,17 +614,15 @@
       </div>
     </div>
 
-    <!-- ==================== BOTTOM-LEFT BLOUB BOT (EXACT -25° TILTED EYES + WIDE GAZE ANGLE) ==================== -->
+    <!-- ==================== BOTTOM-LEFT BLOUB BOT ==================== -->
     <div class="fixed bottom-5 left-5 z-50">
       <button id="bloubBotBtn" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none touch-none" aria-label="Bot Menu">
         <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible pointer-events-none">
           <ellipse id="mainBotShadow" cx="50" cy="94" rx="23" ry="4" fill="rgba(0,0,0,0.14)" />
           <g id="mainBotActor">
             <path id="mainBotBody" d="M 50,10 A 40,40 0 1,1 49.99,10 Z" fill="#111111" stroke="#111111" stroke-width="0" stroke-linejoin="round" class="transition-colors duration-300"/>
-            <!-- Outer group moves across sphere surface; Inner group holds the -25° tilt + blink -->
             <g id="mainBotEyesOuter" transform="translate(56, 39)">
               <g id="mainBotEyesInner" transform="rotate(-25)" fill="#FFFFFF">
-                <!-- Left eye & slightly foreshortened right eye matching the reference image -->
                 <rect id="botEyeL" x="-13" y="-10" width="9" height="20.5" rx="4.5" />
                 <rect id="botEyeR" x="6" y="-10" width="8" height="19.5" rx="4" />
               </g>
@@ -777,7 +787,7 @@
     var selectedUnits = [];
 
     // =========================================================
-    // DARK MODE + WIDE-ANGLE -25° TILTED EYES BOT ENGINE
+    // DARK MODE + PWA BOTTOM BAR SYNC + WIDE-ANGLE BOT ENGINE
     // =========================================================
     const CRISP_BOT_SHAPES = {
       circle: {
@@ -814,6 +824,16 @@
       return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
+    function syncSystemThemeColor() {
+      const dark = isSystemDark();
+      const bgHex = dark ? '#0B0B0E' : '#F7F7F7';
+      document.documentElement.style.backgroundColor = bgHex;
+      document.body.style.backgroundColor = bgHex;
+      document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
+        meta.setAttribute('content', bgHex);
+      });
+    }
+
     function triggerBotTapEffect() {
       targetPressScale = 0.93;
       setTimeout(() => { targetPressScale = 1; }, 130);
@@ -829,7 +849,6 @@
       let resolvedBodyColor = colorHex;
       let resolvedEyeColor = '#FFFFFF';
 
-      // Default Circle Bot inverts cleanly in Dark Mode (White Ball + Black Eyes)
       if (!colorHex || colorHex === 'default' || colorHex === '#111111') {
         resolvedBodyColor = dark ? '#F4F4F6' : '#111111';
         resolvedEyeColor = dark ? '#111111' : '#FFFFFF';
@@ -841,7 +860,6 @@
       body.setAttribute('stroke-width', activeShapeCfg.strokeWidth);
       eyesInner.setAttribute('fill', resolvedEyeColor);
 
-      // Sync Schedule Mini Bot in Menu
       const menuCircleBody = document.getElementById('menuCircleBody');
       const menuCircleEyes = document.getElementById('menuCircleEyes');
       if (menuCircleBody && menuCircleEyes) {
@@ -850,9 +868,10 @@
       }
     }
 
-    // Listen for live OS Dark/Light mode switches
+    syncSystemThemeColor();
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        syncSystemThemeColor();
         setBotAppearance(currentBotShape, currentBotColor);
       });
     }
@@ -865,18 +884,16 @@
 
       setBotAppearance('circle', 'default');
 
-      // Start with the signature wide upper-right gaze from your screenshot!
       let targetGazeX = 6, targetGazeY = -5, curGazeX = 6, curGazeY = -5;
       let targetTilt = -25, curTilt = -25;
       let blinkScaleY = 1;
 
-      // Wide-angle expressive gaze targets
       const GAZE_POSES = [
-        { x: 7.5, y: -5.5, tilt: -26 }, // Signature upper-right look (matches screenshot!)
-        { x: 9.0, y: -2.0, tilt: -23 }, // Far right look
-        { x: -9.5, y: -4.5, tilt: -18 }, // Upper-left look
-        { x: 0, y: 0, tilt: -24 },       // Center neutral with signature -24° tilt
-        { x: 5.5, y: 4.5, tilt: -25 }    // Lower-right look
+        { x: 7.5, y: -5.5, tilt: -26 },
+        { x: 9.0, y: -2.0, tilt: -23 },
+        { x: -9.5, y: -4.5, tilt: -18 },
+        { x: 0, y: 0, tilt: -24 },
+        { x: 5.5, y: 4.5, tilt: -25 }
       ];
 
       setInterval(() => {
@@ -923,7 +940,6 @@
         const shadowRx = 23 - floatY * 0.6;
         shadowEl.setAttribute('rx', shadowRx.toFixed(1));
 
-        // Position eyes on sphere surface + apply -25° tilt and blink along the tilted axis
         const ex = activeShapeCfg.baseEyeX + curGazeX;
         const ey = activeShapeCfg.baseEyeY + curGazeY;
         eyesOuter.setAttribute('transform', `translate(${ex.toFixed(2)}, ${ey.toFixed(2)})`);
@@ -941,7 +957,7 @@
     }
 
     // =========================================================
-    // REQUIREMENT #4 (PLAN A): NEXT CLASS / TODAY TIMETABLE WIDGET
+    // NEXT CLASS / TODAY TIMETABLE WIDGET
     // =========================================================
     function parseTimeToMins(timeStr) {
       if (!timeStr) return 0;
@@ -950,7 +966,7 @@
     }
 
     function getEffectiveSubjectForDate(dateObj, periodIdx) {
-      const dayOfWeek = dateObj.getDay(); // 1..5
+      const dayOfWeek = dateObj.getDay();
       if (dayOfWeek < 1 || dayOfWeek > 5) return '';
       const dIdx = dayOfWeek - 1;
       const yyyy = dateObj.getFullYear();
@@ -980,7 +996,6 @@
       const nowMins = now.getHours() * 60 + now.getMinutes();
       const totalPeriods = appSettings.totalPeriods || 8;
 
-      // Helper to find classes on a given date
       function getDaySchedule(targetDate) {
         const list = [];
         for (let p = 0; p < totalPeriods; p++) {
@@ -1001,7 +1016,6 @@
         return list;
       }
 
-      // Weekday (Mon-Fri): Check current or upcoming period today
       if (day >= 1 && day <= 5) {
         const todayClasses = getDaySchedule(now);
         const currentOrNextIdx = todayClasses.findIndex(c => nowMins <= c.endMins);
@@ -1023,7 +1037,6 @@
         }
       }
 
-      // After school or Weekend -> Show next school day's first class
       let nextSchoolDate = new Date(now);
       nextSchoolDate.setDate(now.getDate() + 1);
       while (nextSchoolDate.getDay() === 0 || nextSchoolDate.getDay() === 6) {
@@ -1050,35 +1063,48 @@
         periodEl.style.color = '#34C77B';
         periodEl.innerText = 'NO CLASSES';
         subjEl.innerText = 'Free';
-        followEl.innerText = 'Tap to edit matrix';
+        followEl.innerText = 'Tap to view matrix';
       }
     }
 
     // =========================================================
-    // REQUIREMENT #1: QUICK LOG FOR GSAT PRACTICE PAPERS
+    // QUICK LOG FOR GSAT PRACTICE PAPERS (PRESETS + CUSTOM MINS FIXED)
     // =========================================================
     function quickLogMinutes(mins) {
-  if (!mins || mins <= 0) return;
-  const subj = currentSubject;
-  const hours = mins / 60;
+      const numericMins = Number(mins);
+      if (!numericMins || numericMins <= 0) return;
+      const subj = currentSubject;
+      const hours = numericMins / 60;
 
-  // 跳出確認視窗，按取消就不會送出
-  if (!confirm(`Log +${mins} mins (${hours.toFixed(2)}h) to ${subj}?`)) return;
+      if (!confirm(`Log +${numericMins} mins (${hours.toFixed(2)}h) to ${subj}?`)) return;
 
-  showToast(`Logging +${mins}m (${subj})...`);
+      showToast(`Logging +${numericMins}m (${subj})...`);
 
-  callBackend('apiRecordTime', { subject: subj, elapsedHours: hours },
-    function() {
-      showToast(`+${mins}m (${hours.toFixed(2)}h) logged to ${subj}`);
-    },
-    function(err) {
-      showToast('Error: ' + err.message);
+      callBackend('apiRecordTime', { subject: subj, elapsedHours: hours },
+        function() {
+          showToast(`+${numericMins}m (${hours.toFixed(2)}h) logged to ${subj}`);
+        },
+        function(err) {
+          showToast('Error: ' + err.message);
+        }
+      );
     }
-  );
-}
+
+    function quickLogCustom() {
+      const input = document.getElementById('customQuickMinutes');
+      if (!input) return;
+      const mins = parseFloat(input.value);
+      if (!mins || isNaN(mins) || mins <= 0) {
+        showToast('Enter valid minutes');
+        return;
+      }
+      input.value = '';
+      input.blur();
+      quickLogMinutes(Math.round(mins));
+    }
 
     // =========================================================
-    // REQUIREMENT #2: WARNING SYMBOL ⚠️ WRAPPER BUTTON
+    // WARNING SYMBOL ⚠️ WRAPPER BUTTON
     // =========================================================
     function toggleWarningSymbol() {
       const input = document.getElementById('eventTitle');
@@ -1591,7 +1617,7 @@
     }
 
     // =========================================================
-    // CALENDARS, SCHEDULE, TIMETABLE, SETTINGS
+    // CALENDARS, SCHEDULE, TIMETABLE (READ-ONLY), SETTINGS
     // =========================================================
     function applyCalendarsList(calendars) {
       if (!calendars || !calendars.length) return;
@@ -1897,6 +1923,7 @@
       return `background:${hex}1F; color:${hex}; border:1.5px solid ${hex}4D;`;
     }
 
+    // Timetable cells are now strictly read-only (no onclick editTimetableCell)
     function renderTimetableGrid() {
       var tbody = document.getElementById('timetableBody');
       var headerRow = document.getElementById('timetableHeaderRow');
@@ -1929,23 +1956,32 @@
             display = (timetableData[swapIn.fromPeriod - 1] && timetableData[swapIn.fromPeriod - 1][origIdx]) || raw;
             dot = '<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500"></span>';
           }
-          tdHtml += `<td class="p-1"><div onclick="editTimetableCell(${p},${d2})" class="relative min-h-[40px] rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer transition" style="${getSubjectStyle(display)}">${display || '·'}${dot}</div></td>`;
+          tdHtml += `<td class="p-1"><div class="relative min-h-[40px] rounded-lg flex items-center justify-center font-bold text-xs select-none" style="${getSubjectStyle(display)}">${display || '·'}${dot}</div></td>`;
         }
         tr.innerHTML = tdHtml;
         tbody.appendChild(tr);
       }
     }
 
-    function editTimetableCell(p, d) {
-      const cur = (timetableData[p] && timetableData[p][d]) || '';
-      const next = prompt(`P${p + 1} Subject:`, cur);
-      if (next !== null) {
-        if (!timetableData[p]) timetableData[p] = ['', '', '', '', ''];
-        timetableData[p][d] = next.trim();
-        EvStore.setJSON('romano_cache_timetable', timetableData);
-        renderTimetableGrid();
-        updateNextClassWidget();
-      }
+    function syncTimetableFromCloud() {
+      var btn = document.getElementById('syncMatrixBtn');
+      if (btn) { btn.disabled = true; setBtnText('syncMatrixBtn', 'Syncing...'); }
+
+      callBackend('getTimetableData', null,
+        function(data) {
+          if (Array.isArray(data)) {
+            timetableData = data;
+            EvStore.setJSON('romano_cache_timetable', data);
+            renderTimetableGrid();
+            updateNextClassWidget();
+            showToast('Timetable synced');
+          }
+          if (btn) { btn.disabled = false; setBtnText('syncMatrixBtn', 'Sync Timetable'); }
+        },
+        function() {
+          if (btn) { btn.disabled = false; setBtnText('syncMatrixBtn', 'Sync Timetable'); }
+        }
+      );
     }
 
     function getWeekdayIndex(dateStr) {
@@ -1962,25 +1998,6 @@
       } else {
         banner.classList.add('hidden');
       }
-    }
-
-    function saveTimetableToCloud() {
-      var btn = document.getElementById('syncMatrixBtn');
-      btn.disabled = true;
-      setBtnText('syncMatrixBtn', 'Saving...');
-      EvStore.setJSON('romano_cache_timetable', timetableData);
-      updateNextClassWidget();
-      callBackend('saveTimetableData', timetableData,
-        function() {
-          showToast('Timetable saved');
-          btn.disabled = false;
-          setBtnText('syncMatrixBtn', 'Save Timetable');
-        },
-        function() {
-          btn.disabled = false;
-          setBtnText('syncMatrixBtn', 'Save Timetable');
-        }
-      );
     }
 
     function openSwapModal() {
@@ -2195,6 +2212,7 @@
     }
 
     function sysInit() {
+      syncSystemThemeColor();
       initAutonomousBotLife();
       initBotGestures();
       initGsatCountdown();
