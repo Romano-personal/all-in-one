@@ -232,7 +232,71 @@
     .mini-bot-svg {
       animation: mini-float 2.8s ease-in-out infinite;
     }
+    /* 1. 極簡雙圓點同步指示器 (取代原本的箭頭) */
+    .sync-orbit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .sync-orbit:active {
+      transform: scale(0.88);
+    }
+    .sync-orbit span {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background-color: var(--ink-muted);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .sync-orbit:hover span {
+      background-color: var(--ink-primary);
+    }
+    @keyframes orbit-swap {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes dot-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.35); background-color: #34C77B; }
+    }
+    .sync-orbit.is-syncing {
+      animation: orbit-swap 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    }
+    .sync-orbit.is-syncing span {
+      animation: dot-pulse 0.85s ease-in-out infinite;
+    }
 
+    /* 2. 開機 Splash 遮罩與 Bot 從螢幕正中央飛入左下角動畫 */
+    #splashCurtain {
+      position: fixed;
+      inset: 0;
+      background-color: var(--bg-main);
+      z-index: 45;
+      pointer-events: none;
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.boot-done #splashCurtain {
+      opacity: 0;
+    }
+    #botSplashAnchor {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 50;
+      /* 初始位置：先固定在螢幕正中央，並放大成跟 PWA 啟動 Icon 一樣大 */
+      transform: translate(calc(50vw - 60px), calc(-50dvh + 60px)) scale(2.15);
+      transition: transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    body.boot-done #botSplashAnchor {
+      /* 降落回左下角原位 */
+      transform: translate(0, 0) scale(1);
+    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -274,8 +338,8 @@
         <div class="b-card p-6 flex flex-col justify-between space-y-3.5 shrink-0">
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">UPCOMING EVENTS</span>
-            <button onclick="loadUpcomingEvents()" class="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] text-sm transition p-1" title="Refresh">
-              <i class="fa-solid fa-rotate-right" id="eventsRefreshIcon"></i>
+            <button onclick="loadUpcomingEvents()" id="eventsRefreshIcon" class="sync-orbit" title="Refresh">
+              <span></span><span></span>
             </button>
           </div>
           <div id="upcomingEventsList" class="space-y-2.5"></div>
@@ -306,8 +370,8 @@
             <div class="flex-1 flex flex-col min-h-0">
               <div class="flex items-center justify-between mb-3 shrink-0">
                 <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">TO-DO</span>
-                <button onclick="syncGoogleTasks()" class="text-xs text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition p-1" title="Sync Google Tasks">
-                  <i class="fa-solid fa-rotate" id="tasksSyncIcon"></i>
+                <button onclick="syncGoogleTasks()" id="tasksSyncIcon" class="sync-orbit" title="Sync Google Tasks">
+                  <span></span><span></span>
                 </button>
               </div>
               <div id="todoListContainer" class="space-y-2 overflow-y-auto no-scrollbar pr-0.5 flex-1"></div>
@@ -615,7 +679,8 @@
     </div>
 
     <!-- ==================== BOTTOM-LEFT BLOUB BOT ==================== -->
-    <div class="fixed bottom-5 left-5 z-50">
+    <div id="splashCurtain"></div>
+    <div id="botSplashAnchor">
       <button id="bloubBotBtn" class="w-20 h-20 rounded-full flex items-center justify-center focus:outline-none select-none touch-none" aria-label="Bot Menu">
         <svg id="mainBotSvg" viewBox="0 0 100 100" class="w-full h-full overflow-visible pointer-events-none">
           <ellipse id="mainBotShadow" cx="50" cy="94" rx="23" ry="4" fill="rgba(0,0,0,0.14)" />
@@ -1337,17 +1402,17 @@
     // =========================================================
     function loadUpcomingEvents() {
       const icon = document.getElementById('eventsRefreshIcon');
-      if (icon) icon.classList.add('fa-spin');
+      if (icon) icon.classList.add('is-syncing');
 
       callBackend('getUpcomingEvents', { calendarIds: visibleCalendarIds, maxResults: 3 },
         function(events) {
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('is-syncing');
           cachedUpcomingEvents = events || [];
           EvStore.setJSON('romano_cache_events', cachedUpcomingEvents);
           renderUpcomingEvents(cachedUpcomingEvents);
         },
         function() {
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('is-syncing');
           renderUpcomingEvents(cachedUpcomingEvents);
         }
       );
@@ -1383,11 +1448,11 @@
 
     function syncGoogleTasks() {
       const icon = document.getElementById('tasksSyncIcon');
-      if (icon) icon.classList.add('fa-spin');
+      if (icon) icon.classList.add('is-syncing');
 
       callBackend('getGoogleTasks', null,
         function(tasks) {
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('is-syncing');
           if (Array.isArray(tasks)) {
             todoItems = tasks;
             EvStore.setJSON('romano_cache_tasks', todoItems);
@@ -1395,7 +1460,7 @@
           }
         },
         function(err) {
-          if (icon) icon.classList.remove('fa-spin');
+          if (icon) icon.classList.remove('is-syncing');
           if (!todoItems.length) {
             const container = document.getElementById('todoListContainer');
             if (container) {
@@ -2216,6 +2281,11 @@
       initAutonomousBotLife();
       initBotGestures();
       initGsatCountdown();
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          document.body.classList.add('boot-done');
+        }, 80);
+      });
       renderUpcomingEvents(cachedUpcomingEvents);
       renderTodos();
       renderTags();
