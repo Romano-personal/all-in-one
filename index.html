@@ -297,22 +297,18 @@
       /* 降落回左下角原位 */
       transform: translate(0, 0) scale(1);
     }
-    /* 上下滑動智慧堆疊卡片 (Vertical Swipe Stack) */
+/* 上下無限迴圈滑動堆疊卡片 (Infinite Vertical Swipe Stack) */
     .swipe-card-Viewport {
       position: relative;
       overflow: hidden;
-      touch-action: pan-x; /* 鎖定卡片區塊的垂直滑動手勢給翻頁使用 */
+      touch-action: pan-x;
     }
     .swipe-track-v {
       height: 200%;
       width: 100%;
       display: flex;
       flex-direction: column;
-      transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
-    }
-    .swipe-track-v.page-1 {
-      transform: translateY(-50%);
     }
     .swipe-slide-v {
       height: 50%;
@@ -407,7 +403,7 @@
           </div>
         </div>
         <!-- 2. UPCOMING EVENTS ⇅ QUICK LINKS -->
-        <div id="midSwipeCard" class="b-card swipe-card-Viewport h-[226px] shrink-0">
+        <div id="midSwipeCard" class="b-card swipe-card-Viewport h-[252px] shrink-0">
           <!-- 右側分頁點 -->
           <div class="v-pager" id="midCardPager">
             <span class="active" onclick="setCardPage('mid', 0)"></span>
@@ -416,7 +412,7 @@
 
           <div id="midSwipeTrack" class="swipe-track-v">
             <!-- Slide 0 (上層): UPCOMING EVENTS -->
-            <div class="swipe-slide-v p-5 pr-8">
+            <div class="swipe-slide-v px-5 py-4 pr-8">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">UPCOMING EVENTS</span>
                 <button onclick="loadUpcomingEvents()" id="eventsRefreshIcon" class="sync-orbit" title="Refresh">
@@ -427,12 +423,12 @@
             </div>
 
             <!-- Slide 1 (下層): 常用網站 QUICK LINKS -->
-            <div class="swipe-slide-v p-5 pr-8">
+            <div class="swipe-slide-v px-5 py-4 pr-8">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)]">QUICK LINKS</span>
                 <button onclick="openLinksModal()" class="text-xs font-bold text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition">Edit</button>
               </div>
-              <div id="quickLinksGrid" class="grid grid-cols-2 gap-2 my-auto"></div>
+              <div id="quickLinksGrid" class="grid grid-cols-2 gap-2.5 my-auto"></div>
             </div>
           </div>
         </div>
@@ -1489,18 +1485,56 @@
       }
     }
     // 1. 卡片上下滑動手勢與翻頁控制 (Vertical Swipe Stack)
-    var cardPageState = { top: 0, mid: 0 };
+var cardPageState = { top: 0, mid: 0 };
+    var cardAnimating = { top: false, mid: false };
 
-    function setCardPage(which, pageIdx) {
-      cardPageState[which] = pageIdx;
-      const track = document.getElementById(which + 'SwipeTrack');
+    function updatePagerDots(which) {
       const pager = document.getElementById(which + 'CardPager');
-      if (track) track.classList.toggle('page-1', pageIdx === 1);
-      if (pager) {
-        const dots = pager.querySelectorAll('span');
-        dots.forEach((d, idx) => d.classList.toggle('active', idx === pageIdx));
-      }
+      if (!pager) return;
+      const dots = pager.querySelectorAll('span');
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === cardPageState[which]));
+    }
+
+    // 支援無限單向迴圈滑動 (dir = 1 為往上撥去下一頁；dir = -1 為往下撥去上一頁)
+    function cycleCardPage(which, dir) {
+      if (cardAnimating[which]) return;
+      const track = document.getElementById(which + 'SwipeTrack');
+      if (!track || track.children.length < 2) return;
+
+      cardAnimating[which] = true;
+      cardPageState[which] = (cardPageState[which] + 1) % 2;
+      updatePagerDots(which);
       if (navigator.vibrate) navigator.vibrate(6);
+
+      if (dir > 0) {
+        // 往上滑 (Swipe Up)：順向滑到 -50%，完成後把第 1 個節點放到後面並瞬間歸零
+        track.style.transition = 'transform 0.44s cubic-bezier(0.22, 1, 0.36, 1)';
+        track.style.transform = 'translateY(-50%)';
+        setTimeout(() => {
+          track.style.transition = 'none';
+          track.appendChild(track.firstElementChild);
+          track.style.transform = 'translateY(0%)';
+          void track.offsetHeight; // 強制重繪
+          cardAnimating[which] = false;
+        }, 445);
+      } else {
+        // 往下滑 (Swipe Down)：先把最後一個節點移到最前面並瞬間定位在 -50%，再順向滑回 0%
+        track.style.transition = 'none';
+        track.insertBefore(track.lastElementChild, track.firstElementChild);
+        track.style.transform = 'translateY(-50%)';
+        void track.offsetHeight; // 強制重繪
+        track.style.transition = 'transform 0.44s cubic-bezier(0.22, 1, 0.36, 1)';
+        track.style.transform = 'translateY(0%)';
+        setTimeout(() => {
+          cardAnimating[which] = false;
+        }, 445);
+      }
+    }
+
+    // 點擊右側小圓點時直接觸發迴圈翻頁
+    function setCardPage(which, targetIdx) {
+      if (cardPageState[which] === targetIdx) return;
+      cycleCardPage(which, targetIdx > cardPageState[which] ? 1 : -1);
     }
 
     function bindVerticalSwipeCard(cardId, which) {
@@ -1519,12 +1553,11 @@
         if (!e.changedTouches || !e.changedTouches.length) return;
         const dy = e.changedTouches[0].clientY - startY;
         const dx = e.changedTouches[0].clientX - startX;
-        // 垂直滑動超過 26px 且大於水平滑動時觸發翻頁
-        if (Math.abs(dy) > 26 && Math.abs(dy) > Math.abs(dx)) {
-          if (dy < 0 && cardPageState[which] === 0) {
-            setCardPage(which, 1); // 往上滑 -> 去下層
-          } else if (dy > 0 && cardPageState[which] === 1) {
-            setCardPage(which, 0); // 往下滑 -> 回上層
+        if (Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(dx)) {
+          if (dy < 0) {
+            cycleCardPage(which, 1);  // 手指往上撥 -> 無限往下捲動
+          } else {
+            cycleCardPage(which, -1); // 手指往下撥 -> 無限往上捲動
           }
         }
       }, { passive: true });
@@ -1703,17 +1736,17 @@
         const ev = list[i];
         if (ev) {
           box.innerHTML += `
-            <div class="px-4 py-3 rounded-2xl b-subtle-box flex items-center justify-between gap-3">
+            <div class="px-3.5 py-2.5 rounded-2xl b-subtle-box flex items-center justify-between gap-3">
               <div class="truncate">
-                <div class="text-sm font-bold truncate">${ev.title}</div>
-                <div class="text-[11px] font-semibold text-[var(--ink-muted)] truncate">${ev.calendarName || ''}</div>
+                <div class="text-sm font-bold truncate leading-snug">${ev.title}</div>
+                <div class="text-[11px] font-semibold text-[var(--ink-muted)] truncate leading-tight mt-0.5">${ev.calendarName || ''}</div>
               </div>
               <span class="text-xs font-extrabold text-[var(--ink-secondary)] shrink-0">${ev.timeLabel || ''}</span>
             </div>
           `;
         } else {
           box.innerHTML += `
-            <div class="px-4 py-3.5 rounded-2xl b-subtle-box flex items-center justify-between opacity-60">
+            <div class="px-3.5 py-3 rounded-2xl b-subtle-box flex items-center justify-between opacity-60">
               <span class="text-sm font-semibold text-[var(--ink-muted)]">${i === 0 ? 'No upcoming events' : '—'}</span>
             </div>
           `;
