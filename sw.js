@@ -1,11 +1,7 @@
-const CACHE_NAME = 'romano-bloub-v3';
+const CACHE_NAME = 'romano-bloub-v4'; // 👈 改為 v4 強制清除剛剛的快取
 const CORE_ASSETS = [
   './',
   './index.html',
-  './manifest.json',
-  './icon.svg',
-  './icon-192.png',
-  './icon-512.png',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
@@ -55,12 +51,12 @@ self.addEventListener('fetch', (event) => {
         return networkRes;
       })
       .catch(() => {
-        // 沒網路時：0.01 秒直接從手機快取拿出來，絕不跳 You're offline
         return caches.match(req).then((cachedRes) => {
           if (cachedRes) return cachedRes;
           if (req.mode === 'navigate') {
             return caches.match('./index.html') || caches.match('./');
           }
+          return Response.error();
         });
       })
   );
