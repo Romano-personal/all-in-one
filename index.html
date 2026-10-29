@@ -361,6 +361,7 @@
         <div class="flex items-center gap-3">
           <h1 class="text-3xl font-extrabold tracking-tight">Hi Romano</h1>
           <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-[#34C77B] transition-colors" title="Synced"></span>
+          <span id="offlineBadge" onclick="flushOfflineQueue()" class="hidden px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gray-500/15 text-[var(--ink-muted)] cursor-pointer">OFFLINE</span>
         </div>
         <span id="currentViewBadge" class="text-xs font-extrabold uppercase tracking-widest text-[var(--ink-muted)] hidden">SCHEDULE</span>
       </header>
@@ -586,6 +587,7 @@
             <button onclick="setSubject('化學')" class="b-tag text-center" data-subj="化學">化學</button>
             <button onclick="setSubject('生物')" class="b-tag text-center" data-subj="生物">生物</button>
             <button onclick="setSubject('地科')" class="b-tag text-center" data-subj="地科">地科</button>
+            <button onclick="setSubject('自然')" class="b-tag text-center !text-[#34C77B] font-extrabold" data-subj="自然">自然÷4</button>
           </div>
         </div>
 
@@ -851,20 +853,130 @@
   </div>
 
   <script>
-    // =========================================================
-    // FAST GAS API BRIDGE + LOCAL STORAGE INSTANT CACHE
+// =========================================================
+    // FAST GAS API BRIDGE + OFFLINE SYNC QUEUE + STATUS INDICATOR
     // =========================================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwO5uOOWyuU3wmYwcZuiTpM7JlUTBtcgPtZrsVvG5DWjJJo5sY7-ciN9zSdm0GhGRWj/exec";
 
     let activeRequests = 0;
+    // 只針對「寫入型動作」進行離線佇列保護 (避免讀取動作重複排隊)
+    const WRITE_ACTIONS = ['apiRecordTime', 'apiRecordProgress', 'addCalendarEvent', 'addGoogleTask', 'toggleGoogleTask', 'saveTimetableData', 'saveSwapRecords', 'savePresetsData'];
+
+    function getOfflineQueue() {
+      try { return JSON.parse(localStorage.getItem('romano_offline_queue') || '[]'); } catch(e) { return []; }
+    }
+    function setOfflineQueue(q) {
+      try { localStorage.setItem('romano_offline_queue', JSON.stringify(q)); } catch(e) {}
+    }
 
     function setSyncIndicator(busy) {
       const dot = document.getElementById('syncDot');
+      const badge = document.getElementById('offlineBadge');
       if (!dot) return;
-      dot.style.backgroundColor = busy ? '#F5B82E' : '#34C77B';
+
+      const qLen = getOfflineQueue().length;
+
+      // 1. 離線狀態：灰色燈號 + 顯示 OFFLINE (若佇列有待傳資料則顯示筆數)
+      if (!navigator.onLine) {
+        dot.style.backgroundColor = '#8E9297';
+        dot.title = 'Offline Mode';
+        if (badge) {
+          badge.innerText = qLen > 0 ? `OFFLINE · ${qLen} QUEUED` : 'OFFLINE';
+          badge.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // 2. 在線且同步中 / 補傳佇列中：琥珀黃燈號
+      if (busy) {
+        dot.style.backgroundColor = '#F5B82E';
+        dot.title = 'Syncing...';
+        if (badge) {
+          if (qLen > 0) {
+            badge.innerText = `SYNCING (${qLen})...`;
+            badge.classList.remove('hidden');
+          } else {
+            badge.classList.add('hidden');
+          }
+        }
+        return;
+      }
+
+      // 3. 在線且全部同步完成：薄荷綠燈號
+      dot.style.backgroundColor = '#34C77B';
+      dot.title = 'Online & Synced';
+      if (badge) badge.classList.add('hidden');
     }
 
+    function enqueueOfflineTask(action, payload) {
+      const q = getOfflineQueue();
+      q.push({ action, payload, ts: Date.now() });
+      setOfflineQueue(q);
+      setSyncIndicator(false);
+    }
+
+    // 網路恢復時，依序把離線期間累積的紀錄補傳回 Google Sheet
+    let isFlushingQueue = false;
+    async function flushOfflineQueue() {
+      if (!navigator.onLine || isFlushingQueue) return;
+      const q = getOfflineQueue();
+      if (q.length === 0) { setSyncIndicator(false); return; }
+
+      isFlushingQueue = true;
+      setSyncIndicator(true);
+      showToast(`Syncing ${q.length} offline record(s)...`);
+
+      while (q.length > 0 && navigator.onLine) {
+        const item = q[0];
+        try {
+          const res = await fetch(GAS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: item.action, payload: item.payload })
+          });
+          const data = await res.json();
+          if (data && data.success) {
+            q.shift(); // 成功送出才移除
+            setOfflineQueue(q);
+          } else {
+            break;
+          }
+        } catch (err) {
+          break; // 網路又不穩，暫停等待下次連線
+        }
+      }
+
+      isFlushingQueue = false;
+      setSyncIndicator(activeRequests > 0);
+      if (getOfflineQueue().length === 0) {
+        showToast('All offline records synced!');
+      }
+    }
+
+    window.addEventListener('online', () => {
+      setSyncIndicator(false);
+      flushOfflineQueue();
+    });
+    window.addEventListener('offline', () => {
+      setSyncIndicator(false);
+    });
+
     function callBackend(action, payload, onSuccess, onFailure) {
+      const isWrite = WRITE_ACTIONS.includes(action);
+
+      // 若目前沒開網路，且是寫入動作 -> 直接存入離線佇列並回報成功！
+      if (!navigator.onLine) {
+        if (isWrite) {
+          enqueueOfflineTask(action, payload);
+          showToast('Saved offline (will auto-sync)');
+          if (onSuccess) onSuccess({ offlineQueued: true });
+        } else if (onFailure) {
+          onFailure(new Error('Offline'));
+        }
+        setSyncIndicator(false);
+        return;
+      }
+
       activeRequests++;
       setSyncIndicator(true);
 
@@ -879,7 +991,14 @@
         else if (!data.success && onFailure) onFailure(new Error(data.message || "API Error"));
       })
       .catch(err => {
-        if (onFailure) onFailure(err);
+        // 連線途中斷網：若是寫入動作一樣自動轉入離線佇列保護，絕不掉資料！
+        if (isWrite) {
+          enqueueOfflineTask(action, payload);
+          showToast('Network drop: Saved to offline queue');
+          if (onSuccess) onSuccess({ offlineQueued: true });
+        } else if (onFailure) {
+          onFailure(err);
+        }
       })
       .finally(() => {
         activeRequests = Math.max(0, activeRequests - 1);
@@ -1223,24 +1342,48 @@
     // =========================================================
     // QUICK LOG FOR GSAT PRACTICE PAPERS (PRESETS + CUSTOM MINS FIXED)
     // =========================================================
+    const SCIENCE_SUBJS = ['物理', '化學', '生物', '地科'];
+
+    function recordStudyTimeSmart(subj, totalHours, labelForToast) {
+      if (subj === '自然') {
+        const quarterHours = totalHours / 4;
+        showToast(`Logging 自然 ÷ 4 (+${quarterHours.toFixed(2)}h each)...`);
+        let doneCount = 0;
+        SCIENCE_SUBJS.forEach(sciSubj => {
+          callBackend('apiRecordTime', { subject: sciSubj, elapsedHours: quarterHours },
+            function() {
+              doneCount++;
+              if (doneCount === 4) {
+                showToast(`自然 ${labelForToast} split to 物/化/生/地!`);
+              }
+            }
+          );
+        });
+      } else {
+        showToast(`Logging ${labelForToast} (${subj})...`);
+        callBackend('apiRecordTime', { subject: subj, elapsedHours: totalHours },
+          function() {
+            showToast(`${labelForToast} (${totalHours.toFixed(2)}h) logged to ${subj}`);
+          },
+          function(err) {
+            showToast('Error: ' + err.message);
+          }
+        );
+      }
+    }
+
     function quickLogMinutes(mins) {
       const numericMins = Number(mins);
       if (!numericMins || numericMins <= 0) return;
       const subj = currentSubject;
       const hours = numericMins / 60;
 
-      if (!confirm(`Log +${numericMins} mins (${hours.toFixed(2)}h) to ${subj}?`)) return;
+      const confirmMsg = (subj === '自然')
+        ? `Log +${numericMins} mins to 自然?\n(Will split +${(numericMins / 4).toFixed(1)}m / ${(hours / 4).toFixed(2)}h each to 物理, 化學, 生物, 地科)`
+        : `Log +${numericMins} mins (${hours.toFixed(2)}h) to ${subj}?`;
 
-      showToast(`Logging +${numericMins}m (${subj})...`);
-
-      callBackend('apiRecordTime', { subject: subj, elapsedHours: hours },
-        function() {
-          showToast(`+${numericMins}m (${hours.toFixed(2)}h) logged to ${subj}`);
-        },
-        function(err) {
-          showToast('Error: ' + err.message);
-        }
-      );
+      if (!confirm(confirmMsg)) return;
+      recordStudyTimeSmart(subj, hours, `+${numericMins}m`);
     }
 
     function quickLogCustom() {
@@ -1948,14 +2091,7 @@ var cardPageState = { top: 0, mid: 0 };
 
       showToast(`Logging +${hours.toFixed(2)}h...`);
 
-      callBackend('apiRecordTime', { subject: subjToLog, elapsedHours: hours },
-        function() {
-          showToast(`+${hours.toFixed(2)}h saved`);
-        },
-        function(err) {
-          showToast('Sync error: ' + err.message);
-        }
-      );
+      recordStudyTimeSmart(subjToLog, hours, `+${hours.toFixed(2)}h`);
     }
 
     function resetTimerUI() {
@@ -2456,7 +2592,9 @@ var cardPageState = { top: 0, mid: 0 };
       var c = document.getElementById('unit-tag-container');
       if (!c) return;
       c.innerHTML = '';
-      var list = unitsCache[currentSubject] || [];
+     var list = (currentSubject === '自然')
+        ? [].concat(unitsCache['物理'] || [], unitsCache['化學'] || [], unitsCache['生物'] || [], unitsCache['地科'] || [])
+        : (unitsCache[currentSubject] || []);
       if (!list.length) {
         c.innerHTML = '<span class="text-xs text-[var(--ink-muted)]">No topics loaded</span>';
         return;
@@ -2607,6 +2745,8 @@ var cardPageState = { top: 0, mid: 0 };
 
       if (allUserCalendars.length) applyCalendarsList(allUserCalendars);
       checkPersistedTimer();
+      setSyncIndicator(false);
+      flushOfflineQueue();
 
       callBackend('getInitialBundle', { calendarIds: visibleCalendarIds, maxResults: 3 },
         function(bundle) {
@@ -2645,6 +2785,11 @@ var cardPageState = { top: 0, mid: 0 };
     }
 
     sysInit();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>
