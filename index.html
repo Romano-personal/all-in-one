@@ -343,6 +343,66 @@
       opacity: 0.9;
       background-color: var(--ink-primary);
     }
+    #lockInOverlay {
+      position: fixed;
+      inset: 0;
+      background-color: #000000; /* OLED 真純黑：黑底像素完全關閉不耗電 */
+      color: #F4F4F6;
+      z-index: 90;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 48px 24px 44px;
+      user-select: none;
+      transition: opacity 0.35s ease;
+    }
+    body.lock-in-active #lockInOverlay {
+      display: flex;
+    }
+    /* 10秒無操作自動進入省電微光模式 (OLED Dimming) */
+    #lockInOverlay.oled-dimmed #lockInClockWrap {
+      opacity: 0.38;
+    }
+    #lockInOverlay.oled-dimmed #lockInTopBar,
+    #lockInOverlay.oled-dimmed #lockInBottomBar {
+      opacity: 0.18;
+    }
+    #lockInClockWrap, #lockInTopBar, #lockInBottomBar {
+      transition: opacity 0.6s ease, transform 1.2s ease;
+    }
+    /* 切出畫面被抓包時的紅光閃爍警告 */
+    @keyframes busted-flash {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(234, 67, 53, 0); }
+      50% { box-shadow: inset 0 0 90px 24px rgba(234, 67, 53, 0.48); }
+    }
+    #lockInOverlay.busted-alert {
+      animation: busted-flash 0.7s ease-in-out 3;
+    }
+    /* 長按 2 秒解鎖進度條 */
+    .unlock-hold-btn {
+      position: relative;
+      overflow: hidden;
+      background: #121216;
+      border: 1.5px solid #27272F;
+      color: #9CA3AF;
+      border-radius: 999px;
+      padding: 14px 30px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      touch-action: none;
+    }
+    .unlock-hold-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: rgba(234, 67, 53, 0.28);
+      pointer-events: none;
+    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -620,6 +680,34 @@
             </div>
           </div>
         </div>
+        <!-- 👇 新增這張卡片：LOCK-IN MODE (倒數計時 + 專注結界啟動器) 👇 -->
+        <div class="b-card p-5 space-y-3 border-[#EA4335]/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#EA4335]"></span>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-[var(--ink-primary)]">LOCK-IN MODE (COUNTDOWN)</span>
+            </div>
+            <span class="text-[11px] font-bold text-[var(--ink-muted)]" id="lockInTargetLabel">100 min</span>
+          </div>
+
+          <!-- 學測倒數分鐘數預設按鈕 -->
+          <div class="grid grid-cols-5 gap-1.5" id="lockInPresetBtns">
+            <button type="button" onclick="setLockInMins(110, this)" class="b-tag py-2 text-center font-extrabold">110m</button>
+            <button type="button" onclick="setLockInMins(100, this)" class="b-tag b-tag-active py-2 text-center font-extrabold">100m</button>
+            <button type="button" onclick="setLockInMins(90, this)" class="b-tag py-2 text-center font-extrabold">90m</button>
+            <button type="button" onclick="setLockInMins(60, this)" class="b-tag py-2 text-center font-extrabold">60m</button>
+            <button type="button" onclick="setLockInMins(25, this)" class="b-tag py-2 text-center font-extrabold">25m</button>
+          </div>
+
+          <!-- 自訂倒數分鐘 + 啟動結界按鈕 -->
+          <div class="flex items-center gap-2 pt-1">
+            <input type="number" id="customLockInMins" inputmode="numeric" placeholder="Custom mins..." min="1" max="300" oninput="setCustomLockInMins(this.value)" class="w-32 b-input px-3 py-2.5 text-xs font-bold">
+            <button type="button" onclick="startLockInSession()" class="b-btn-primary flex-1 py-2.5 text-xs tracking-wider uppercase !bg-[#111111] !text-white dark:!bg-[#F4F4F6] dark:!text-[#0B0B0E] flex items-center justify-center gap-2">
+              <i class="fa-solid fa-lock text-[11px]"></i>
+              <span>ENTER LOCK-IN</span>
+            </button>
+          </div>
+        </div>
 
         <!-- QUICK LOG FOR GSAT PRACTICE PAPERS -->
         <div class="b-card p-5 space-y-3">
@@ -785,7 +873,54 @@
         </svg>
       </button>
     </div>
+<!-- ==================== 👇 新增：FULLSCREEN LOCK-IN OVERLAY 👇 ==================== -->
+    <div id="lockInOverlay" onclick="wakeLockInScreen()">
+      <!-- 頂部狀態列：科目、恆亮省電狀態、抓包次數 -->
+      <div id="lockInTopBar" class="w-full max-w-sm flex items-center justify-between text-xs font-extrabold tracking-widest uppercase">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#EA4335] animate-pulse"></span>
+          <span id="lockInSubjBadge" class="text-white">數學</span>
+          <span class="text-[#6B7280]">· LOCKED IN</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="lockInWakeBadge" class="px-2 py-0.5 rounded-full bg-white/5 text-[#9CA3AF] text-[10px]">OLED ECO</span>
+          <span id="lockInBustedBadge" class="px-2.5 py-0.5 rounded-full bg-[#EA4335]/20 text-[#EA4335] text-[11px] font-black">⚠️ 0</span>
+        </div>
+      </div>
 
+      <!-- 中央極簡超大倒數時鐘 + 監考小 Bot -->
+      <div id="lockInClockWrap" class="flex flex-col items-center justify-center my-auto text-center px-2">
+        <!-- 監考小 Bot (被抓包時眼睛會變紅怒視) -->
+        <svg class="w-16 h-16 mb-5 overflow-visible" viewBox="0 0 100 100">
+          <path d="M 50,10 A 40,40 0 1,1 49.99,10 Z" fill="#141418" stroke="#27272F" stroke-width="2.5"/>
+          <g id="lockInBotEyes" transform="translate(55, 39) rotate(-25)" fill="#F4F4F6">
+            <rect x="-13" y="-10" width="9" height="20.5" rx="4.5" />
+            <rect x="6" y="-10" width="8" height="19.5" rx="4" />
+          </g>
+        </svg>
+
+        <div id="lockInCountdownText" class="text-[76px] sm:text-8xl font-black tracking-tighter tabular-nums leading-none text-white">
+          100:00
+        </div>
+
+        <p id="lockInStatusMsg" class="text-xs font-bold tracking-widest uppercase text-[#6B7280] mt-4">
+          STAY FOCUSED · DO NOT LEAVE APP
+        </p>
+      </div>
+
+      <!-- 底部控制列：長按 2 秒才能解鎖退出 -->
+      <div id="lockInBottomBar" class="w-full max-w-xs flex flex-col items-center gap-3">
+        <button id="unlockHoldBtn" class="unlock-hold-btn w-full"
+          onpointerdown="startUnlockHold(event)"
+          onpointerup="cancelUnlockHold()"
+          onpointerleave="cancelUnlockHold()"
+          onpointercancel="cancelUnlockHold()">
+          <div id="unlockHoldFill" class="unlock-hold-fill"></div>
+          <span id="unlockHoldText" class="relative z-10">HOLD 2S TO UNLOCK / FINISH</span>
+        </button>
+        <span class="text-[10px] font-semibold text-[#6B7280] tracking-wider">Tap screen to wake brightness · Leaving logs a distraction</span>
+      </div>
+    </div>
     <!-- Toast -->
     <div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 rounded-full bg-[#111111] text-white text-xs font-semibold shadow-lg"></div>
 
@@ -859,7 +994,7 @@
 
     let activeRequests = 0;
     // 只針對「寫入型動作」進行離線佇列保護 (避免讀取動作重複排隊)
-    const WRITE_ACTIONS = ['apiRecordTime', 'apiRecordProgress', 'addCalendarEvent', 'addGoogleTask', 'toggleGoogleTask', 'saveTimetableData', 'saveSwapRecords', 'savePresetsData'];
+    const WRITE_ACTIONS = ['apiRecordTime', 'apiRecordProgress', 'addCalendarEvent', 'addGoogleTask', 'toggleGoogleTask', 'saveTimetableData', 'saveSwapRecords', 'savePresetsData', 'apiRecordDistraction'];
 
     function getOfflineQueue() {
       try { return JSON.parse(localStorage.getItem('romano_offline_queue') || '[]'); } catch(e) { return []; }
@@ -2091,6 +2226,238 @@ var cardPageState = { top: 0, mid: 0 };
       showToast(`Logging +${hours.toFixed(2)}h...`);
 
       recordStudyTimeSmart(subjToLog, hours, `+${hours.toFixed(2)}h`);
+    }
+    // =========================================================
+    // 👇 新增：LOCK-IN MODE (倒數 + 全螢幕 + 恆亮省電 + 切出抓包記錄) 👇
+    // =========================================================
+    var isLockInActive = false;
+    var lockInTargetMins = 100;
+    var lockInEndTimeMs = null;
+    var lockInStartTimeMs = null;
+    var lockInTimerInterval = null;
+    var lockInWakeLock = null;
+    var lockInDimTimeout = null;
+    var lockInDistractions = 0;
+    var lastDistractionTs = 0;
+    var unlockHoldTimer = null;
+    var unlockHoldStartMs = 0;
+    var unlockAnimFrame = null;
+
+    function setLockInMins(mins, btnEl) {
+      lockInTargetMins = mins;
+      document.getElementById('lockInTargetLabel').innerText = mins + ' min';
+      document.getElementById('customLockInMins').value = '';
+      document.querySelectorAll('#lockInPresetBtns button').forEach(b => b.classList.remove('b-tag-active'));
+      if (btnEl) btnEl.classList.add('b-tag-active');
+    }
+
+    function setCustomLockInMins(val) {
+      const m = parseInt(val, 10);
+      if (m && m > 0) {
+        lockInTargetMins = m;
+        document.getElementById('lockInTargetLabel').innerText = m + ' min';
+        document.querySelectorAll('#lockInPresetBtns button').forEach(b => b.classList.remove('b-tag-active'));
+      }
+    }
+
+    // 申請螢幕恆亮鎖 (Screen Wake Lock API)
+    async function requestScreenWakeLock() {
+      const badge = document.getElementById('lockInWakeBadge');
+      if ('wakeLock' in navigator) {
+        try {
+          lockInWakeLock = await navigator.wakeLock.request('screen');
+          if (badge) badge.innerText = 'WAKE LOCK · ECO';
+          lockInWakeLock.addEventListener('release', () => {
+            if (isLockInActive && document.visibilityState === 'visible') {
+              requestScreenWakeLock();
+            }
+          });
+        } catch (err) {
+          if (badge) badge.innerText = 'OLED ECO';
+        }
+      }
+    }
+
+    function releaseScreenWakeLock() {
+      if (lockInWakeLock) {
+        try { lockInWakeLock.release(); } catch(e) {}
+        lockInWakeLock = null;
+      }
+    }
+
+    // 10秒無觸控自動進入 OLED 低亮度省電模式
+    function wakeLockInScreen() {
+      if (!isLockInActive) return;
+      const overlay = document.getElementById('lockInOverlay');
+      overlay.classList.remove('oled-dimmed');
+      clearTimeout(lockInDimTimeout);
+      lockInDimTimeout = setTimeout(() => {
+        if (isLockInActive) overlay.classList.add('oled-dimmed');
+      }, 10000);
+    }
+
+    function startLockInSession() {
+      if (timerState !== 'IDLE') {
+        showToast('Please finish current stopwatch first');
+        return;
+      }
+      if (!lockInTargetMins || lockInTargetMins <= 0) {
+        showToast('Select valid countdown minutes');
+        return;
+      }
+
+      isLockInActive = true;
+      lockInDistractions = 0;
+      lockInStartTimeMs = Date.now();
+      lockInEndTimeMs = lockInStartTimeMs + lockInTargetMins * 60 * 1000;
+
+      document.body.classList.add('lock-in-active');
+      document.getElementById('lockInSubjBadge').innerText = currentSubject;
+      document.getElementById('lockInBustedBadge').innerText = '⚠️ 0';
+      document.getElementById('lockInStatusMsg').innerText = 'STAY FOCUSED · DO NOT LEAVE APP';
+      document.getElementById('lockInStatusMsg').style.color = '#6B7280';
+      document.getElementById('lockInBotEyes').setAttribute('fill', '#F4F4F6');
+
+      // 進入無邊框全螢幕
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+
+      requestScreenWakeLock();
+      wakeLockInScreen();
+      updateLockInCountdownDisplay();
+      lockInTimerInterval = setInterval(updateLockInCountdownDisplay, 500);
+    }
+
+    function updateLockInCountdownDisplay() {
+      if (!isLockInActive) return;
+      const now = Date.now();
+      const remainMs = Math.max(0, lockInEndTimeMs - now);
+      const totalSec = Math.ceil(remainMs / 1000);
+
+      const hrs = Math.floor(totalSec / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      const textEl = document.getElementById('lockInCountdownText');
+      if (hrs > 0) {
+        textEl.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      } else {
+        textEl.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+
+      // 每分鐘微幅像素位移 (OLED 防烙印保護)
+      if (secs === 0) {
+        const shiftX = (Math.random() - 0.5) * 8;
+        const shiftY = (Math.random() - 0.5) * 10;
+        document.getElementById('lockInClockWrap').style.transform = `translate(${shiftX.toFixed(1)}px, ${shiftY.toFixed(1)}px)`;
+      }
+
+      if (remainMs <= 0) {
+        completeLockInSession(true);
+      }
+    }
+
+    // 核心抓包引擎：只要切出畫面 / 回桌面 / 換 App 立即觸發並寫入 Google Sheet
+    function handleLockInVisibilityAndBlur() {
+      if (!isLockInActive) return;
+      const now = Date.now();
+      // 防彈跳：2 秒內同一次切換只計 1 次
+      if (now - lastDistractionTs < 2000) return;
+      lastDistractionTs = now;
+
+      lockInDistractions++;
+      if (navigator.vibrate) navigator.vibrate([120, 60, 150]);
+
+      document.getElementById('lockInBustedBadge').innerText = `⚠️ ${lockInDistractions}`;
+      const msgEl = document.getElementById('lockInStatusMsg');
+      msgEl.innerText = `BUSTED! LEFT APP (${lockInDistractions}x LOGGED TO SHEET)`;
+      msgEl.style.color = '#EA4335';
+      document.getElementById('lockInBotEyes').setAttribute('fill', '#EA4335');
+
+      const overlay = document.getElementById('lockInOverlay');
+      overlay.classList.remove('busted-alert');
+      void overlay.offsetWidth;
+      overlay.classList.add('busted-alert');
+
+      // 立即把分心抓包紀錄送到 Google Sheet 新欄位
+      callBackend('apiRecordDistraction', {
+        subject: currentSubject,
+        count: 1,
+        totalSessionDistractions: lockInDistractions,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && isLockInActive) {
+        handleLockInVisibilityAndBlur();
+      } else if (!document.hidden && isLockInActive) {
+        requestScreenWakeLock();
+        wakeLockInScreen();
+      }
+    });
+
+    // 長按 2 秒解鎖機制
+    function startUnlockHold(e) {
+      if (!isLockInActive) return;
+      e.stopPropagation();
+      wakeLockInScreen();
+      unlockHoldStartMs = Date.now();
+      const fillEl = document.getElementById('unlockHoldFill');
+      const textEl = document.getElementById('unlockHoldText');
+
+      function step() {
+        const elapsed = Date.now() - unlockHoldStartMs;
+        const pct = Math.min(100, (elapsed / 1800) * 100);
+        fillEl.style.width = pct + '%';
+        textEl.innerText = `HOLDING... ${Math.ceil((1800 - elapsed) / 1000)}S`;
+
+        if (pct >= 100) {
+          cancelUnlockHold();
+          completeLockInSession(false);
+        } else {
+          unlockAnimFrame = requestAnimationFrame(step);
+        }
+      }
+      unlockAnimFrame = requestAnimationFrame(step);
+    }
+
+    function cancelUnlockHold() {
+      if (unlockAnimFrame) cancelAnimationFrame(unlockAnimFrame);
+      unlockAnimFrame = null;
+      const fillEl = document.getElementById('unlockHoldFill');
+      const textEl = document.getElementById('unlockHoldText');
+      if (fillEl) fillEl.style.width = '0%';
+      if (textEl) textEl.innerText = 'HOLD 2S TO UNLOCK / FINISH';
+    }
+
+    function completeLockInSession(isFullTimeCompleted) {
+      clearInterval(lockInTimerInterval);
+      clearTimeout(lockInDimTimeout);
+      isLockInActive = false;
+
+      const elapsedMs = Date.now() - lockInStartTimeMs;
+      const elapsedMins = Math.round(elapsedMs / 60000);
+      const elapsedHours = elapsedMs / (1000 * 60 * 60);
+
+      document.body.classList.remove('lock-in-active');
+      releaseScreenWakeLock();
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+
+      if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+
+      if (isFullTimeCompleted) {
+        recordStudyTimeSmart(currentSubject, lockInTargetMins / 60, `Lock-In +${lockInTargetMins}m`);
+      } else if (elapsedMins >= 1) {
+        if (confirm(`Lock-In ended early.\nLog actual time studied (+${elapsedMins} mins / ${elapsedHours.toFixed(2)}h) to ${currentSubject}?`)) {
+          recordStudyTimeSmart(currentSubject, elapsedHours, `Lock-In +${elapsedMins}m`);
+        }
+      } else {
+        showToast('Lock-In exited (< 1 min)');
+      }
     }
 
     function resetTimerUI() {
